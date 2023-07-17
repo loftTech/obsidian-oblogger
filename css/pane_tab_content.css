@@ -54,16 +54,6 @@
     margin-top: 6px;
 }
 
-.oblogger-content .empty-rx-message {
-    align-content: center;
-    align-items: center;
-    color: var(--text-muted);
-    display: flex;
-    font-size: 9pt;
-    justify-content: center;
-    margin: 6px 0;
-}
-
 .oblogger-content .rx-separator { margin: -9px auto 5px; }
 
 .oblogger-content .otc-separator { margin: -4px auto 3px; }
