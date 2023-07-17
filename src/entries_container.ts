@@ -63,7 +63,7 @@ export class EntriesContainer extends ViewContainer {
         return (e: MouseEvent) => {
             const menu = new Menu();
             menu.addItem(item => {
-                item.setTitle("change entry tag");
+                item.setTitle("Change entry tag");
                 item.setIcon("replace");
                 item.onClick(() => {
                     const modal = new NewTagModal(this.app, (result: string) => {
