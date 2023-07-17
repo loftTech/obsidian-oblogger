@@ -46,17 +46,6 @@
     width: 65px;
 }
 
-.oblogger-content .separator-border-line-left,
-.oblogger-content .separator-border-line-right {
-    border-top: 1px solid var(--interactive-accent);
-    background: none;
-    margin-top: 7px;
-    opacity: 0.6;
-    width: 45px;
-
-    display: none;
-}
-
 .oblogger-content .separator-container.body {
     margin-bottom: -4px;
     margin-top: 6px;

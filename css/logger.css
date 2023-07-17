@@ -189,6 +189,7 @@
     width: 50%;
 }
 
+
 .logger .date-section,
 .logger .time-section {
     align-items: center;
@@ -349,9 +350,6 @@
     transition: 0.6s;
     width: 65px;
 }
-
-.logger .separator-border-line-left,
-.logger .separator-border-line-right { display: none; }
 
 .logger .separator-container.metadata {
     margin-bottom: -4px;
