@@ -47,8 +47,6 @@ oblogger is a plugin for Obsidian which focuses on two primary core features:
 
 ## faq
 
-- what was that error notice that popped up on first load about FileExplorer?
-    - that's connected to how we're showing all the options in the context menus on files. sorry for the distraction :(
 - why can't I rename files from the side panel?
   - because it's hard :(. if you figure out how to link into the FileExplorer core plugin in a clean way, please let us know!
 - why can't I log to the root vault folder?
