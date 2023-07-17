@@ -13,21 +13,17 @@
     scroll-padding-block: var(--size-4-2);
 }
 
-.oblogger-content .hidden {
-    display:none;
-}
+.oblogger-content .hidden { display:none; }
 
 .oblogger-content .rx-groups,
-.oblogger-content .otc-groups {
-    margin-right: 19px;
-}
+.oblogger-content .otc-groups { margin-right: 19px; }
 
 .oblogger-content .separator-container {
     align-items: center;
     display: flex;
     height: 15px;
-    width: fit-content;
     margin: 0 auto -2px;
+    width: fit-content;
 }
 
 .oblogger-content .separator {
@@ -52,12 +48,12 @@
 }
 
 .oblogger-content .empty-rx-message {
-    display: flex;
-    align-items: center;
     align-content: center;
-    justify-content: center;
+    align-items: center;
     color: var(--text-muted);
+    display: flex;
     font-size: 9pt;
+    justify-content: center;
     margin: 6px 0;
 }
 
@@ -78,8 +74,8 @@
 .oblogger-content .title-container.collapsed { margin-bottom: 8px; }
 
 .oblogger-content .svg-holder {
-    width: 16px;
     margin: auto 0;
+    width: 16px;
 }
 
 .oblogger-content .title {
@@ -92,8 +88,8 @@
     display: inline-block;
     font-size: smaller;
     font-weight: 600;
-    overflow-wrap: anywhere;
     overflow: hidden;
+    overflow-wrap: anywhere;
     text-overflow: ellipsis;
     white-space: var(--nav-item-white-space);
 }
@@ -131,21 +127,21 @@
 .oblogger-content .family-title-text {
     align-items: center;
     display: inline-block;
-    overflow-wrap: anywhere;
     overflow: hidden;
+    overflow-wrap: anywhere;
     text-overflow: ellipsis;
     white-space: var(--nav-item-white-space);
 }
 
 .oblogger-content .family-content {
     border-left: var(--nav-indentation-guide-width) solid var(--nav-indentation-guide-color);
-    margin: 0 0 0 13px;
+    margin-left: 13px;
     padding-left: 5px;
 }
 
-.oblogger-content .status-icon.visible { opacity: 1; }
-
 .oblogger-content .status-icon { opacity: 0; }
+
+.oblogger-content .status-icon.visible { opacity: 1; }
 
 .oblogger-content .status-container.visible,
 .oblogger-content .status-container {
@@ -158,20 +154,9 @@
     width: 10px;
 }
 
-.oblogger-content .family-content .child-item  .status-container {
+.oblogger-content .family-content .status-container {
     padding: 0;
     width: 7px;
-}
-
-.oblogger-content .child-item-icon {
-    pointer-events: none;
-    padding: 0 var(--size-2-3) 0 0;
-}
-
-.oblogger-content .child-item.active {
-    background-color: var(--nav-item-background-hover);
-    color: var(--nav-item-color-hover);
-    font-weight: var(--nav-item-weight-hover);
 }
 
 .oblogger-content .child-item {
@@ -180,6 +165,17 @@
     margin-left: -3px;
     margin-top: 2px;
     padding: 3px 0;
+}
+
+.oblogger-content .child-item.active {
+    background-color: var(--nav-item-background-hover);
+    color: var(--nav-item-color-hover);
+    font-weight: var(--nav-item-weight-hover);
+}
+
+.oblogger-content .child-item-icon {
+    padding: 0 var(--size-2-3) 0 0;
+    pointer-events: none;
 }
 
 .oblogger-content .child-item-content {
@@ -230,7 +226,7 @@
 
 .greeter-title-default-avatar {
     align-items: center;
-    background-color: hsla(240, 15%, 17%, 0.6);
+    background-color: hsla(240deg 15% 17%/60%);
     border-radius: 50%;
     color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/90%);
     display: flex;
@@ -295,7 +291,7 @@
     cursor: default;
     font-size: var(--vault-name-font-size);
     font-weight: var(--vault-name-font-weight);
-    margin: 0 0 3px;
+    margin-bottom: 3px;
 }
 
 .greeter-clock {
@@ -401,6 +397,18 @@
    ==========================================================================
 */
 
+.oblogger-content .separator:active,
+.oblogger-content .title-tag.wiggle:active {
+    animation: wiggle 0.2s;
+}
+
+/* noinspection Stylelint */
+.oblogger-content .title-tag:hover,
+.oblogger-content .title-tag:hover .svg-icon {
+    opacity: 1;
+    transition: 0.2s;
+}
+
 .oblogger-content .separator-container:hover .separator {
     align-items: center;
     background-color: var(--interactive-accent);
@@ -414,17 +422,6 @@
     opacity: 1;
     transition: 0.2s;
     width: 85px;
-}
-
-.oblogger-content .separator:active,
-.oblogger-content .title-tag.wiggle:active {
-    animation: wiggle 0.2s;
-}
-
-.oblogger-content .title-tag:hover,
-.oblogger-content .title-tag:hover .svg-icon {
-    opacity: 1;
-    transition: 0.2s;
 }
 
 .oblogger-content .title:hover { color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/100%); }
