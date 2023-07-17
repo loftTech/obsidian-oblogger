@@ -1,7 +1,7 @@
 {
 	"id": "oblogger",
 	"name": "oblogger",
-	"version": "0.7.2",
+	"version": "0.7.3",
 	"minAppVersion": "0.15.0",
 	"description": "tagger explorer and frontmatter logger plugin for obsidian",
 	"author": "loftTech <lofttechinc@gmail.com>",
