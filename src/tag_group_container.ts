@@ -92,11 +92,9 @@ export class TagGroupContainer extends ViewContainer {
                 }
                 const tags = getAllTags(cache)
                     ?.map(tag => tag.replace("#", ""))
-                    ?.unique();
+                    ?.unique()
+                    ?.filter((tag: string) => tag.startsWith(this.groupName));
                 if (!tags) {
-                    return null;
-                }
-                if (!tags?.some((tag: string) => tag.startsWith(this.groupName))) {
                     return null;
                 }
                 return { file, tags };
