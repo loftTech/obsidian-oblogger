@@ -202,7 +202,6 @@ export class ObloggerView extends ItemView {
         this.registerInterval(window.setInterval(() => {
             const fileExplorerLeaf = this.app.workspace.getLeavesOfType("file-explorer")[0] as FileExplorerLeaf;
             if (!fileExplorerLeaf) {
-                new Notice("Need the FileExplorer core plugin for some Oblogger functionality.");
                 return;
             }
             const fileExplorer = fileExplorerLeaf.view as FileExplorerView;
