@@ -25,9 +25,7 @@
    ==========================================================================
 */
 
-.logger .hidden {
-    display: none;
-}
+.logger .hidden { display: none; }
 
 .logger .modal-close-button { display: none; }
 
@@ -138,8 +136,8 @@
 .logger .new-field-input:focus { box-shadow: 0 0 0 2px hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 50%); }
 
 .logger .datetime-section {
-    border-radius: var(--input-radius);
     border: 1px solid var(--modal-border-color);
+    border-radius: var(--input-radius);
     color: var(--nav-item-color);
     display: flex;
     height: 32px;
@@ -357,8 +355,8 @@
 }
 
 .logger .separator-container.body {
-    margin-top: 6px;
     margin-bottom: -4px;
+    margin-top: 6px;
 }
 
 /* ==========================================================================
