@@ -4,7 +4,6 @@ import { ObloggerSettings, DEFAULT_SETTINGS } from "./settings";
 import { LoggerModal } from "./logger_modal";
 
 import "../css/logger.css";
-import "../css/pop_up.css";
 import "../css/pane_tab_header.css";
 import "../css/pane_tab_content.css";
 
