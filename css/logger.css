@@ -1,0 +1,518 @@
+.theme-dark {
+    --accent-color: hsl(var(--accent-h) var(--accent-s) var(--accent-l));
+    --color-dull: hsla(240deg 19% 19%/50%);
+    --color-dullish: hsla(240deg 15% 35%/50%);
+    --color-highlight: hsla(0deg 0% 40% /50%);
+    --color-text-highlight: hsla(0deg 10% 100% /100%);
+    --color-active: hsla(0deg 0% 10% /60%);
+    --color-text-active: hsla(0deg 10% 100% /50%);
+}
+
+.theme-light {
+    --accent-color: hsl(var(--accent-h) var(--accent-s) var(--accent-l));
+    --accent-color-dull: hsl(var(--accent-h) 50% var(--accent-l));
+    --color-text: hsla(0deg 0% 0% /60%);
+    --color-dull: hsla(0deg 0% 90% /50%);
+    --color-dullish: hsla(0deg 0% 30% /40%);
+    --color-highlight: hsla(0deg 40% 99% /50%);
+    --color-text-highlight: hsla(0deg 40% 0% /50%);
+    --color-active: hsla(0deg 0% 60% /50%);
+    --color-text-active: hsla(0deg 0% 100% /50%);
+}
+
+/* ==========================================================================
+   LOGGER
+   ==========================================================================
+*/
+
+.logger .hidden {
+    display: none;
+}
+
+.logger .modal-close-button { display: none; }
+
+.logger .modal {
+    background: var(--accent-color);
+    border: none;
+    border-radius: 13px;
+    min-width: 324px;
+    padding: 0;
+    width: 324px;
+}
+
+.logger .accent-content {
+    border-radius: 6px 6px 0 0;
+    margin: 0 auto;
+    max-height: 500px;
+    overflow: auto;
+    width: calc(100% - 10px);
+}
+
+.logger .accent-div {
+    background: var(--color-dull);
+    border-radius: inherit;
+    display: flex;
+    flex-direction: column;
+    max-height: inherit;
+    max-width: inherit;
+    min-height: inherit;
+    overflow: auto;
+    position: inherit;
+    width: inherit;
+}
+
+.logger .title-bar {
+    color: var(--color-text);
+    display: flex;
+    height: 35px;
+    padding: 0 18px;
+}
+
+.logger .title-bar-label {
+    display: flex;
+    height: inherit;
+    width: 95%;
+}
+
+.logger .title-bar-label-text::before {
+    content: "save to: ";
+    padding-right: 5px;
+}
+
+.logger .title-bar-icon {
+    align-items: center;
+    display: flex;
+    height: inherit;
+    margin: 1px 8px 0 0;
+}
+
+.logger .title-bar-label-text {
+    align-items: center;
+    display: flex;
+    height: inherit;
+    margin: 0 2px 0 0;
+}
+
+.logger .logger-close-button {
+    align-items: center;
+    display: flex;
+    height: 22px;
+    justify-content: flex-end;
+    margin: auto 0 auto 4px;
+    padding-top: 1px;
+    width: 5%;
+}
+
+.logger .content-section {
+    background: var(--modal-background);
+    padding: 10px 14px 8px;
+}
+
+.logger .new-field-icons {
+    color: var(--modal-border);
+    display: flex;
+    position: absolute;
+    right: 6px;
+    top: 6px;
+}
+
+.logger .trash-icon,
+.logger .add-icon { margin: 0 2px 0 5px; }
+
+.logger .new-field-input-container,
+.logger .field-div {
+    align-items: center;
+    border: 1px solid var(--modal-border-color);
+    border-radius: var(--input-radius);
+    color: var(--nav-item-color);
+    display: flex;
+    width: 100%;
+}
+
+.logger .content-section .field-div {
+    margin-top: 10px;
+    position: relative;
+}
+
+.logger .new-field-input:active,
+.logger .new-field-input:focus { box-shadow: 0 0 0 2px hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 50%); }
+
+.logger .datetime-section {
+    border-radius: var(--input-radius);
+    border: 1px solid var(--modal-border-color);
+    color: var(--nav-item-color);
+    display: flex;
+    height: 32px;
+    margin-top: 10px;
+}
+
+.logger input[type='text'] {
+    background: none;
+    border: none;
+    color: var(--nav-item-color);
+    width: 100%;
+}
+
+.logger .content-div textarea {
+    background: none;
+    border: 1px solid var(--modal-border-color);
+    border-radius: var(--input-radius);
+    color: var(--nav-item-color);
+    height: 100px;
+    margin-top: 10px;
+    max-height: 400px;
+    max-width: 100%;
+    min-height: 100px;
+    min-width: 100%;
+    width: 100%;
+}
+
+.logger .datetime-section input[type="text"] {
+    background: none;
+    border: none;
+    color: var(--nav-item-color);
+    outline: none;
+    padding: 0;
+    width: 58%;
+}
+
+.logger .date-section {
+    border-right: 1px solid var(--modal-border-color);
+    height: 100%;
+    width: 50%;
+}
+
+.logger .time-section {
+    display: flex;
+    height: 100%;
+    justify-content: flex-end;
+    width: 50%;
+}
+
+.logger .date-section,
+.logger .time-section {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    font-family: monospace;
+    justify-content: center;
+}
+
+.logger .time-section input[type="text"] { width: 80px; }
+
+.logger .date-section input[type="text"] { width: 95px; }
+
+.logger .date-section input[type="text"]:active,
+.logger .time-section input[type="text"]:active,
+.logger .date-section input[type="text"]:focus,
+.logger .time-section input[type="text"]:focus { box-shadow: none; }
+
+.logger textarea::placeholder,
+.logger input[type='text']::placeholder { color: var(--modal-border-color); }
+
+.logger .submit-bar {
+    background-color: var(--modal-background);
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-top: 1px solid var(--modal-border-color);
+    bottom: 0;
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 auto 5px;
+    padding: 14px;
+    position: sticky;
+    width: calc(100% - 10px);
+}
+
+.logger .location-container {
+    align-items: center;
+    display: flex;
+}
+
+.logger .location-icon {
+    align-items: center;
+    border-radius: var(--input-radius);
+    display: flex;
+    height: 28px;
+    justify-content: center;
+    width: 30px;
+}
+
+.logger .log-choice-container {
+    align-items: center;
+    background-color: var(--accent-color);
+    border-radius: var(--input-radius);
+    box-shadow: var(--input-shadow);
+    color: var(--color-text);
+    display: flex;
+    font-family: inherit;
+    font-size: var(--font-ui-small);
+    height: 30px;
+    outline: none;
+    width: max-content;
+}
+
+.logger .log-choice {
+    align-items: center;
+    background-color: var(--color-dull);
+    border-bottom-left-radius: var(--input-radius);
+    border-top-left-radius: var(--input-radius);
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    padding: 10px 13px;
+    width: 100%;
+}
+
+.logger .disabled {
+    align-items: center;
+    background-color: var(--modal-border-color);
+    border-radius: var(--input-radius);
+    box-shadow: var(--input-shadow);
+    color: var(--color-text);
+    display: flex;
+    font-family: inherit;
+    font-size: var(--font-ui-small);
+    height: 30px;
+    outline: none;
+    width: max-content;
+
+}
+
+.log-chooser {
+    align-items: center;
+    background-color: var(--color-dull);
+    border-bottom-right-radius: var(--input-radius);
+    border-left: 1px solid var(--color-dullish);
+    border-top-right-radius: var(--input-radius);
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    padding-right: 0.5px;
+    width: 30px !important;
+}
+
+.log-drop-down {
+    background-color: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border-hover);
+    border-radius: var(--radius-m);
+    bottom: 46px;
+    font-size: var(--font-ui-small);
+    justify-content: center;
+    position: absolute;
+    right: 14px;
+    z-index: 0;
+}
+
+.log-drop-container {
+    align-items: center;
+    border-radius: var(--radius-s);
+    cursor: var(--cursor);
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    padding: 6px 12px 6px 5px;
+    white-space: pre-wrap;
+}
+
+.log-drop-down-choices { padding: 5px; }
+
+.log-drop-down.hidden { display: none; }
+
+.log-drop-icon {
+    align-items: center;
+    display: flex;
+    justify-content: flex-start;
+    width: 21px;
+}
+
+.logger .separator-container {
+    align-items: center;
+    display: flex;
+    height: 15px;
+    margin: 0 auto -2px;
+    width: fit-content;
+}
+
+.logger .separator {
+    align-items: center;
+    background-color: var(--interactive-accent);
+    border-radius: 10px;
+    color: var(--interactive-accent);
+    display: flex;
+    font-size: 0;
+    height: 3px;
+    justify-content: center;
+    margin: 0 10px;
+    opacity: 0.6;
+    padding: 1px 5px;
+    transition: 0.6s;
+    width: 65px;
+}
+
+.logger .separator-border-line-left,
+.logger .separator-border-line-right { display: none; }
+
+.logger .separator-container.metadata {
+    margin-bottom: -4px;
+    margin-top: -4px;
+}
+
+.logger .separator-container.body {
+    margin-top: 6px;
+    margin-bottom: -4px;
+}
+
+/* ==========================================================================
+   SVG
+   ==========================================================================
+*/
+
+.logger .field-div svg.svg-icon {
+    color: var(--modal-background);
+    fill: var(--interactive-accent);
+    opacity: 0.6;
+    transition: 0.2s;
+}
+
+.logger .trash-icon svg.svg-icon { fill: var(--color-red); }
+
+.logger .warning-icon svg.svg-icon { fill: var(--color-yellow); }
+
+.logger .log-chooser .svg { width: 24px !important; }
+
+.logger .log-chooser svg.svg-icon { width: inherit; }
+
+.logger .log-drop-icon svg {
+    color: var(--accent-color);
+    height: 15px;
+    width: 15px;
+}
+
+/* ==========================================================================
+   HOVER AND ACTIVE
+   ==========================================================================
+*/
+
+.logger .logger-close-button:hover svg.svg-icon { color: var(--color-red); }
+
+.logger .title-bar-label:hover .title-bar-label-text { color: var(--color-text-highlight); }
+
+.logger .log-choice:active {
+    background-color: var(--color-active);
+    color: var(--color-text-active);
+}
+
+.logger .log-choice:hover {
+    background-color: var(--color-highlight);
+    color: var(--color-text-highlight);
+    transition: 0.2s;
+}
+
+.logger .warning-icon:active,
+.logger .separator:active,
+.logger .disabled .log-choice:active { animation: wiggle 0.2s; }
+
+.logger .separator-container:hover .separator {
+    align-items: center;
+    background-color: var(--interactive-accent);
+    border-radius: 8px;
+    color: var(--background-secondary);
+    display: flex;
+    font-size: 8px;
+    font-weight: 700;
+    height: inherit;
+    justify-content: center;
+    opacity: 1;
+    transition: 0.2s;
+    width: 85px;
+}
+
+.logger .add-icon:hover svg.svg-icon,
+.logger .warning-icon:hover svg.svg-icon,
+.logger .trash-icon:hover svg.svg-icon {
+    opacity: 1;
+    transition: 0.2s;
+}
+
+.logger .trash-icon:hover svg.svg-icon {
+    opacity: 1;
+    transition: 0.2s;
+}
+
+.logger .disabled .log-choice:hover  {
+    background-color: var(--color-dull);
+    color: var(--color-text);
+    cursor: not-allowed;
+}
+
+.logger .log-chooser:hover {
+    background-color: var(--color-highlight);
+    color: var(--color-text-highlight);
+    transition: 0.2s;
+}
+
+.logger .log-chooser:active {
+    background-color: var(--color-active);
+    color: var(--color-text-active);
+}
+
+.logger .log-drop-container:hover { background-color: var(--nav-item-background-hover); }
+
+/* ==========================================================================
+   MOBILE
+   ==========================================================================
+*/
+
+.is-phone .logger .modal {
+    border: none;
+    border-radius: var(--radius-m) var(--radius-m) var(--radius-m) var(--radius-m);
+    height: fit-content;
+    margin-top: var(--modal-top);
+    max-height: 400px;
+    padding: 0 var(--safe-area-inset-right) 0 var(--safe-area-inset-left);
+    position: sticky;
+    width: 80%;
+
+    --modal-top: -70vw;
+    --modal-bottom: var(--safe-area-inset-bottom);
+}
+
+.is-phone .logger .modal .modal-title { display: none; }
+
+.is-phone .logger .modal-content { padding: 0; }
+
+.is-phone .logger .datetime-section .field-div { margin: 6px 0; }
+
+/* ==========================================================================
+   MISC
+   ==========================================================================
+*/
+
+body:not(.native-scrollbars) .logger ::-webkit-scrollbar {
+    background-color: var(--modal-background) !important;
+    border-radius: 0 6px 0 0;
+    width: 10px;
+}
+
+/* tweak for minimal theme styled scrollbars setting */
+body:not(.hider-scrollbars).styled-scrollbars .logger ::-webkit-scrollbar {
+    background-color: var(--modal-background) !important;
+    border-radius: 0 6px 0 0;
+}
+
+body:not(.native-scrollbars) .logger ::-webkit-scrollbar-thumb { -webkit-border-radius: 12px; }
+
+@keyframes wiggle {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-2px, 0) rotate(1deg); }
+    30% { transform: translate(2px, 1px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-2px, 1px) rotate(0deg); }
+    70% { transform: translate(2px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+}

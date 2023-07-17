@@ -1,0 +1,34 @@
+
+/* ==========================================================================
+   PANE-TAB HEADER
+   ==========================================================================
+*/
+
+.oblogger-pill-menu-icon {
+    height: var(--icon-size);
+    width: var(--icon-size);
+
+}
+
+.oblogger-header {
+    padding: var(--size-4-2);
+}
+
+.button-bar-button {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    color: var(--icon-color) !important;
+    height: auto;
+    opacity: var(--icon-opacity) !important;
+    padding: var(--size-2-2) var(--size-2-3);
+}
+
+/* ==========================================================================
+   PANE-TAB HEADER
+   ==========================================================================
+*/
+
+.button-bar-button:hover {
+    background-color: var(--nav-item-background-hover) !important;
+    color: var(--nav-item-color-hover) !important;
+}

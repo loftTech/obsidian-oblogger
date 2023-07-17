@@ -1,0 +1,40 @@
+{
+    "name": "obsidian-oblogger",
+    "version": "0.6.0",
+    "description": "",
+    "type": "module",
+    "main": "main.js",
+    "scripts": {
+        "dev": "npx rollup --config rollup-debug.config.js -w",
+        "build": "npx rollup --config rollup.config.js --environment BUILD:production",
+        "version": "node scripts/version-bump.mjs && git add manifest.json versions.json"
+    },
+    "keywords": [
+        "obsidian",
+        "oblogger"
+    ],
+    "author": "loftTech",
+    "license": "MIT",
+    "devDependencies": {
+        "@rollup/plugin-terser": "^0.4.3",
+        "@types/node": "^18.14.2",
+        "@typescript-eslint/eslint-plugin": "^5.57.0",
+        "@typescript-eslint/parser": "^5.57.0",
+        "builtin-modules": "^3.3.0",
+        "esbuild": "^0.17.15",
+        "eslint": "^8.37.0",
+        "obsidian": "^1.1.1",
+        "prettier": "^2.8.7",
+        "process": "^0.11.10",
+        "rollup": "^3.20.2",
+        "rollup-plugin-copy-watch": "^0.0.1",
+        "rollup-plugin-scss": "^3.0.0",
+        "rollup-plugin-typescript2": "^0.34.1",
+        "sass": "^1.63.6",
+        "stylelint": "^15.4.0",
+        "stylelint-config-standard": "^32.0.0",
+        "terser": "^5.17.6",
+        "tslib": "^2.5.0",
+        "typescript": "^5.0.3"
+    }
+}

@@ -1,0 +1,27 @@
+# vscode
+.vscode 
+
+*.swp
+
+# Intellij
+*.iml
+.idea
+
+# npm
+node_modules
+
+# Exclude sourcemaps
+*.map
+
+build/
+
+yarn.lock
+
+# obsidian
+test-vault/.obsidian/workspace*
+test-vault/.obsidian/plugins/oblogger/*.json
+test-vault/.obsidian/plugins/oblogger/*.js
+test-vault/.obsidian/plugins/oblogger/*.css
+
+# Exclude macOS Finder (System Explorer) View States
+.DS_Store
