@@ -126,14 +126,19 @@ const DEFAULT_ARCHIVE_ICON = "folder-archive";
 
 export const FILE_EXTENSION_TYPES = new Map([
     ["bmp", { type: FileType.image, icon: DEFAULT_IMAGE_ICON }],
-    ["png", { type: FileType.image, icon: DEFAULT_IMAGE_ICON }],
-    ["jpg", { type: FileType.image, icon: DEFAULT_IMAGE_ICON }],
+    ["gif", { type: FileType.image, icon: DEFAULT_IMAGE_ICON }],
+    ["heic", { type: FileType.image, icon: DEFAULT_IMAGE_ICON }],
     ["jpeg", { type: FileType.image, icon: DEFAULT_IMAGE_ICON }],
     ["gif", { type: FileType.image, icon: DEFAULT_IMAGE_ICON }],
     ["svg", { type: FileType.image, icon: DEFAULT_IMAGE_ICON }],
+    ["tiff", { type: FileType.image, icon: DEFAULT_IMAGE_ICON }],
     ["webp", { type: FileType.image, icon: DEFAULT_IMAGE_ICON }],
 
+    ["obj", { type: FileType.image, icon: DEFAULT_NATIVE_IMAGE_ICON }],
+    ["procreate", { type: FileType.image, icon: DEFAULT_NATIVE_IMAGE_ICON }],
     ["psd", { type: FileType.image, icon: DEFAULT_NATIVE_IMAGE_ICON }],
+    ["usdz", { type: FileType.image, icon: DEFAULT_NATIVE_IMAGE_ICON }],
+    ["xcf", { type: FileType.image, icon: DEFAULT_NATIVE_IMAGE_ICON }],
 
     ["mp3", { type: FileType.audio, icon: DEFAULT_AUDIO_ICON }],
     ["wav", { type: FileType.audio, icon: DEFAULT_AUDIO_ICON }],
@@ -144,10 +149,8 @@ export const FILE_EXTENSION_TYPES = new Map([
     ["oga", { type: FileType.audio, icon: DEFAULT_AUDIO_ICON }],
     ["opus", { type: FileType.audio, icon: DEFAULT_AUDIO_ICON }],
 
-    ["mp4", { type: FileType.video, icon: DEFAULT_VIDEO_ICON }],
-    ["webm", { type: FileType.video, icon: DEFAULT_VIDEO_ICON }],
-    ["ogv", { type: FileType.video, icon: DEFAULT_VIDEO_ICON }],
-    ["mov", { type: FileType.video, icon: DEFAULT_VIDEO_ICON }],
+    ["avi", { type: FileType.video, icon: DEFAULT_VIDEO_ICON }],
+    ["hevc", { type: FileType.video, icon: DEFAULT_VIDEO_ICON }],
     ["mkv", { type: FileType.video, icon: DEFAULT_VIDEO_ICON }],
     ["avi", { type: FileType.video, icon: DEFAULT_VIDEO_ICON }],
     ["mpg", { type: FileType.video, icon: DEFAULT_VIDEO_ICON }],
