@@ -8,7 +8,8 @@ import {
     moment,
     FrontMatterCache,
     TextAreaComponent,
-    setIcon
+    setIcon,
+    TAbstractFile
 } from "obsidian";
 import { ObloggerSettings, PostLogAction } from "./settings";
 import { StringPopoverSuggest } from "./string_popover_suggest";
@@ -58,40 +59,37 @@ export class LoggerModal extends Modal {
 
     private gatherLogMap(): Map<string, TFile[]> {
         const logMap: Map<string, TFile[]> = new Map<string, TFile[]>();
-        (this.app.vault.getAbstractFileByPath(this.settings.loggingPath) as TFolder)
-            ?.children
-            .forEach(
-                (f) => {
-                    const maybeFolder = f as TFolder;
-                    if (maybeFolder.children) {
-                        const logType = maybeFolder.name;
-                        maybeFolder
+        const maybeLoggingFolder = this.app.vault.getAbstractFileByPath(this.settings.loggingPath);
+        if (maybeLoggingFolder instanceof TFolder) {
+            maybeLoggingFolder
+                .children
+                .forEach((fOuter: TAbstractFile): void => {
+                    if (fOuter instanceof TFolder && fOuter.children) {
+                        fOuter
                             .children
-                            .forEach((maybeSubFile) => {
-                                const subFile = maybeSubFile as TFile;
-                                if (!subFile) {
-                                    return;
+                            .forEach((fInner: TAbstractFile): void => {
+                                if (fInner instanceof TFile) {
+                                    logMap.set(
+                                        fOuter.name,
+                                        (logMap.get(fOuter.name) ?? [])
+                                            .concat([fInner]));
                                 }
-                                logMap.set(
-                                    logType,
-                                    (logMap.get(logType) ?? [])
-                                        .concat([subFile]));
                             });
                         return;
                     }
 
-                    const maybeFile = f as TFile;
-                    if (maybeFile) {
+                    if (fOuter instanceof TFile) {
                         logMap.set(
                             "",
                             (logMap.get("") ?? [])
-                                .concat([maybeFile])
+                                .concat([fOuter])
                         )
                         return;
                     }
 
-                    console.error(`Unknown file type found in ${f}`);
+                    console.error(`Unknown file type found in ${fOuter}`);
                 });
+        }
         return logMap;
     }
 

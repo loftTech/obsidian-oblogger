@@ -101,14 +101,9 @@ export default class Oblogger extends Plugin {
 
         await this.loadSettings();
 
-        this.registerInterval(window.setTimeout(() => {
+        this.app.workspace.onLayoutReady(() => {
             this.activateSidePane();
-        }, 100));
-    }
-
-    onunload() {
-        console.debug("oblogger unloading");
-        this.app.workspace.detachLeavesOfType(VIEW_TYPE_OBLOGGER);
+        });
     }
 
     async activateSidePane() {

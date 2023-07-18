@@ -6,8 +6,7 @@ import {
     moment,
     Menu,
     View,
-    Notice,
-    FileSystemAdapter
+    Notice
 } from "obsidian";
 import { ObloggerSettings, RxGroupType } from "./settings";
 import { TagGroupContainer } from "./tag_group_container";
@@ -200,14 +199,13 @@ export class ObloggerView extends ItemView {
         }
 
         this.registerInterval(window.setInterval(() => {
-            const fileExplorerLeaf = this.app.workspace.getLeavesOfType("file-explorer")[0] as FileExplorerLeaf;
-            if (!fileExplorerLeaf) {
-                return;
+            const fileExplorerLeaf = this.app.workspace.getLeavesOfType("file-explorer")[0];
+            if (fileExplorerLeaf instanceof FileExplorerLeaf) {
+                const fileExplorer = fileExplorerLeaf.view as FileExplorerView;
+                this.openFileContextMenu = fileExplorer.openFileContextMenu;
+                this.setFocusedItem = fileExplorer.setFocusedItem;
+                this.afterCreate = fileExplorer.afterCreate;
             }
-            const fileExplorer = fileExplorerLeaf.view as FileExplorerView;
-            this.openFileContextMenu = fileExplorer.openFileContextMenu;
-            this.setFocusedItem = fileExplorer.setFocusedItem;
-            this.afterCreate = fileExplorer.afterCreate;
         }, 0))
     }
 
@@ -249,7 +247,9 @@ export class ObloggerView extends ItemView {
         const collapsedFolders = this.settings.tagGroups.find(
             settingsGroup => settingsGroup.tag === group.groupName
         )?.collapsedFolders ?? [];
-        (group as TagGroupContainer).render(collapsedFolders, excludedFolders);
+        if (group instanceof TagGroupContainer) {
+            group.render(collapsedFolders, excludedFolders);
+        }
     }
 
     private renderRxGroup(groupName: string, excludedFolders: string[]) {
@@ -285,7 +285,6 @@ export class ObloggerView extends ItemView {
     private async renderNow() {
         this.files = new WeakMap();
         this.fileItems = {};
-        console.debug("Rendering...");
 
         await this.renderAvatar();
 
@@ -302,18 +301,16 @@ export class ObloggerView extends ItemView {
     }
 
     private async renderAvatar() {
-        if (this.settings.avatarVisible) {
+        if (this.settings?.avatarVisible) {
             this.greeterContainerDiv && this.greeterContainerDiv.removeClass("hidden");
         } else {
             this.greeterContainerDiv && this.greeterContainerDiv.addClass("hidden");
         }
         const myImage = new Image();
         if (this.settings.avatarPath) {
-            const adapter = this.app.vault.adapter;
-            if (adapter instanceof FileSystemAdapter) {
-                if (await adapter.exists(this.settings.avatarPath)) {
-                    myImage.src = adapter.getResourcePath(this.settings.avatarPath);
-                }
+            const maybeAvatarFile = this.app.vault.getAbstractFileByPath(this.settings.avatarPath);
+            if (maybeAvatarFile instanceof TFile) {
+                myImage.src = this.app.vault.getResourcePath(maybeAvatarFile);
             }
         }
 
@@ -451,32 +448,33 @@ export class ObloggerView extends ItemView {
             .onClick((e) => {
                 const menu = new Menu();
 
-                menu.addItem(item => {
-                    item.setTitle(`${this.settings.avatarVisible ? "Hide" : "Show"} avatar`);
-                    item.setIcon(this.settings.avatarVisible ? "eye-off" : "eye");
-                    item.onClick(async () => {
-                        this.settings.avatarVisible = !this.settings.avatarVisible;
-                        await this.saveSettingsCallback();
-                        this.requestRender();
-                    })
-                });
-
-                menu.addSeparator();
-
-                this.settings.rxGroups.forEach(groupSetting => {
+                if (this.settings) {
                     menu.addItem(item => {
-                        const isVisible = groupSetting.isVisible;
-                        item.setTitle(`${isVisible ? "Hide" : "Show"} ${groupSetting.groupName}`);
-                        item.setIcon(isVisible ? "eye-off" : "eye");
-                        item.onClick(async() => {
-                            groupSetting.isVisible = !groupSetting.isVisible;
+                        item.setTitle(`${this.settings.avatarVisible ? "Hide" : "Show"} avatar`);
+                        item.setIcon(this.settings.avatarVisible ? "eye-off" : "eye");
+                        item.onClick(async () => {
+                            this.settings.avatarVisible = !this.settings.avatarVisible;
                             await this.saveSettingsCallback();
                             this.requestRender();
+                        })
+                    });
+
+                    menu.addSeparator();
+
+                    this.settings.rxGroups.forEach(groupSetting => {
+                        menu.addItem(item => {
+                            const isVisible = groupSetting.isVisible;
+                            item.setTitle(`${isVisible ? "Hide" : "Show"} ${groupSetting.groupName}`);
+                            item.setIcon(isVisible ? "eye-off" : "eye");
+                            item.onClick(async () => {
+                                groupSetting.isVisible = !groupSetting.isVisible;
+                                await this.saveSettingsCallback();
+                                this.requestRender();
+                            });
                         });
                     });
-                });
-
-                menu.showAtMouseEvent(e);
+                    menu.showAtMouseEvent(e);
+                }
             });
     }
 
@@ -715,9 +713,10 @@ export class ObloggerView extends ItemView {
                 class FileMenu extends Menu {
                     items: FileMenuAction[]
                 }
-                const fileMenu = menu as FileMenu;
-                const renameAction = fileMenu.items.find(i => i?.titleEl?.innerHTML === "Rename");
-                renameAction && fileMenu.items.remove(renameAction);
+                if (menu instanceof FileMenu) {
+                    const renameAction = menu.items.find(i => i?.titleEl?.innerHTML === "Rename");
+                    renameAction && menu.items.remove(renameAction);
+                }
                 return;
             })
         );
