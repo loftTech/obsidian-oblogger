@@ -106,11 +106,6 @@ export default class Oblogger extends Plugin {
         });
     }
 
-    onunload() {
-        console.debug("oblogger unloading");
-        this.app.workspace.detachLeavesOfType(VIEW_TYPE_OBLOGGER);
-    }
-
     async activateSidePane() {
         if (this.app.workspace.getActiveViewOfType(ObloggerView)) {
             return;
