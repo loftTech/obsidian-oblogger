@@ -199,14 +199,13 @@ export class ObloggerView extends ItemView {
         }
 
         this.registerInterval(window.setInterval(() => {
-            const fileExplorerLeaf = this.app.workspace.getLeavesOfType("file-explorer")[0] as FileExplorerLeaf;
-            if (!fileExplorerLeaf) {
-                return;
+            const fileExplorerLeaf = this.app.workspace.getLeavesOfType("file-explorer")[0];
+            if (fileExplorerLeaf instanceof FileExplorerLeaf) {
+                const fileExplorer = fileExplorerLeaf.view as FileExplorerView;
+                this.openFileContextMenu = fileExplorer.openFileContextMenu;
+                this.setFocusedItem = fileExplorer.setFocusedItem;
+                this.afterCreate = fileExplorer.afterCreate;
             }
-            const fileExplorer = fileExplorerLeaf.view as FileExplorerView;
-            this.openFileContextMenu = fileExplorer.openFileContextMenu;
-            this.setFocusedItem = fileExplorer.setFocusedItem;
-            this.afterCreate = fileExplorer.afterCreate;
         }, 0))
     }
 
@@ -248,7 +247,9 @@ export class ObloggerView extends ItemView {
         const collapsedFolders = this.settings.tagGroups.find(
             settingsGroup => settingsGroup.tag === group.groupName
         )?.collapsedFolders ?? [];
-        (group as TagGroupContainer).render(collapsedFolders, excludedFolders);
+        if (group instanceof TagGroupContainer) {
+            group.render(collapsedFolders, excludedFolders);
+        }
     }
 
     private renderRxGroup(groupName: string, excludedFolders: string[]) {
@@ -712,9 +713,10 @@ export class ObloggerView extends ItemView {
                 class FileMenu extends Menu {
                     items: FileMenuAction[]
                 }
-                const fileMenu = menu as FileMenu;
-                const renameAction = fileMenu.items.find(i => i?.titleEl?.innerHTML === "Rename");
-                renameAction && fileMenu.items.remove(renameAction);
+                if (menu instanceof FileMenu) {
+                    const renameAction = menu.items.find(i => i?.titleEl?.innerHTML === "Rename");
+                    renameAction && menu.items.remove(renameAction);
+                }
                 return;
             })
         );
