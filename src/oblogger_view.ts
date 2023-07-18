@@ -6,8 +6,7 @@ import {
     moment,
     Menu,
     View,
-    Notice,
-    FileSystemAdapter
+    Notice
 } from "obsidian";
 import { ObloggerSettings, RxGroupType } from "./settings";
 import { TagGroupContainer } from "./tag_group_container";
@@ -285,7 +284,6 @@ export class ObloggerView extends ItemView {
     private async renderNow() {
         this.files = new WeakMap();
         this.fileItems = {};
-        console.debug("Rendering...");
 
         await this.renderAvatar();
 
@@ -309,11 +307,9 @@ export class ObloggerView extends ItemView {
         }
         const myImage = new Image();
         if (this.settings.avatarPath) {
-            const adapter = this.app.vault.adapter;
-            if (adapter instanceof FileSystemAdapter) {
-                if (await adapter.exists(this.settings.avatarPath)) {
-                    myImage.src = adapter.getResourcePath(this.settings.avatarPath);
-                }
+            const maybeAvatarFile = this.app.vault.getAbstractFileByPath(this.settings.avatarPath);
+            if (maybeAvatarFile instanceof TFile) {
+                myImage.src = this.app.vault.getResourcePath(maybeAvatarFile);
             }
         }
 
