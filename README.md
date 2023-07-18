@@ -5,10 +5,10 @@ oblogger is a plugin for Obsidian which focuses on two primary core features:
 2. a helpful modal for **logging** information to a new document's frontmatter
 
 <p align="center">
-    <img width="500" alt="side panel preview" src="https://github.com/loftTech/oblogger/assets/1900880/a1bc1817-d2c0-431d-be0f-575bcaf51e57">
+    <img width="500" alt="side panel preview" src="https://github.com/loftTech/obsidian-oblogger/assets/1900880/4103f8c6-28d3-4c03-98ca-f200262ab581">
 </p>
 <p align="center">
-    <img width="364" alt="logger" src="https://github.com/loftTech/oblogger/assets/1900880/1598da1b-20a0-4eb7-93b6-498abdf5310d">
+    <img width="364" alt="logger" src="https://github.com/loftTech/obsidian-oblogger/assets/1900880/43a4e169-2242-4d1c-a364-08de3ec9bcbf">
 </p>
 
 ## features
