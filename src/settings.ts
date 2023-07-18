@@ -103,11 +103,12 @@ export enum FileType {
     image = "image",
     audio = "audio",
     video = "video",
-    pdf = "pdf",
     md = "md",
     canvas = "canvas",
     code = "code",
-    html = "html"
+    html = "html",
+    archive = "archive",
+    text = "text"
 }
 
 const UNKNOWN_FILE_TYPE_ICON = "file-question";
@@ -116,11 +117,12 @@ const DEFAULT_IMAGE_ICON = "image";
 const DEFAULT_NATIVE_IMAGE_ICON = "file-image";
 const DEFAULT_AUDIO_ICON = "file-audio";
 const DEFAULT_VIDEO_ICON = "file-video";
-const DEFAULT_PDF_ICON = "file-text";
+const DEFAULT_TEXT_ICON = "file-text";
 const DEFAULT_MD_ICON = "file";
 const DEFAULT_CANVAS_ICON = "layout-dashboard";
 const DEFAULT_CODE_ICON = "file-json-2";
 const DEFAULT_HTML_ICON = "file-code";
+const DEFAULT_ARCHIVE_ICON = "folder-archive";
 
 export const FILE_EXTENSION_TYPES = new Map([
     ["bmp", { type: FileType.image, icon: DEFAULT_IMAGE_ICON }],
@@ -151,7 +153,10 @@ export const FILE_EXTENSION_TYPES = new Map([
     ["mpg", { type: FileType.video, icon: DEFAULT_VIDEO_ICON }],
     ["mpeg", { type: FileType.video, icon: DEFAULT_VIDEO_ICON }],
 
-    ["pdf", { type: FileType.pdf, icon: DEFAULT_PDF_ICON }],
+    ["docx", { type: FileType.text, icon: DEFAULT_TEXT_ICON }],
+    ["pdf", { type: FileType.text, icon: DEFAULT_TEXT_ICON }],
+    ["rtf", { type: FileType.text, icon: DEFAULT_TEXT_ICON }],
+    ["txt", { type: FileType.text, icon: DEFAULT_TEXT_ICON }],
 
     ["md", { type: FileType.md, icon: DEFAULT_MD_ICON }],
 
@@ -160,8 +165,24 @@ export const FILE_EXTENSION_TYPES = new Map([
     ["json", { type: FileType.code, icon: DEFAULT_CODE_ICON }],
     ["css", { type: FileType.code, icon: DEFAULT_CODE_ICON }],
     ["js", { type: FileType.code, icon: DEFAULT_CODE_ICON }],
+    ["ts", { type: FileType.code, icon: DEFAULT_CODE_ICON }],
 
     ["html", { type: FileType.html, icon: DEFAULT_HTML_ICON }],
+
+    ["7z", { type: FileType.archive, icon: DEFAULT_ARCHIVE_ICON}],
+    ["apk", { type: FileType.archive, icon: DEFAULT_ARCHIVE_ICON}],
+    ["dmg", { type: FileType.archive, icon: DEFAULT_ARCHIVE_ICON}],
+    ["gz", { type: FileType.archive, icon: DEFAULT_ARCHIVE_ICON}],
+    ["iso", { type: FileType.archive, icon: DEFAULT_ARCHIVE_ICON}],
+    ["jar", { type: FileType.archive, icon: DEFAULT_ARCHIVE_ICON}],
+    ["rar", { type: FileType.archive, icon: DEFAULT_ARCHIVE_ICON}],
+    ["tar", { type: FileType.archive, icon: DEFAULT_ARCHIVE_ICON}],
+    ["war", { type: FileType.archive, icon: DEFAULT_ARCHIVE_ICON}],
+    ["wim", { type: FileType.archive, icon: DEFAULT_ARCHIVE_ICON}],
+    ["xar", { type: FileType.archive, icon: DEFAULT_ARCHIVE_ICON}],
+    ["xz", { type: FileType.archive, icon: DEFAULT_ARCHIVE_ICON}],
+    ["zip", { type: FileType.archive, icon: DEFAULT_ARCHIVE_ICON}],
+    ["zipx", { type: FileType.archive, icon: DEFAULT_ARCHIVE_ICON}],
 ]);
 
 export const getFileType = (extension: string): string | undefined => {
