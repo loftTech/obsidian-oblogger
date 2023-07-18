@@ -198,15 +198,13 @@ export class ObloggerView extends ItemView {
             }
         }
 
-        this.registerInterval(window.setInterval(() => {
-            const fileExplorerLeaf = this.app.workspace.getLeavesOfType("file-explorer")[0];
-            if (fileExplorerLeaf instanceof FileExplorerLeaf) {
-                const fileExplorer = fileExplorerLeaf.view as FileExplorerView;
-                this.openFileContextMenu = fileExplorer.openFileContextMenu;
-                this.setFocusedItem = fileExplorer.setFocusedItem;
-                this.afterCreate = fileExplorer.afterCreate;
-            }
-        }, 0))
+        this.app.workspace.onLayoutReady(() => {
+            const fileExplorerLeaf = this.app.workspace.getLeavesOfType("file-explorer")[0] as FileExplorerLeaf;
+            const fileExplorer = fileExplorerLeaf.view as FileExplorerView;
+            this.openFileContextMenu = fileExplorer.openFileContextMenu;
+            this.setFocusedItem = fileExplorer.setFocusedItem;
+            this.afterCreate = fileExplorer.afterCreate;
+        });
     }
 
     private highlightLastOpenFile() {
