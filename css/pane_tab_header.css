@@ -11,7 +11,17 @@
 }
 
 .oblogger-header {
-    padding: var(--size-4-2);
+    padding: 8px;
+}
+
+/* modification for macos */
+.mod-macos .oblogger-header {
+    padding: 8px 20px 8px 8px;
+}
+
+/* modification for minimal styled scrollbars setting */
+body.styled-scrollbars .oblogger-header {
+    padding: 8px;
 }
 
 .button-bar-button {
