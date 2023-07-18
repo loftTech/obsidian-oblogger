@@ -8,9 +8,19 @@
     flex-grow: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 0 4px 70px 4px;
+    padding: 0 4px 70px;
     position: relative;
     scrollbar-gutter: stable;
+}
+
+/* modification for macos */
+.mod-macos .oblogger-content {
+    padding: 0 20px 70px 10px;
+}
+
+/* modification for minimal styled scrollbars setting */
+body.styled-scrollbars .oblogger-content {
+    padding: 0 4px 70px;
 }
 
 .oblogger-content .hidden { display:none; }
