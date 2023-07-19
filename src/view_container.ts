@@ -75,7 +75,7 @@ export abstract class ViewContainer extends GroupFolder {
 
         menu.addItem(item =>
             item
-                .setTitle("Move Up")
+                .setTitle("Move up")
                 .setIcon("arrow-up")
                 .setSection("movement")
                 .onClick(() => {
@@ -85,7 +85,7 @@ export abstract class ViewContainer extends GroupFolder {
 
         menu.addItem(item =>
             item
-                .setTitle("Move Down")
+                .setTitle("Move down")
                 .setIcon("arrow-down")
                 .setSection("movement")
                 .onClick(() => {
