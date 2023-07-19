@@ -5,6 +5,7 @@ import { ObloggerSettings } from "./settings";
 export abstract class ViewContainer extends GroupFolder {
     settings: ObloggerSettings;
     isMovable: boolean;
+    canBePinned: boolean;
 
     fileClickCallback: FileClickCallback;
     fileAddedCallback: FileAddedCallback;
@@ -37,7 +38,8 @@ export abstract class ViewContainer extends GroupFolder {
         getGroupIconCallback: (isCollapsed: boolean) => string,
         moveCallback: (up: boolean) => void,
         hideCallback: () => void,
-        isMovable: boolean
+        isMovable: boolean,
+        canBePinned: boolean
     ) {
         super(
             app,
@@ -52,6 +54,7 @@ export abstract class ViewContainer extends GroupFolder {
 
         this.settings = settings;
         this.isMovable = isMovable;
+        this.canBePinned = canBePinned;
 
         this.fileClickCallback = fileClickCallback;
         this.fileAddedCallback = fileAddedCallback;
@@ -95,6 +98,14 @@ export abstract class ViewContainer extends GroupFolder {
                     .onClick(() => {
                         this.moveCallback(false)
                     })
+            );
+        }
+
+        if (this.canBePinned) {
+            menu.addItem(item =>
+                item
+                    .setTitle(this.isPinned ? "Unpin" : "Pin")
+                    // todo: finish adding pinning structure here
             );
         }
 
