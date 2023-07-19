@@ -1,0 +1,36 @@
+name: release
+
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - "*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: "14.x" # You might need to adjust this value to your own version
+      - run: npm install
+      - run: npm run build
+      - name: publish artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: build
+      - name: create release
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: true
+          draft: false
+          generate_release_notes: true
+          files: build/*
+
