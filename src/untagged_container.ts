@@ -25,7 +25,7 @@ export class UntaggedContainer extends ViewContainer {
             requestRenderCallback,
             settings,
             saveSettingsCallback,
-            (isCollapsed) => isCollapsed ? "folder" : "folder-open",
+            (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
             moveCallback,
             hideCallback);
     }
