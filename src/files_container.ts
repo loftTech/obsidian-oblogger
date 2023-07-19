@@ -27,7 +27,8 @@ export class FilesContainer extends ViewContainer {
             saveSettingsCallback,
             (isCollapsed) => isCollapsed ? "package" : "package-open",
             moveCallback,
-            hideCallback);
+            hideCallback,
+            true);
     }
 
     protected getEmptyMessage(): string {

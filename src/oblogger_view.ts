@@ -69,7 +69,7 @@ export class ObloggerView extends ItemView {
     settings: ObloggerSettings;
     avatarDiv: HTMLElement;
     greeterContainerDiv: HTMLElement;
-    tagGroups: TagGroup[]
+    otcGroups: TagGroup[]
     rxContainers: ViewContainer[]
     lastOpenFile: TFile | undefined;
     renderTimeout: number | null = null;
@@ -116,7 +116,7 @@ export class ObloggerView extends ItemView {
         this.files = new WeakMap();
         this.selectedDoms = [];
         this.fileItems = {};
-        this.tagGroups = [];
+        this.otcGroups = [];
         this.saveSettingsCallback = saveSettingsCallback;
 
         class FileExplorerLeaf extends WorkspaceLeaf {}
@@ -209,7 +209,7 @@ export class ObloggerView extends ItemView {
 
     private highlightLastOpenFile() {
         this.rxContainers
-            .concat(this.tagGroups.map(tg => tg.container))
+            .concat(this.otcGroups.map(tg => tg.container))
             .forEach(container => {
                 this.lastOpenFile && container.highlightFile(this.lastOpenFile);
             });
@@ -291,7 +291,7 @@ export class ObloggerView extends ItemView {
         this.renderUntagged();
         this.renderFiles();
 
-        this.tagGroups.forEach(group => this.renderTagGroup(group.container));
+        this.otcGroups.forEach(group => this.renderTagGroup(group.container));
 
         this.highlightLastOpenFile();
 
@@ -402,8 +402,15 @@ export class ObloggerView extends ItemView {
     }
 
     private showNewTagModal() {
-        const modal = new NewTagModal(this.app, (result: string) => {
-            this.otcGroupsDiv && this.addTagGroup(result, this.otcGroupsDiv, true);
+        const modal = new NewTagModal(this.app, async (result: string) => {
+            if (!this.settings.tagGroups) {
+                this.settings.tagGroups = [];
+            }
+            this.settings.tagGroups.push({
+                tag: result,
+                collapsedFolders: [] });
+            await this.saveSettingsCallback();
+            this.reloadOtcGroups();
         });
         modal.open();
     }
@@ -476,8 +483,8 @@ export class ObloggerView extends ItemView {
             });
     }
 
-    private async removeTagGroup(tag: string) {
-        const tagGroup = this.tagGroups.find((tg) => tg.tag === tag);
+    private async removeOtcGroup(tag: string) {
+        const tagGroup = this.otcGroups.find((tg) => tg.tag === tag);
         if (tagGroup === undefined) {
             new Notice("Nothing to delete");
             return;
@@ -486,7 +493,7 @@ export class ObloggerView extends ItemView {
             console.debug("Something went wrong, tag group has wrong tag.");
             return;
         }
-        this.tagGroups.remove(tagGroup);
+        this.otcGroups.remove(tagGroup);
         tagGroup.container.rootElement.remove();
         this.settings.tagGroups = this.settings.tagGroups.filter(group => group.tag !== tag);
         await this.saveSettingsCallback();
@@ -527,7 +534,7 @@ export class ObloggerView extends ItemView {
         this.requestRender();
     }
 
-    private moveTagGroup(tag: string, up: boolean): void {
+    private async moveOtcGroup(tag: string, up: boolean): Promise<void> {
         const currentIndex = this.settings.tagGroups.findIndex(group => group.tag === tag);
         if (currentIndex === -1) {
             console.warn(`Tag ${tag} doesn't exist.`);
@@ -546,14 +553,14 @@ export class ObloggerView extends ItemView {
         this.settings.tagGroups.remove(group);
         this.settings.tagGroups.splice(newIndex, 0, group);
 
-        this.saveSettingsCallback();
-        this.reloadTagGroups();
+        await this.saveSettingsCallback();
+        this.reloadOtcGroups();
         this.requestRender();
     }
 
-    private addTagGroup(tag: string, parent: HTMLElement, saveToSettings: boolean) {
-        const removeCallback = async () => { return await this.removeTagGroup(tag); }
-        const moveCallback = (up: boolean) => { this.moveTagGroup(tag, up); }
+    private addOtcGroup(tag: string, parent: HTMLElement) {
+        const removeCallback = async () => { return await this.removeOtcGroup(tag); }
+        const moveCallback = (up: boolean) => { this.moveOtcGroup(tag, up); }
 
         const container = new TagGroupContainer(
             this.app,
@@ -566,41 +573,33 @@ export class ObloggerView extends ItemView {
             () => { this.requestRender() },
             this.settings,
             this.saveSettingsCallback);
-        this.tagGroups.push({
+        this.otcGroups.push({
             tag: tag,
             container: container
         })
         parent.appendChild(container.rootElement);
-        this.requestRender()
-
-        if (saveToSettings) {
-            if (!this.settings.tagGroups) {
-                this.settings.tagGroups = [];
-            }
-            if (this.settings.tagGroups.some(group => group.tag === tag)) {
-                console.debug(`Duplicate tag ${tag}...already saved?`)
-            } else {
-                this.settings.tagGroups.push({
-                    tag: tag,
-                    collapsedFolders: [] });
-                this.saveSettingsCallback();
-            }
-        }
+        this.requestRender();
     }
 
-    private reloadTagGroups() {
+    private reloadOtcGroups() {
+        console.log("reloading otc groups")
         this.otcGroupsDiv?.empty();
 
-        this.tagGroups = [];
+        this.otcGroups = [];
         this.files = new WeakMap();
         this.fileItems = {};
 
         // Load tags from settings
-        this.settings.tagGroups?.forEach(group =>
-            this.otcGroupsDiv && this.addTagGroup(
-                group.tag,
-                this.otcGroupsDiv,
-                false));
+        this.settings.tagGroups
+            ?.sort((a, b) => {
+                const aChildTag = a.tag.split("/").last() ?? "";
+                const bChildTag = b.tag.split("/").last() ?? "";
+                return aChildTag < bChildTag ? -1 : aChildTag > bChildTag ? 1 : 0
+            })
+            ?.forEach(group =>
+                this.otcGroupsDiv && this.addOtcGroup(
+                    group.tag,
+                    this.otcGroupsDiv));
     }
 
     private async hideRxGroup(groupName: string) {
@@ -686,7 +685,7 @@ export class ObloggerView extends ItemView {
         this.otcGroupsDiv = document.createElement("div");
         this.otcGroupsDiv.addClass("otc-groups");
 
-        this.reloadTagGroups();
+        this.reloadOtcGroups();
 
         body.appendChild(this.otcGroupsDiv);
     }

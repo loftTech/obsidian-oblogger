@@ -27,7 +27,8 @@ export class UntaggedContainer extends ViewContainer {
             saveSettingsCallback,
             (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
             moveCallback,
-            hideCallback);
+            hideCallback,
+            true);
     }
 
     protected getEmptyMessage(): string {

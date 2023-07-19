@@ -29,7 +29,8 @@ export class TagGroupContainer extends ViewContainer {
             saveSettingsCallback,
             (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
             moveCallback,
-            removeCallback);
+            removeCallback,
+            false);
     }
 
     protected getEmptyMessage(): string {

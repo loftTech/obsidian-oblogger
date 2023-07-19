@@ -28,7 +28,8 @@ export class EntriesContainer extends ViewContainer {
             saveSettingsCallback,
             (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
             moveCallback,
-            hideCallback);
+            hideCallback,
+            true);
     }
 
     protected getEmptyMessage(): string {
@@ -66,7 +67,7 @@ export class EntriesContainer extends ViewContainer {
                 item.setTitle("Change entry tag");
                 item.setIcon("replace");
                 item.onClick(() => {
-                    const modal = new NewTagModal(this.app, (result: string) => {
+                    const modal = new NewTagModal(this.app, async (result: string) => {
                         if (!result) {
                             new Notice("Not setting entries tag")
                             return;
