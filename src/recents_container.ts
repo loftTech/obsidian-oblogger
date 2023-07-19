@@ -31,7 +31,8 @@ export class RecentsContainer extends ViewContainer {
             saveSettingsCallback,
             (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
             moveCallback,
-            hideCallback);
+            hideCallback,
+            true);
 
         this.recentsCount = settings.recentsCount;
     }

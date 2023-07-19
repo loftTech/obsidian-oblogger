@@ -4,6 +4,7 @@ import { ObloggerSettings } from "./settings";
 
 export abstract class ViewContainer extends GroupFolder {
     settings: ObloggerSettings;
+    isMovable: boolean;
 
     fileClickCallback: FileClickCallback;
     fileAddedCallback: FileAddedCallback;
@@ -35,7 +36,8 @@ export abstract class ViewContainer extends GroupFolder {
         saveSettingsCallback: () => void,
         getGroupIconCallback: (isCollapsed: boolean) => string,
         moveCallback: (up: boolean) => void,
-        hideCallback: () => void
+        hideCallback: () => void,
+        isMovable: boolean
     ) {
         super(
             app,
@@ -49,6 +51,7 @@ export abstract class ViewContainer extends GroupFolder {
             () => { return this.getEmptyMessage() });
 
         this.settings = settings;
+        this.isMovable = isMovable;
 
         this.fileClickCallback = fileClickCallback;
         this.fileAddedCallback = fileAddedCallback;
@@ -73,25 +76,27 @@ export abstract class ViewContainer extends GroupFolder {
     protected getContextMenu() {
         const menu = new Menu();
 
-        menu.addItem(item =>
-            item
-                .setTitle("Move up")
-                .setIcon("arrow-up")
-                .setSection("movement")
-                .onClick(() => {
-                    this.moveCallback(true)
-                })
-        );
+        if (this.isMovable) {
+            menu.addItem(item =>
+                item
+                    .setTitle("Move up")
+                    .setIcon("arrow-up")
+                    .setSection("movement")
+                    .onClick(() => {
+                        this.moveCallback(true)
+                    })
+            );
 
-        menu.addItem(item =>
-            item
-                .setTitle("Move down")
-                .setIcon("arrow-down")
-                .setSection("movement")
-                .onClick(() => {
-                    this.moveCallback(false)
-                })
-        );
+            menu.addItem(item =>
+                item
+                    .setTitle("Move down")
+                    .setIcon("arrow-down")
+                    .setSection("movement")
+                    .onClick(() => {
+                        this.moveCallback(false)
+                    })
+            );
+        }
 
         menu.addItem(item =>
             item
