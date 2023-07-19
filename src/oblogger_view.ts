@@ -403,7 +403,6 @@ export class ObloggerView extends ItemView {
 
     private showNewTagModal() {
         const modal = new NewTagModal(this.app, async (result: string) => {
-            console.log(`adding ${result}`);
             if (!this.settings.tagGroups) {
                 this.settings.tagGroups = [];
             }
