@@ -36,6 +36,7 @@ class FileItem {
     el: HTMLElement;
     titleInnerEl: HTMLElement;
     file: TFile;
+    selfEl: HTMLElement;
 
     constructor(
         file: TFile,
@@ -47,6 +48,9 @@ class FileItem {
         this.file = file;
         this.titleEl = titleEl;
         this.titleInnerEl = titleInnerEl;
+
+        // not sure if this is the right thing to set it to
+        this.selfEl = el;
     }
 }
 
@@ -102,6 +106,7 @@ export class ObloggerView extends ItemView {
     openFileContextMenu: (e: MouseEvent, container: HTMLDivElement) => void;
     setFocusedItem: (fileItem: FileItem) => void;
     afterCreate: (file: TFile, unknownBool: boolean) => void;
+    isItem: (file: TFile) => boolean;
 
     constructor(
         leaf: WorkspaceLeaf,
@@ -204,6 +209,7 @@ export class ObloggerView extends ItemView {
             this.openFileContextMenu = fileExplorer.openFileContextMenu;
             this.setFocusedItem = fileExplorer.setFocusedItem;
             this.afterCreate = fileExplorer.afterCreate;
+            this.isItem = (file: TFile) => false;
         });
     }
 
