@@ -610,6 +610,9 @@ export class ObloggerView extends ItemView {
         // Load tags from settings
         this.settings.tagGroups
             ?.sort((a, b) => {
+                if (a.isPinned !== b.isPinned) {
+                    return a.isPinned ? -1 : 1;
+                }
                 const aChildTag = a.tag.split("/").last() ?? "";
                 const bChildTag = b.tag.split("/").last() ?? "";
                 return aChildTag < bChildTag ? -1 : aChildTag > bChildTag ? 1 : 0
