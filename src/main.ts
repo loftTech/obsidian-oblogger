@@ -41,7 +41,8 @@ export default class Oblogger extends Plugin {
     }
 
     async onload() {
-        console.log("oblogger loading");
+        await this.loadSettings();
+
         this.registerEvent(
             this.app.metadataCache.on("changed", async () => {
                 await this.getObloggerView()?.requestRender();
@@ -97,8 +98,6 @@ export default class Oblogger extends Plugin {
                 this.activateSidePane();
             },
         });
-
-        await this.loadSettings();
 
         this.app.workspace.onLayoutReady(() => {
             this.activateSidePane();
