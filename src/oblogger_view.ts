@@ -210,6 +210,34 @@ export class ObloggerView extends ItemView {
             this.setFocusedItem = fileExplorer.setFocusedItem;
             this.afterCreate = fileExplorer.afterCreate;
             this.isItem = (file: TFile) => false;
+
+            this.registerEvent(
+                // todo(#172): right now, we're disabling rename because it's broken
+                //  however, we should fix it with either custom rename or by getting
+                //  the in-line rename to work right
+                this.app.workspace.on("file-menu", (menu, file) => {
+                    // Don't hide it for other views (like file-explorer)
+                    if(!this.app.workspace.getActiveViewOfType(ObloggerView)?.getState()) {
+                        return;
+                    }
+                    console.debug(`Hiding rename for file ${file.name}...`)
+                    // These types are added at run-time on top of Menu? Or Menu is
+                    // the wrong type to be using and these are already defined
+                    // somewhere.
+                    class FileMenuAction {
+                        titleEl: HTMLElement;
+                    }
+                    class FileMenu extends Menu {
+                        items: FileMenuAction[]
+                    }
+                    const fileMenu = menu as FileMenu;
+                    const renameAction = fileMenu.items.find(i => i?.titleEl?.innerHTML === "Rename");
+                    if (!renameAction) {
+                        console.log("Rename not found!");
+                    }
+                    renameAction && fileMenu.items.remove(renameAction);
+                })
+            );
         });
     }
 
@@ -698,33 +726,6 @@ export class ObloggerView extends ItemView {
     }
 
     async onOpen() {
-        this.registerEvent(
-            // todo(#172): right now, we're disabling rename because it's broken
-            //  however, we should fix it with either custom rename or by getting
-            //  the in-line rename to work right
-            this.app.workspace.on("file-menu", (menu, file) => {
-                // Don't hide it for other views (like file-explorer)
-                if(!this.app.workspace.getActiveViewOfType(ObloggerView)?.getState()) {
-                    return;
-                }
-                console.debug(`Hiding rename for file ${file.name}...`)
-                // These types are added at run-time on top of Menu? Or Menu is
-                // the wrong type to be using and these are already defined
-                // somewhere.
-                class FileMenuAction {
-                    titleEl: HTMLElement;
-                }
-                class FileMenu extends Menu {
-                    items: FileMenuAction[]
-                }
-                if (menu instanceof FileMenu) {
-                    const renameAction = menu.items.find(i => i?.titleEl?.innerHTML === "Rename");
-                    renameAction && menu.items.remove(renameAction);
-                }
-                return;
-            })
-        );
-
         this.containerEl.empty();
 
         const header = document.createElement("div");
