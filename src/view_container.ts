@@ -6,6 +6,7 @@ export abstract class ViewContainer extends GroupFolder {
     settings: ObloggerSettings;
     isMovable: boolean;
     canBePinned: boolean;
+    isPinned: boolean;
 
     fileClickCallback: FileClickCallback;
     fileAddedCallback: FileAddedCallback;
@@ -13,6 +14,7 @@ export abstract class ViewContainer extends GroupFolder {
     saveSettingsCallback: () => void;
     hideCallback: () => void;
     moveCallback: (up: boolean) => void;
+    pinCallback: (pin: boolean) => void;
 
     protected abstract getTitleText(): string;
     protected abstract getPillText(): string;
@@ -39,7 +41,9 @@ export abstract class ViewContainer extends GroupFolder {
         moveCallback: (up: boolean) => void,
         hideCallback: () => void,
         isMovable: boolean,
-        canBePinned: boolean
+        canBePinned: boolean,
+        pinCallback: (pin: boolean) => void,
+        isPinned: boolean
     ) {
         super(
             app,
@@ -55,6 +59,7 @@ export abstract class ViewContainer extends GroupFolder {
         this.settings = settings;
         this.isMovable = isMovable;
         this.canBePinned = canBePinned;
+        this.isPinned = isPinned;
 
         this.fileClickCallback = fileClickCallback;
         this.fileAddedCallback = fileAddedCallback;
@@ -62,6 +67,7 @@ export abstract class ViewContainer extends GroupFolder {
         this.saveSettingsCallback = saveSettingsCallback;
         this.hideCallback = hideCallback;
         this.moveCallback = moveCallback;
+        this.pinCallback = pinCallback;
     }
 
     protected isVisible(): boolean {
@@ -105,7 +111,11 @@ export abstract class ViewContainer extends GroupFolder {
             menu.addItem(item =>
                 item
                     .setTitle(this.isPinned ? "Unpin" : "Pin")
-                    // todo: finish adding pinning structure here
+                    .setIcon(this.isPinned ? "unpin" : "pin")
+                    .setSection("movement")
+                    .onClick(() => {
+                        this.pinCallback(!this.isPinned)
+                    })
             );
         }
 

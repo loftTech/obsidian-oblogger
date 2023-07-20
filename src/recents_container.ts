@@ -32,7 +32,10 @@ export class RecentsContainer extends ViewContainer {
             (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
             moveCallback,
             hideCallback,
-            true);
+            true, // isMovable
+            false, // canBePinned
+            (pin: boolean) => { },
+            false); // isPinned
 
         this.recentsCount = settings.recentsCount;
     }
