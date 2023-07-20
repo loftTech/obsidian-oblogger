@@ -8,7 +8,7 @@ import {
     View,
     Notice
 } from "obsidian";
-import { ObloggerSettings, RxGroupType } from "./settings";
+import { ObloggerSettings, RxGroupType, TagGroup as SettingsTagGroup } from "./settings";
 import { TagGroupContainer } from "./tag_group_container";
 import { EntriesContainer } from "./entries_container";
 import { GroupFolder } from "./group_folder";
@@ -607,21 +607,33 @@ export class ObloggerView extends ItemView {
         this.files = new WeakMap();
         this.fileItems = {};
 
-        // Load tags from settings
+        const groupSorter = (a: SettingsTagGroup, b: SettingsTagGroup): number => {
+            const aChildTag = a.tag.split("/").last() ?? "";
+            const bChildTag = b.tag.split("/").last() ?? "";
+            return aChildTag < bChildTag ? -1 : aChildTag > bChildTag ? 1 : 0
+        }
+
+        // Add pinned groups
         this.settings.tagGroups
-            ?.sort((a, b) => {
-                if (a.isPinned !== b.isPinned) {
-                    return a.isPinned ? -1 : 1;
-                }
-                const aChildTag = a.tag.split("/").last() ?? "";
-                const bChildTag = b.tag.split("/").last() ?? "";
-                return aChildTag < bChildTag ? -1 : aChildTag > bChildTag ? 1 : 0
-            })
-            ?.forEach(group =>
+            ?.filter(otcGroup => otcGroup.isPinned)
+            ?.sort(groupSorter)
+            ?.forEach(group => {
                 this.otcGroupsDiv && this.addOtcGroup(
                     group.tag,
-                    group.isPinned ?? false,
-                    this.otcGroupsDiv));
+                    true,
+                    this.otcGroupsDiv);
+            });
+        
+        // Add unpinned groups
+        this.settings.tagGroups
+            ?.filter(otcGroup => !otcGroup.isPinned)
+            ?.sort(groupSorter)
+            ?.forEach(group => {
+                this.otcGroupsDiv && this.addOtcGroup(
+                    group.tag,
+                    false,
+                    this.otcGroupsDiv);
+            });
     }
 
     private async hideRxGroup(groupName: string) {
