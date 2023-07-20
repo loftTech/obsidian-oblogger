@@ -400,7 +400,7 @@ export class ObloggerView extends ItemView {
     }
 
     private showNewTagModal() {
-        const modal = new NewTagModal(this.app, (result: string) => {
+        const modal = new NewTagModal(this.app, async (result: string)=> {
             this.otcGroupsDiv && this.addTagGroup(result, this.otcGroupsDiv, true);
         });
         modal.open();
