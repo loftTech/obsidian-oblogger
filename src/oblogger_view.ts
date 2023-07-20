@@ -162,7 +162,7 @@ export class ObloggerView extends ItemView {
             if (!save) {
                 return;
             }
-            const groupSetting = this.settings.rxGroups.find(group => group.groupName === groupName);
+            const groupSetting = this.settings?.rxGroups.find(group => group.groupName === groupName);
             if (groupSetting) {
                 groupSetting.collapsedFolders = collapsedFolders;
                 this.saveSettingsCallback();
@@ -177,10 +177,10 @@ export class ObloggerView extends ItemView {
             if (!save) {
                 return;
             }
-            if (!this.settings.tagGroups.some(group => group.tag === groupName)) {
-                this.settings.tagGroups.push({tag: groupName, collapsedFolders: []});
+            if (!this.settings?.tagGroups.some(group => group.tag === groupName)) {
+                this.settings?.tagGroups.push({tag: groupName, collapsedFolders: []});
             }
-            const group = this.settings.tagGroups.find(
+            const group = this.settings?.tagGroups.find(
                 group => group.tag === groupName
             );
             if (!group) {
@@ -239,8 +239,8 @@ export class ObloggerView extends ItemView {
     }
 
     private renderTagGroup(group: GroupFolder) {
-        const excludedFolders = this.settings.excludedFolders ?? [];
-        const collapsedFolders = this.settings.tagGroups.find(
+        const excludedFolders = this.settings?.excludedFolders ?? [];
+        const collapsedFolders = this.settings?.tagGroups.find(
             settingsGroup => settingsGroup.tag === group.groupName
         )?.collapsedFolders ?? [];
         if (group instanceof TagGroupContainer) {
@@ -249,7 +249,7 @@ export class ObloggerView extends ItemView {
     }
 
     private renderRxGroup(groupName: string, excludedFolders: string[]) {
-        const groupSetting = this.settings.rxGroups.find(group => group.groupName === groupName);
+        const groupSetting = this.settings?.rxGroups.find(group => group.groupName === groupName);
         if (!groupSetting) {
             console.warn(`unable to find settings for rx group ${groupName}`);
             return;
@@ -263,7 +263,7 @@ export class ObloggerView extends ItemView {
     }
 
     private renderEntries() {
-        this.renderRxGroup(RxGroupType.ENTRIES, this.settings.excludedFolders ?? []);
+        this.renderRxGroup(RxGroupType.ENTRIES, this.settings?.excludedFolders ?? []);
     }
 
     private renderFiles() {
@@ -271,7 +271,7 @@ export class ObloggerView extends ItemView {
     }
 
     private renderUntagged() {
-        this.renderRxGroup(RxGroupType.UNTAGGED, [this.settings.loggingPath]);
+        this.renderRxGroup(RxGroupType.UNTAGGED, [this.settings?.loggingPath]);
     }
 
     private renderRecents() {
@@ -303,7 +303,7 @@ export class ObloggerView extends ItemView {
             this.greeterContainerDiv && this.greeterContainerDiv.addClass("hidden");
         }
         const myImage = new Image();
-        if (this.settings.avatarPath) {
+        if (this.settings?.avatarPath) {
             const maybeAvatarFile = this.app.vault.getAbstractFileByPath(this.settings.avatarPath);
             if (maybeAvatarFile instanceof TFile) {
                 myImage.src = this.app.vault.getResourcePath(maybeAvatarFile);
@@ -486,13 +486,17 @@ export class ObloggerView extends ItemView {
         }
         this.tagGroups.remove(tagGroup);
         tagGroup.container.rootElement.remove();
-        this.settings.tagGroups = this.settings.tagGroups.filter(group => group.tag !== tag);
+        this.settings.tagGroups = this.settings?.tagGroups.filter(group => group.tag !== tag);
         await this.saveSettingsCallback();
         this.requestRender();
         new Notice(`"${tag}" removed`);
     }
 
     private moveRxGroup(groupName: string, up: boolean): void {
+        if (!this.settings) {
+            return;
+        }
+
         const currentIndex = this.settings.rxGroups.findIndex(group => group.groupName === groupName);
         if (currentIndex === -1) {
             console.warn(`Group ${groupName} doesn't exist.`);
@@ -594,7 +598,7 @@ export class ObloggerView extends ItemView {
         this.fileItems = {};
 
         // Load tags from settings
-        this.settings.tagGroups?.forEach(group =>
+        this.settings?.tagGroups?.forEach(group =>
             this.otcGroupsDiv && this.addTagGroup(
                 group.tag,
                 this.otcGroupsDiv,
@@ -647,9 +651,9 @@ export class ObloggerView extends ItemView {
                 () => { this.hideRxGroup(groupName); });
         }
 
-        this.rxContainers = this.settings.rxGroups.map(rxGroupSetting => {
+        this.rxContainers = this.settings?.rxGroups.map(rxGroupSetting => {
             return createRxGroup(rxGroupSetting.groupName)
-        })
+        }) ?? []
 
         this.rxGroupsDiv.empty();
         this.rxContainers.forEach(container =>
