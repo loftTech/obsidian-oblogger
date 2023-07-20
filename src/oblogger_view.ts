@@ -220,7 +220,6 @@ export class ObloggerView extends ItemView {
                     if(!this.app.workspace.getActiveViewOfType(ObloggerView)?.getState()) {
                         return;
                     }
-                    console.debug(`Hiding rename for file ${file.name}...`)
                     // These types are added at run-time on top of Menu? Or Menu is
                     // the wrong type to be using and these are already defined
                     // somewhere.
@@ -232,9 +231,6 @@ export class ObloggerView extends ItemView {
                     }
                     const fileMenu = menu as FileMenu;
                     const renameAction = fileMenu.items.find(i => i?.titleEl?.innerHTML === "Rename");
-                    if (!renameAction) {
-                        console.log("Rename not found!");
-                    }
                     renameAction && fileMenu.items.remove(renameAction);
                 })
             );
