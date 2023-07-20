@@ -229,10 +229,8 @@ export class ObloggerView extends ItemView {
 
     requestRender() {
         if (this.renderTimeout) {
-            console.debug("Request already pending, ignoring further requests...");
             return;
         }
-        console.debug(`Scheduling render for ${RENDER_DELAY_MS} ms`);
         this.renderTimeout = window.setTimeout(
             () => this.renderNow(),
             RENDER_DELAY_MS

@@ -28,7 +28,6 @@ export default class Oblogger extends Plugin {
     }
 
     async saveSettings() {
-        console.debug("Saving settings...");
         await this.saveData(this.settings);
         this.getObloggerView()?.requestRender();
     }
