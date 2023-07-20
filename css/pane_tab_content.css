@@ -101,6 +101,27 @@ body.styled-scrollbars .oblogger-content {
     white-space: var(--nav-item-white-space);
 }
 
+.tag-title-group {
+    align-items: center;
+    display: flex;
+}
+
+.pin-container {
+    margin-right: 3px;
+}
+
+.pin {
+    align-items: center;
+    display: flex;
+    height: 9px;
+    width: 9px;
+}
+
+.oblogger-content .pin .svg-icon {
+    color: transparent;
+    fill: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/90%);
+}
+
 .oblogger-content .title-tag {
     align-items: center;
     background: var(--interactive-accent);
