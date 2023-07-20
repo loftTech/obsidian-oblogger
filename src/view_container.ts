@@ -186,6 +186,9 @@ export abstract class ViewContainer extends GroupFolder {
 
         const pinDiv = document.createElement("div");
         pinDiv.addClass("pin");
+        if (this.isPinned) {
+            pinDiv.addClass("is-pinned");
+        }
         setIcon(pinDiv, "pin");
         pinContainerDiv.appendChild(pinDiv);
 
