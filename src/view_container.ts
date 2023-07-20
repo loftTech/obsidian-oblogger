@@ -111,7 +111,7 @@ export abstract class ViewContainer extends GroupFolder {
             menu.addItem(item =>
                 item
                     .setTitle(this.isPinned ? "Unpin" : "Pin")
-                    .setIcon(this.isPinned ? "unpin" : "pin")
+                    .setIcon(this.isPinned ? "pin-off" : "pin")
                     .setSection("movement")
                     .onClick(() => {
                         this.pinCallback(!this.isPinned)
