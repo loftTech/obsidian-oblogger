@@ -28,7 +28,10 @@ export class FilesContainer extends ViewContainer {
             (isCollapsed) => isCollapsed ? "package" : "package-open",
             moveCallback,
             hideCallback,
-            true);
+            true, // isMovable
+            false, // canBePinned
+            (pin: boolean) => { },
+            false); // isPinned
     }
 
     protected getEmptyMessage(): string {

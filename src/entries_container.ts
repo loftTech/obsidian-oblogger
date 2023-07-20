@@ -22,14 +22,17 @@ export class EntriesContainer extends ViewContainer {
             fileClickCallback,
             fileAddedCallback,
             collapseChangedCallback,
-            false,
+            false, // showStatusIcon
             requestRenderCallback,
             settings,
             saveSettingsCallback,
             (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
             moveCallback,
             hideCallback,
-            true);
+            true, // isMovable
+            false, // canBePinned
+            (pin: boolean) => { },
+            false); // isPinned
     }
 
     protected getEmptyMessage(): string {

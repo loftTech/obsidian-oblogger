@@ -177,14 +177,11 @@ export class ObloggerView extends ItemView {
             if (!save) {
                 return;
             }
-            if (!this.settings.tagGroups.some(group => group.tag === groupName)) {
-                this.settings.tagGroups.push({tag: groupName, collapsedFolders: []});
-            }
             const group = this.settings.tagGroups.find(
                 group => group.tag === groupName
             );
             if (!group) {
-                console.error(`Something weird happened, ${groupName} should be here...`);
+                new Notice(`Unable to find tag ${groupName} to update the collapse for.`);
                 return;
             }
             group.collapsedFolders = collapsedFolders;
@@ -362,9 +359,9 @@ export class ObloggerView extends ItemView {
         avatarChangerDiv.addClass("greeter-title-avatar-changer");
         avatarChangerDiv.addEventListener("click", () => {
             const modal = new ImageFileSuggestModal(this.app, async (image: TFile) => {
-                new Notice(image.path);
                 this.settings.avatarPath = image.path;
                 await this.saveSettingsCallback();
+                new Notice(`Changed avatar image to ${image.path}`);
                 this.requestRender();
             })
             modal.open();
@@ -408,7 +405,9 @@ export class ObloggerView extends ItemView {
             }
             this.settings.tagGroups.push({
                 tag: result,
-                collapsedFolders: [] });
+                collapsedFolders: [],
+                isPinned: false
+            });
             await this.saveSettingsCallback();
             this.reloadOtcGroups();
         });
@@ -558,9 +557,26 @@ export class ObloggerView extends ItemView {
         this.requestRender();
     }
 
-    private addOtcGroup(tag: string, parent: HTMLElement) {
+    private async pinOtcGroup(tag: string, pin: boolean): Promise<void> {
+        const otcGroup = this.settings.tagGroups.find((tagGroup) => tagGroup.tag === tag);
+        if (otcGroup === undefined) {
+            new Notice(`Unable to find tag ${tag} to ${pin ? "pin" : "unpin"}`);
+            return;
+        }
+        otcGroup.isPinned = pin;
+        await this.saveSettingsCallback();
+        this.reloadOtcGroups();
+        this.requestRender();
+    }
+
+    private addOtcGroup(
+        tag: string,
+        isPinned: boolean,
+        parent: HTMLElement
+    ) {
         const removeCallback = async () => { return await this.removeOtcGroup(tag); }
         const moveCallback = (up: boolean) => { this.moveOtcGroup(tag, up); }
+        const pinCallback = (pin: boolean) => { this.pinOtcGroup(tag, pin); }
 
         const container = new TagGroupContainer(
             this.app,
@@ -572,7 +588,9 @@ export class ObloggerView extends ItemView {
             this.tagGroupCollapseChangedCallback,
             () => { this.requestRender() },
             this.settings,
-            this.saveSettingsCallback);
+            this.saveSettingsCallback,
+            pinCallback,
+            isPinned);
         this.otcGroups.push({
             tag: tag,
             container: container
@@ -592,6 +610,9 @@ export class ObloggerView extends ItemView {
         // Load tags from settings
         this.settings.tagGroups
             ?.sort((a, b) => {
+                if (a.isPinned !== b.isPinned) {
+                    return a.isPinned ? -1 : 1;
+                }
                 const aChildTag = a.tag.split("/").last() ?? "";
                 const bChildTag = b.tag.split("/").last() ?? "";
                 return aChildTag < bChildTag ? -1 : aChildTag > bChildTag ? 1 : 0
@@ -599,6 +620,7 @@ export class ObloggerView extends ItemView {
             ?.forEach(group =>
                 this.otcGroupsDiv && this.addOtcGroup(
                     group.tag,
+                    group.isPinned ?? false,
                     this.otcGroupsDiv));
     }
 
