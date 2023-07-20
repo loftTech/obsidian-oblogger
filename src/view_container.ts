@@ -149,6 +149,28 @@ export abstract class ViewContainer extends GroupFolder {
         return titleButton;
     }
 
+    private buildTagTitleGroup(): HTMLElement {
+        const tagTitleGroupDiv = document.createElement("div");
+        tagTitleGroupDiv.addClass("tag-title-group")
+
+        tagTitleGroupDiv.appendChild(this.buildPinContainer());
+        tagTitleGroupDiv.appendChild(this.buildPill());
+
+        return tagTitleGroupDiv;
+    }
+
+    private buildPinContainer(): HTMLElement {
+        const pinContainerDiv = document.createElement("div");
+        pinContainerDiv.addClass("pin-container");
+
+        const pinDiv = document.createElement("div");
+        pinDiv.addClass("pin");
+        setIcon(pinDiv, "pin");
+        pinContainerDiv.appendChild(pinDiv);
+
+        return pinContainerDiv;
+    }
+
     private buildPill(): HTMLElement {
         const pillDiv = document.createElement("div");
         pillDiv.addClass("title-tag");
@@ -190,7 +212,7 @@ export abstract class ViewContainer extends GroupFolder {
         this.titleContainer.addClass("title-container");
 
         this.titleContainer.appendChild(this.buildTitleButton());
-        this.titleContainer.appendChild(this.buildPill());
+        this.titleContainer.appendChild(this.buildTagTitleGroup());
 
         this.titleContainer.addEventListener("click", () => {
             this.toggleCollapse();
