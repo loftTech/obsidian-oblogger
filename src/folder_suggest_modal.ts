@@ -1,4 +1,4 @@
-import { App, Notice, SuggestModal, TFolder } from "obsidian";
+import { App, Notice, SuggestModal, TFile, TFolder } from "obsidian";
 
 interface FolderSelection {
     folderName: string;
@@ -84,9 +84,15 @@ export class FolderSuggestModal extends SuggestModal<FolderSelection> {
 
     async onChooseSuggestion(folder: FolderSelection, evt: MouseEvent | KeyboardEvent) {
         if (evt.shiftKey || folder.isCreator)  {
-            if (!this.app.vault.getAbstractFileByPath(folder.folderName)) {
+            const abstractFile = this.app.vault.getAbstractFileByPath(folder.folderName);
+            if (!abstractFile) {
+                // it doesn't exist as a file or folder, so create it as a folder
                 await this.app.vault.createFolder(folder.folderName);
                 new Notice(`Created logging folder at "${folder.folderName}"`);
+            } else if (abstractFile instanceof TFile) {
+                // it exists as a TFile, won't be able to log to this path
+                new Notice(`Path ${folder.folderName} already exists as a file. Please choose a different path.`);
+                return;
             }
         }
         new Notice(`Changed logging folder to "${folder.folderName}"`);
