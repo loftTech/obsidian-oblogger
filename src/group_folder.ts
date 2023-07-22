@@ -165,6 +165,14 @@ export class GroupFolder {
         }
     }
 
+    private isBookmarked(file: TFile): boolean {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return !!app.internalPlugins.plugins.bookmarks?.instance?.items?.find(item => {
+            return item.type === "file" && item.path === file.path
+        });
+    }
+
     private buildFileElement(
         file: TFile,
         fileClickCallback: FileClickCallback,
