@@ -208,10 +208,12 @@ export class ObloggerView extends ItemView {
 
             // Hook up to the bookmarks plugin
             // @ts-ignore
-            this.app.internalPlugins.getEnabledPluginById("bookmarks")?.on("changed", () => {
-                console.log("bookmarks changed, requesting render");
-                this.requestRender();
-            });
+            const bookmarkPlugin = this.app.internalPlugins.getEnabledPluginById("bookmarks");
+            if (bookmarkPlugin) {
+                bookmarkPlugin.on("changed", () => {
+                    this.requestRender();
+                });
+            }
         });
     }
 
