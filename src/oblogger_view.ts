@@ -199,11 +199,19 @@ export class ObloggerView extends ItemView {
         }
 
         this.app.workspace.onLayoutReady(() => {
+            // Hook up to the file-explorer plugin
             const fileExplorerLeaf = this.app.workspace.getLeavesOfType("file-explorer")[0] as FileExplorerLeaf;
             const fileExplorer = fileExplorerLeaf.view as FileExplorerView;
             this.openFileContextMenu = fileExplorer.openFileContextMenu;
             this.setFocusedItem = fileExplorer.setFocusedItem;
             this.afterCreate = fileExplorer.afterCreate;
+
+            // Hook up to the bookmarks plugin
+            // @ts-ignore
+            this.app.internalPlugins.getEnabledPluginById("bookmarks")?.on("changed", () => {
+                console.log("bookmarks changed, requesting render");
+                this.requestRender();
+            });
         });
     }
 
