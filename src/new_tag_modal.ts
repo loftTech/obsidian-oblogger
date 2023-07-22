@@ -4,7 +4,7 @@ import { App, FuzzySuggestModal, Notice } from "obsidian";
 export class NewTagModal extends FuzzySuggestModal<string> {
     onSelect: (tag: string) => void
 
-    constructor(app: App, onSelect: (tag: string) => void) {
+    constructor(app: App, onSelect: (tag: string) => Promise<void>) {
         super(app);
         this.onSelect = onSelect;
     }

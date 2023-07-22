@@ -3,6 +3,7 @@ import { TFile } from "obsidian";
 export interface TagGroup {
     tag: string;
     collapsedFolders: string[];
+    isPinned: boolean;
 }
 
 export const ContainerSortMethod = {

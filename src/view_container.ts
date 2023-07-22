@@ -4,6 +4,9 @@ import { ObloggerSettings } from "./settings";
 
 export abstract class ViewContainer extends GroupFolder {
     settings: ObloggerSettings;
+    isMovable: boolean;
+    canBePinned: boolean;
+    isPinned: boolean;
 
     fileClickCallback: FileClickCallback;
     fileAddedCallback: FileAddedCallback;
@@ -11,6 +14,7 @@ export abstract class ViewContainer extends GroupFolder {
     saveSettingsCallback: () => void;
     hideCallback: () => void;
     moveCallback: (up: boolean) => void;
+    pinCallback: ((pin: boolean) => void) | undefined;
 
     protected abstract getTitleText(): string;
     protected abstract getPillText(): string;
@@ -35,7 +39,11 @@ export abstract class ViewContainer extends GroupFolder {
         saveSettingsCallback: () => void,
         getGroupIconCallback: (isCollapsed: boolean) => string,
         moveCallback: (up: boolean) => void,
-        hideCallback: () => void
+        hideCallback: () => void,
+        isMovable: boolean,
+        canBePinned: boolean,
+        pinCallback: ((pin: boolean) => void) | undefined,
+        isPinned: boolean
     ) {
         super(
             app,
@@ -49,6 +57,9 @@ export abstract class ViewContainer extends GroupFolder {
             () => { return this.getEmptyMessage() });
 
         this.settings = settings;
+        this.isMovable = isMovable;
+        this.canBePinned = canBePinned;
+        this.isPinned = isPinned;
 
         this.fileClickCallback = fileClickCallback;
         this.fileAddedCallback = fileAddedCallback;
@@ -56,6 +67,7 @@ export abstract class ViewContainer extends GroupFolder {
         this.saveSettingsCallback = saveSettingsCallback;
         this.hideCallback = hideCallback;
         this.moveCallback = moveCallback;
+        this.pinCallback = pinCallback;
     }
 
     protected isVisible(): boolean {
@@ -73,25 +85,39 @@ export abstract class ViewContainer extends GroupFolder {
     protected getContextMenu() {
         const menu = new Menu();
 
-        menu.addItem(item =>
-            item
-                .setTitle("Move up")
-                .setIcon("arrow-up")
-                .setSection("movement")
-                .onClick(() => {
-                    this.moveCallback(true)
-                })
-        );
+        if (this.isMovable) {
+            menu.addItem(item =>
+                item
+                    .setTitle("Move up")
+                    .setIcon("arrow-up")
+                    .setSection("movement")
+                    .onClick(() => {
+                        this.moveCallback(true)
+                    })
+            );
 
-        menu.addItem(item =>
-            item
-                .setTitle("Move down")
-                .setIcon("arrow-down")
-                .setSection("movement")
-                .onClick(() => {
-                    this.moveCallback(false)
-                })
-        );
+            menu.addItem(item =>
+                item
+                    .setTitle("Move down")
+                    .setIcon("arrow-down")
+                    .setSection("movement")
+                    .onClick(() => {
+                        this.moveCallback(false)
+                    })
+            );
+        }
+
+        if (this.canBePinned) {
+            menu.addItem(item =>
+                item
+                    .setTitle(this.isPinned ? "Unpin" : "Pin")
+                    .setIcon(this.isPinned ? "pin-off" : "pin")
+                    .setSection("movement")
+                    .onClick(() => {
+                        this.pinCallback && this.pinCallback(!this.isPinned)
+                    })
+            );
+        }
 
         menu.addItem(item =>
             item
@@ -122,14 +148,46 @@ export abstract class ViewContainer extends GroupFolder {
         this.subFolders.forEach(folder => folder.setCollapsed(true, true));
     }
 
+    private buildPinContainer(): HTMLElement {
+        const pinContainerDiv = document.createElement("div");
+        pinContainerDiv.addClass("pin-container");
+
+        const pinDiv = document.createElement("div");
+        pinDiv.addClass("pin");
+        if (this.isPinned) {
+            pinDiv.addClass("is-pinned");
+        }
+        // setIcon(pinDiv, "circle");
+        setIcon(pinDiv, "circle");
+        pinContainerDiv.appendChild(pinDiv);
+
+        return pinContainerDiv;
+    }
+
+    private buildTitleSvgHolder() : HTMLElement {
+        const svgHolder = document.createElement("div");
+        svgHolder.addClass("svg-holder");
+
+        const titleChevronContainer = document.createElement("div");
+        titleChevronContainer.addClass("title-chevron-container")
+
+        const titleChevron = document.createElement("div");
+        setIcon(titleChevron, "chevron-down");
+        titleChevron.addClass("title-chevron");
+        if (this.isPinned) {
+            titleChevron.addClass("is-pinned");
+        }
+        titleChevronContainer.appendChild(titleChevron)
+
+        svgHolder.appendChild(this.buildPinContainer());
+        svgHolder.appendChild(titleChevronContainer);
+
+        return svgHolder;
+    }
+
     private buildTitleButton() : HTMLElement {
         const titleButton = document.createElement("div");
         titleButton.addClass("title");
-
-        const svgHolder = document.createElement("div");
-        setIcon(svgHolder, "chevron-down");
-        svgHolder.addClass("svg-holder");
-        titleButton.appendChild(svgHolder);
 
         const titleText = document.createElement("div");
         titleText.addClass("title-text");
@@ -142,6 +200,15 @@ export abstract class ViewContainer extends GroupFolder {
         });
 
         return titleButton;
+    }
+
+    private buildTagTitleGroup(): HTMLElement {
+        const tagTitleGroupDiv = document.createElement("div");
+        tagTitleGroupDiv.addClass("tag-title-group")
+
+        tagTitleGroupDiv.appendChild(this.buildPill());
+
+        return tagTitleGroupDiv;
     }
 
     private buildPill(): HTMLElement {
@@ -184,8 +251,9 @@ export abstract class ViewContainer extends GroupFolder {
         this.titleContainer = document.createElement("div");
         this.titleContainer.addClass("title-container");
 
+        this.titleContainer.appendChild(this.buildTitleSvgHolder());
         this.titleContainer.appendChild(this.buildTitleButton());
-        this.titleContainer.appendChild(this.buildPill());
+        this.titleContainer.appendChild(this.buildTagTitleGroup());
 
         this.titleContainer.addEventListener("click", () => {
             this.toggleCollapse();

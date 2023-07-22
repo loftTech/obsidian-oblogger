@@ -15,7 +15,9 @@ export class TagGroupContainer extends ViewContainer {
         collapseChangedCallback: (baseTag: string, collapsedFolders: string[], save: boolean) => void,
         requestRenderCallback: () => void,
         settings: ObloggerSettings,
-        saveSettingsCallback: () => void
+        saveSettingsCallback: () => void,
+        pinCallback: (pin: boolean) => void,
+        isPinned: boolean
     ) {
         super(
             app,
@@ -29,7 +31,12 @@ export class TagGroupContainer extends ViewContainer {
             saveSettingsCallback,
             (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
             moveCallback,
-            removeCallback);
+            removeCallback,
+            false, // isMovable
+            true, // canBePinned
+            pinCallback,
+            isPinned
+        );
     }
 
     protected getEmptyMessage(): string {
