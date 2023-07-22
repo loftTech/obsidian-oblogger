@@ -49,7 +49,7 @@ export class ImageFileSuggestModal extends SuggestModal<TFile> {
         el.ariaLabel = image.path;
     }
 
-    onChooseSuggestion(image: TFile, evt: MouseEvent | KeyboardEvent) {
+    onChooseSuggestion(image: TFile) {
         this.onSelect(image);
     }
 }
