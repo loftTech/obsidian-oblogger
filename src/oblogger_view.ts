@@ -207,13 +207,13 @@ export class ObloggerView extends ItemView {
             this.openFileContextMenu = fileExplorer.openFileContextMenu;
             this.setFocusedItem = fileExplorer.setFocusedItem;
             this.afterCreate = fileExplorer.afterCreate;
-            this.isItem = (file: TFile) => false;
+            this.isItem = () => false;
 
             this.registerEvent(
                 // todo(#172): right now, we're disabling rename because it's broken
                 //  however, we should fix it with either custom rename or by getting
                 //  the in-line rename to work right
-                this.app.workspace.on("file-menu", (menu, file) => {
+                this.app.workspace.on("file-menu", (menu) => {
                     // Don't hide it for other views (like file-explorer)
                     if(!this.app.workspace.getActiveViewOfType(ObloggerView)?.getState()) {
                         return;
@@ -234,6 +234,7 @@ export class ObloggerView extends ItemView {
             );
 
             // Hook up to the bookmarks plugin
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             const bookmarkPlugin = this.app.internalPlugins.getEnabledPluginById("bookmarks");
             if (bookmarkPlugin) {
