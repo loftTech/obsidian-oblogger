@@ -72,7 +72,6 @@ body.styled-scrollbars .oblogger-content {
 .menu-item-icon.files-sort-confirmation { color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/90%); }
 
 .oblogger-content .title-container {
-    align-items: center;
     display: flex;
     height: 18px;
     justify-content: space-between;
@@ -81,24 +80,67 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .title-container.collapsed { margin-bottom: 8px; }
 
 .oblogger-content .svg-holder {
-    margin: auto 0;
-    width: 16px;
+    display: grid;
+    grid-template-areas: "layer";
+}
+
+.pin-container {
+    display: flex;
+    align-items: center;
+    grid-area: layer;
+    z-index: -1;
+}
+
+.pin {
+    display: none;
+}
+
+.pin.is-pinned {
+    align-items: center;
+    display: flex;
+    height: 18px;
+    justify-content: center;
+    padding-bottom: 2px;
+    width: 18px;
+}
+
+.title-chevron-container {
+    grid-area: layer;
+    display: flex;
+    align-items: center;
+}
+
+.oblogger-content .title-chevron {
+    align-items: center;
+    display: flex;
+    height: 18px;
+    justify-content: center;
+    padding-bottom: .07rem;
+    width: 18px;
 }
 
 .oblogger-content .title {
     border-radius: var(--radius-s);
     color: var(--vault-name-color);
     display: flex;
+    margin-right: auto;
 }
 
 .oblogger-content .title-text {
-    display: inline-block;
+    align-items: center;
+    display: flex;
     font-size: smaller;
     font-weight: 600;
     overflow: hidden;
     overflow-wrap: anywhere;
+    padding-top: 1px;
     text-overflow: ellipsis;
     white-space: var(--nav-item-white-space);
+}
+
+.tag-title-group {
+    align-items: center;
+    display: flex;
 }
 
 .oblogger-content .title-tag {
@@ -346,7 +388,10 @@ body.styled-scrollbars .oblogger-content {
    ==========================================================================
 */
 
-.oblogger-content .svg-icon { color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/90%); }
+.oblogger-content .svg-icon {
+    color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/90%);
+    transition: transform 100ms ease-in-out;
+}
 
 .oblogger-pill-menu-icon .svg-icon {
     color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/90%);
@@ -378,26 +423,29 @@ body.styled-scrollbars .oblogger-content {
     width: 16px;
 }
 
-.oblogger-content .svg-holder .svg-icon {
-    align-items: center;
-    display: flex;
-    pointer-events: none;
+.oblogger-content .pin .svg-icon {
+    color: var(--nav-collapse-icon-color-collapsed);
+    fill: var(--nav-collapse-icon-color-collapsed);
+    height: 12px;
+    width: 12px;
+}
+
+.oblogger-content .title-chevron svg.svg-icon {
+    color: var(--nav-collapse-icon-color);
+    stroke-width: 3px;
+    height: 12px;
+    width: 12px;
+}
+
+.oblogger-content .title-chevron.is-pinned .svg-icon {
+    color: var(--background-secondary);
 }
 
 .oblogger-content .rx-child .collapsed .svg-icon:not(.content .svg-icon),
-.oblogger-content .otc-child .collapsed .svg-icon:not(.content .svg-icon) {
-    align-items: center;
-    color: var(--nav-collapse-icon-color-collapsed);
+.oblogger-content .title-container.collapsed .svg-icon:not(.oblogger-content .pin .svg-icon) {
     transform: rotate(-90deg);
 }
 
-.oblogger-content .svg-holder svg.svg-icon {
-    color: var(--nav-collapse-icon-color);
-    height: 10px;
-    stroke-width: 4px;
-    transition: transform 100ms ease-in-out;
-    width: 10px;
-}
 
 /* ==========================================================================
    HOVER AND ACTIVE
