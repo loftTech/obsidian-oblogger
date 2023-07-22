@@ -251,6 +251,7 @@ export abstract class ViewContainer extends GroupFolder {
         this.titleContainer = document.createElement("div");
         this.titleContainer.addClass("title-container");
 
+        this.titleContainer.appendChild(this.buildTitleSvgHolder());
         this.titleContainer.appendChild(this.buildTitleButton());
         this.titleContainer.appendChild(this.buildTagTitleGroup());
 
