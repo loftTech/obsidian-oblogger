@@ -30,7 +30,7 @@ export class FilesContainer extends ViewContainer {
             hideCallback,
             true, // isMovable
             false, // canBePinned
-            (pin: boolean) => { },
+            undefined,
             false); // isPinned
     }
 

@@ -14,7 +14,7 @@ export abstract class ViewContainer extends GroupFolder {
     saveSettingsCallback: () => void;
     hideCallback: () => void;
     moveCallback: (up: boolean) => void;
-    pinCallback: (pin: boolean) => void;
+    pinCallback: ((pin: boolean) => void) | undefined;
 
     protected abstract getTitleText(): string;
     protected abstract getPillText(): string;
@@ -42,7 +42,7 @@ export abstract class ViewContainer extends GroupFolder {
         hideCallback: () => void,
         isMovable: boolean,
         canBePinned: boolean,
-        pinCallback: (pin: boolean) => void,
+        pinCallback: ((pin: boolean) => void) | undefined,
         isPinned: boolean
     ) {
         super(
@@ -114,7 +114,7 @@ export abstract class ViewContainer extends GroupFolder {
                     .setIcon(this.isPinned ? "pin-off" : "pin")
                     .setSection("movement")
                     .onClick(() => {
-                        this.pinCallback(!this.isPinned)
+                        this.pinCallback && this.pinCallback(!this.isPinned)
                     })
             );
         }

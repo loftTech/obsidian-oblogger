@@ -34,7 +34,7 @@ export class RecentsContainer extends ViewContainer {
             hideCallback,
             true, // isMovable
             false, // canBePinned
-            (pin: boolean) => { },
+            undefined,
             false); // isPinned
 
         this.recentsCount = settings.recentsCount;
