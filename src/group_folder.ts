@@ -165,7 +165,7 @@ export class GroupFolder {
         }
     }
 
-    private isBookmarked(file: TFile): boolean {
+    protected isBookmarked(file: TFile): boolean {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         return !!app.internalPlugins.plugins.bookmarks?.instance?.items?.find(item => {
