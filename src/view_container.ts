@@ -148,14 +148,46 @@ export abstract class ViewContainer extends GroupFolder {
         this.subFolders.forEach(folder => folder.setCollapsed(true, true));
     }
 
+    private buildPinContainer(): HTMLElement {
+        const pinContainerDiv = document.createElement("div");
+        pinContainerDiv.addClass("pin-container");
+
+        const pinDiv = document.createElement("div");
+        pinDiv.addClass("pin");
+        if (this.isPinned) {
+            pinDiv.addClass("is-pinned");
+        }
+        // setIcon(pinDiv, "circle");
+        setIcon(pinDiv, "circle");
+        pinContainerDiv.appendChild(pinDiv);
+
+        return pinContainerDiv;
+    }
+
+    private buildTitleSvgHolder() : HTMLElement {
+        const svgHolder = document.createElement("div");
+        svgHolder.addClass("svg-holder");
+
+        const titleChevronContainer = document.createElement("div");
+        titleChevronContainer.addClass("title-chevron-container")
+
+        const titleChevron = document.createElement("div");
+        setIcon(titleChevron, "chevron-down");
+        titleChevron.addClass("title-chevron");
+        if (this.isPinned) {
+            titleChevron.addClass("is-pinned");
+        }
+        titleChevronContainer.appendChild(titleChevron)
+
+        svgHolder.appendChild(this.buildPinContainer());
+        svgHolder.appendChild(titleChevronContainer);
+
+        return svgHolder;
+    }
+
     private buildTitleButton() : HTMLElement {
         const titleButton = document.createElement("div");
         titleButton.addClass("title");
-
-        const svgHolder = document.createElement("div");
-        setIcon(svgHolder, "chevron-down");
-        svgHolder.addClass("svg-holder");
-        titleButton.appendChild(svgHolder);
 
         const titleText = document.createElement("div");
         titleText.addClass("title-text");
@@ -174,7 +206,6 @@ export abstract class ViewContainer extends GroupFolder {
         const tagTitleGroupDiv = document.createElement("div");
         tagTitleGroupDiv.addClass("tag-title-group")
 
-        tagTitleGroupDiv.appendChild(this.buildPinContainer());
         tagTitleGroupDiv.appendChild(this.buildPill());
 
         return tagTitleGroupDiv;
