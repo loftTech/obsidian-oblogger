@@ -195,7 +195,8 @@ Created at ${window.moment(file.stat.ctime).format("YYYY-MM-DD HH:mm")}`;
 
         const statusIconDiv = document.createElement("div");
         statusIconDiv.addClass("status-icon");
-        setIcon(statusIconDiv, "circle");
+        const isBookmarked = this.isBookmarked(file);
+        setIcon(statusIconDiv, isBookmarked ? "star" : "circle");
         statusContainerDiv.appendChild(statusIconDiv);
 
         if (
@@ -205,6 +206,9 @@ Created at ${window.moment(file.stat.ctime).format("YYYY-MM-DD HH:mm")}`;
         ) {
             statusIconDiv.addClass("visible");
             statusIconDiv.ariaLabel = "Untagged";
+        } else if (isBookmarked) {
+            statusIconDiv.addClass("visible");
+            statusIconDiv.ariaLabel = "Bookmarked";
         }
 
         root_childItem.appendChild(statusContainerDiv);
