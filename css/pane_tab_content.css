@@ -73,8 +73,6 @@ body.styled-scrollbars .oblogger-content {
 
 .oblogger-content .title-container {
     display: flex;
-
-/* todo reexamine this height declaration */
     height: 18px;
     justify-content: space-between;
 }
