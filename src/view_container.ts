@@ -202,6 +202,18 @@ export abstract class ViewContainer extends GroupFolder {
         return titleButton;
     }
 
+    private buildBookmarkContainer(): HTMLElement {
+        const bookmarkContainerDiv = document.createElement("div");
+        bookmarkContainerDiv.addClass("bookmark-container");
+
+        const bookmark = document.createElement("div");
+        bookmark.addClass("bookmark");
+        setIcon(bookmark, "bookmark");
+        bookmarkContainerDiv.appendChild(bookmark);
+
+        return bookmarkContainerDiv;
+    }
+
     private buildTagTitleGroup(): HTMLElement {
         const tagTitleGroupDiv = document.createElement("div");
         tagTitleGroupDiv.addClass("tag-title-group")
@@ -253,6 +265,7 @@ export abstract class ViewContainer extends GroupFolder {
 
         this.titleContainer.appendChild(this.buildTitleSvgHolder());
         this.titleContainer.appendChild(this.buildTitleButton());
+        this.titleContainer.appendChild(this.buildBookmarkContainer());
         this.titleContainer.appendChild(this.buildTagTitleGroup());
 
         this.titleContainer.addEventListener("click", () => {
