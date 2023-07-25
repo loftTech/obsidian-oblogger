@@ -80,43 +80,34 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .svg-holder {
+    align-items: center;
     display: grid;
     grid-template-areas: "layer";
+    margin-right: 4px;
+    max-width: 12px;
+    padding-bottom: 1px;
 }
 
-.pin-container {
-    display: flex;
-    align-items: center;
-    grid-area: layer;
-    z-index: -1;
-}
+.oblogger-content .pin-container { grid-area: layer; }
 
-.pin {
-    display: none;
-}
+.oblogger-content .pin { display: none; }
 
-.pin.is-pinned {
+.oblogger-content .pin.is-pinned {
     align-items: center;
     display: flex;
-    height: 18px;
     justify-content: center;
-    padding-bottom: 2px;
-    width: 18px;
 }
 
-.title-chevron-container {
-    grid-area: layer;
-    display: flex;
+.oblogger-content .title-chevron-container {
     align-items: center;
+    display: flex;
+    grid-area: layer;
 }
 
 .oblogger-content .title-chevron {
     align-items: center;
     display: flex;
-    height: 18px;
     justify-content: center;
-    padding-bottom: .07rem;
-    width: 18px;
 }
 
 .oblogger-content .title {
@@ -404,8 +395,8 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .pill-icon .svg-icon {
     color: var(--background-secondary);
     height: 9px;
-    margin-right: 1px;
     margin-left: -2px;
+    margin-right: 1px;
     width: 9px;
 }
 
@@ -426,16 +417,17 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .pin .svg-icon {
-    color: var(--nav-collapse-icon-color-collapsed);
-    fill: var(--nav-collapse-icon-color-collapsed);
-    height: 12px;
-    width: 12px;
+    color: var(--nav-indentation-guide-color);
+    height: 16px;
+    margin-left: -1px;
+    stroke-width: 3px;
+    width: 14px;
 }
 
 .oblogger-content .title-chevron svg.svg-icon {
-    color: var(--nav-collapse-icon-color);
-    stroke-width: 3px;
+    color: var(--nav-indentation-guide-color);
     height: 12px;
+    stroke-width: 3px;
     width: 12px;
 }
 
