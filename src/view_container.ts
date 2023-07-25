@@ -184,21 +184,16 @@ export abstract class ViewContainer extends GroupFolder {
         return svgHolder;
     }
 
-    private buildTitleButton() : HTMLElement {
-        const titleButton = document.createElement("div");
-        titleButton.addClass("title");
-
+    private buildTitleTextDiv() : HTMLElement {
         const titleText = document.createElement("div");
         titleText.addClass("title-text");
         titleText.setText(this.getTitleText().toUpperCase());
-        titleButton.appendChild(titleText);
-
-        titleButton.addEventListener("contextmenu", (e) => {
+        titleText.addEventListener("contextmenu", (e) => {
             const contextMenu = this.getContextMenu();
             contextMenu && contextMenu.showAtMouseEvent(e);
         });
 
-        return titleButton;
+        return titleText;
     }
 
     private buildTagTitleGroup(): HTMLElement {
@@ -211,17 +206,17 @@ export abstract class ViewContainer extends GroupFolder {
     }
 
     private buildPill(): HTMLElement {
-        const pillDiv = document.createElement("div");
-        pillDiv.addClass("title-tag");
+        const titleTagDiv = document.createElement("div");
+        titleTagDiv.addClass("title-tag");
         const pillTooltipText = this.getPillTooltipText();
         if (pillTooltipText.length > 0) {
-            pillDiv.ariaLabel = pillTooltipText;
+            titleTagDiv.ariaLabel = pillTooltipText;
         }
         const pillClickHandler = this.getPillClickHandler();
         if (!pillClickHandler) {
-            pillDiv.addClass("wiggle");
+            titleTagDiv.addClass("wiggle");
         }
-        pillDiv.addEventListener("click", e => {
+        titleTagDiv.addEventListener("click", e => {
             e.stopPropagation();
             if (pillClickHandler) {
                 pillClickHandler(e);
@@ -232,14 +227,14 @@ export abstract class ViewContainer extends GroupFolder {
         pillIconDiv.addClass("pill-icon");
         const pillIcon = this.getPillIcon();
         pillIcon && setIcon(pillIconDiv, pillIcon);
-        pillDiv.appendChild(pillIconDiv);
+        titleTagDiv.appendChild(pillIconDiv);
 
         const pillLabelDiv = document.createElement("div");
         pillLabelDiv.addClass("pill-label");
         pillLabelDiv.setText(this.getPillText());
-        pillDiv.appendChild(pillLabelDiv);
+        titleTagDiv.appendChild(pillLabelDiv);
 
-        return pillDiv;
+        return titleTagDiv;
     }
 
     protected buildTitle() {
@@ -251,7 +246,7 @@ export abstract class ViewContainer extends GroupFolder {
         this.titleContainer.addClass("title-container");
 
         this.titleContainer.appendChild(this.buildTitleSvgHolder());
-        this.titleContainer.appendChild(this.buildTitleButton());
+        this.titleContainer.appendChild(this.buildTitleTextDiv());
         this.titleContainer.appendChild(this.buildTagTitleGroup());
 
         this.titleContainer.addEventListener("click", () => {
