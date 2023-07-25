@@ -249,7 +249,7 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .content {
-    padding: 4px 0 15px 3px;
+    padding: 0 0 6px 4px;
     transition-duration: 0.1s;
     transition-timing-function: cubic-bezier(0.02, 0.01, 0.47, 1);
 }
