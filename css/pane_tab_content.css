@@ -165,7 +165,8 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .family-title .clickable-icon {
-    margin-top: 2px;
+    margin: 2px 2px 0;
+    padding: 4px;
     transition: none;
 }
 
