@@ -118,8 +118,6 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .title-text {
-    align-items: center;
-    display: flex;
     font-size: smaller;
     font-weight: 600;
     overflow: hidden;
@@ -130,8 +128,7 @@ body.styled-scrollbars .oblogger-content {
     width: 60%;
 }
 
-.tag-title-group {
-    align-items: center;
+.oblogger-content .tag-title-group {
     display: flex;
 }
 
@@ -143,7 +140,6 @@ body.styled-scrollbars .oblogger-content {
     display: flex;
     font-size: 9px;
     font-weight: 600;
-    height: fit-content;
     max-height: 18px;
     opacity: 0.5;
     overflow: hidden;
@@ -472,15 +468,10 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .separator-container:hover .separator {
-    align-items: center;
-    background-color: var(--interactive-accent);
-    border-radius: 8px;
     color: var(--background-secondary);
-    display: flex;
     font-size: 8px;
     font-weight: 700;
     height: inherit;
-    justify-content: center;
     opacity: 1;
     transition: 0.2s;
     width: 85px;
