@@ -157,8 +157,7 @@ export abstract class ViewContainer extends GroupFolder {
         if (this.isPinned) {
             pinDiv.addClass("is-pinned");
         }
-        // setIcon(pinDiv, "circle");
-        setIcon(pinDiv, "circle");
+        setIcon(pinDiv, "chevrons-down");
         pinContainerDiv.appendChild(pinDiv);
 
         return pinContainerDiv;
