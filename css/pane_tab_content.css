@@ -449,7 +449,7 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .title-chevron.is-pinned .svg-icon {
-    color: var(--background-secondary);
+    color: transparent;
 }
 
 .oblogger-content .rx-child .collapsed .svg-icon:not(.content .svg-icon),
