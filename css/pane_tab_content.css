@@ -231,6 +231,19 @@ body.styled-scrollbars .oblogger-content {
     white-space: nowrap;
 }
 
+.oblogger-content .nav-file-tag {
+    align-self: center;
+    background-color: var(--background-modifier-hover);
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    line-height: 1.5;
+    margin: 0 6px;
+    padding: 0 4px;
+    text-transform: uppercase;
+}
+
 .oblogger-content .family-content.collapsed,
 .oblogger-content .content.collapsed {
     max-height: 0;
