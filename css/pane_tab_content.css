@@ -453,9 +453,7 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .rx-child .collapsed .svg-icon:not(.content .svg-icon),
-.oblogger-content .title-container.collapsed .svg-icon:not(.oblogger-content .pin .svg-icon) {
-    transform: rotate(-90deg);
-}
+.oblogger-content .title-container.collapsed .svg-icon { transform: rotate(-90deg); }
 
 
 /* ==========================================================================
@@ -464,9 +462,7 @@ body.styled-scrollbars .oblogger-content {
 */
 
 .oblogger-content .separator:active,
-.oblogger-content .title-tag.wiggle:active {
-    animation: wiggle 0.2s;
-}
+.oblogger-content .title-tag.wiggle:active { animation: wiggle 0.2s; }
 
 /* noinspection Stylelint */
 .oblogger-content .title-tag:hover,
@@ -504,9 +500,7 @@ body.styled-scrollbars .oblogger-content {
    ==========================================================================
 */
 
-.is-phone .oblogger-content {
-    padding: 0 25px 70px;
-}
+.is-phone .oblogger-content { padding: 0 25px 70px; }
 
 /* ==========================================================================
    MISC
