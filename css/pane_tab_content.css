@@ -71,11 +71,13 @@ body.styled-scrollbars .oblogger-content {
 
 .oblogger-content .title-container {
     display: flex;
-    height: 18px;
-    justify-content: space-between;
+    height: 22px;
+    padding: 3px 0;
 }
 
-.oblogger-content .title-container.collapsed { margin-bottom: 8px; }
+.oblogger-content .title-button {
+    display: flex;
+}
 
 .oblogger-content .svg-holder {
     display: grid;
@@ -131,9 +133,10 @@ body.styled-scrollbars .oblogger-content {
     font-weight: 600;
     overflow: hidden;
     overflow-wrap: anywhere;
-    padding-top: 1px;
+    padding-top: 2px;
     text-overflow: ellipsis;
-    white-space: var(--nav-item-white-space);
+    white-space: nowrap;
+    width: 60%;
 }
 
 .tag-title-group {
@@ -152,6 +155,7 @@ body.styled-scrollbars .oblogger-content {
     height: fit-content;
     max-height: 18px;
     opacity: 0.5;
+    overflow: hidden;
     padding: 2px 5px;
     transition: 0.3s;
 }
@@ -177,7 +181,7 @@ body.styled-scrollbars .oblogger-content {
     overflow: hidden;
     overflow-wrap: anywhere;
     text-overflow: ellipsis;
-    white-space: var(--nav-item-white-space);
+    white-space: nowrap;
 }
 
 .oblogger-content .family-content {
@@ -233,7 +237,7 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .child-item-text {
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: var(--nav-item-white-space);
+    white-space: nowrap;
 }
 
 .oblogger-content .family-content.collapsed,
