@@ -130,6 +130,8 @@ body.styled-scrollbars .oblogger-content {
 
 .oblogger-content .tag-title-group {
     display: flex;
+    justify-content: flex-end;
+    width: 40%;
 }
 
 .oblogger-content .title-tag {
@@ -150,6 +152,11 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .collapsed .title-tag { display: none; }
 
 .oblogger-content .pill-icon { display: flex; }
+
+.oblogger-content .pill-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 .oblogger-content .family-title {
     align-items: center;
