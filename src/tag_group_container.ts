@@ -55,13 +55,26 @@ export class TagGroupContainer extends ViewContainer {
         return true;
     }
 
+    private getIsolatedTagMatch(): RegExpMatchArray | null {
+        return this.groupName.match("\\.\\.\\./(.*)/\\.\\.\\.");
+    }
+
     protected getTitleText(): string {
-        const match = this.groupName.match("\\.\\.\\./(.*)/\\.\\.\\.");
+        const match = this.getIsolatedTagMatch();
         if (match) {
-            return this.groupName;
+            return `${match[1]}`
         } else {
             return this.groupName.split("/").last() ?? ""
         }
+    }
+
+    protected getTitleIcon(): string {
+        if (this.getIsolatedTagMatch()) {
+            // return "list-tree";
+            // return "layers"
+            return "tags";
+        }
+        return "";
     }
 
     protected getPillText(): string {
@@ -88,9 +101,7 @@ export class TagGroupContainer extends ViewContainer {
             tags: string[]
         }
 
-        const isolatedGroupName = this.groupName
-            .match("\\.\\.\\./(.*)/\\.\\.\\.")
-            ?.at(1);
+        const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
 
         type TagFileMap = { [key: string]: TFile[] };
 

@@ -56,6 +56,10 @@ export class RecentsContainer extends ViewContainer {
         return "Recents";
     }
 
+    protected getTitleIcon(): string {
+        return "";
+    }
+
     protected getPillText(): string {
         return `Last ${this.recentsCount}`;
     }

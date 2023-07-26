@@ -50,6 +50,10 @@ export class UntaggedContainer extends ViewContainer {
         return "Untagged";
     }
 
+    protected getTitleIcon(): string {
+        return "";
+    }
+
     protected getPillText(): string {
         return getSortMethodDisplayText(this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL);
     }
