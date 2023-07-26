@@ -195,8 +195,7 @@ Created at ${window.moment(file.stat.ctime).format("YYYY-MM-DD HH:mm")}`;
 
         const statusIconDiv = document.createElement("div");
         statusIconDiv.addClass("status-icon");
-        const isBookmarked = this.isBookmarked(file);
-        setIcon(statusIconDiv, isBookmarked ? "star" : "circle");
+        setIcon(statusIconDiv, "circle");
         statusContainerDiv.appendChild(statusIconDiv);
 
         if (
@@ -206,9 +205,6 @@ Created at ${window.moment(file.stat.ctime).format("YYYY-MM-DD HH:mm")}`;
         ) {
             statusIconDiv.addClass("visible");
             statusIconDiv.ariaLabel = "Untagged";
-        } else if (isBookmarked) {
-            statusIconDiv.addClass("visible");
-            statusIconDiv.ariaLabel = "Bookmarked";
         }
 
         root_childItem.appendChild(statusContainerDiv);
@@ -226,6 +222,13 @@ Created at ${window.moment(file.stat.ctime).format("YYYY-MM-DD HH:mm")}`;
         childItemText.setText(maybeFrontmatter?.alias ?? file.basename);
         childItemText.ariaLabel = fileTooltipText;
         childItemContent.appendChild(childItemText);
+
+        const bookmarkIcon = document.createElement("div");
+        bookmarkIcon.addClass("bookmark-icon");
+        if (this.isBookmarked(file)) {
+            setIcon(bookmarkIcon, "bookmark");
+        }
+        childItemContent.appendChild(bookmarkIcon);
 
         if (file.extension.toLowerCase() !== "md") {
             const childItemTypePill = document.createElement("div");
