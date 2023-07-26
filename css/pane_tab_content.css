@@ -36,87 +36,78 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .separator-container {
-    align-items: center;
-    display: flex;
     height: 15px;
-    margin: 0 auto -2px;
     width: fit-content;
 }
 
 .oblogger-content .separator {
     align-items: center;
-    background-color: var(--interactive-accent);
+    background-color: var(--nav-indentation-guide-color);
     border-radius: 10px;
-    color: var(--interactive-accent);
+    color: var(--nav-indentation-guide-color);
     display: flex;
     font-size: 0;
     height: 3px;
     justify-content: center;
-    margin: 0 10px;
     opacity: 0.6;
-    padding: 1px 5px;
     transition: 0.6s;
     width: 65px;
 }
 
-.oblogger-content .separator-container.body {
-    margin-bottom: -4px;
-    margin-top: 6px;
+.oblogger-content .rx-separator {
+    margin: auto;
+    display: flex;
+    align-items: center;
 }
 
-.oblogger-content .rx-separator { margin: -9px auto 5px; }
-
-.oblogger-content .otc-separator { margin: -4px auto 3px; }
+.oblogger-content .otc-separator {
+    margin: auto;
+    display: flex;
+    align-items: center;
+}
 
 .menu-item-icon.untagged-sort-confirmation,
 .menu-item-icon.files-sort-confirmation { color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/90%); }
 
 .oblogger-content .title-container {
     display: flex;
-    height: 18px;
-    justify-content: space-between;
+    height: 22px;
+    padding: 3px 0;
 }
 
-.oblogger-content .title-container.collapsed { margin-bottom: 8px; }
+.oblogger-content .title-button {
+    display: flex;
+}
 
 .oblogger-content .svg-holder {
+    align-items: center;
     display: grid;
     grid-template-areas: "layer";
+    margin-right: 4px;
+    max-width: 12px;
+    padding-bottom: 1px;
 }
 
-.pin-container {
-    display: flex;
-    align-items: center;
-    grid-area: layer;
-    z-index: -1;
-}
+.oblogger-content .pin-container { grid-area: layer; }
 
-.pin {
-    display: none;
-}
+.oblogger-content .pin { display: none; }
 
-.pin.is-pinned {
+.oblogger-content .pin.is-pinned {
     align-items: center;
     display: flex;
-    height: 18px;
     justify-content: center;
-    padding-bottom: 2px;
-    width: 18px;
 }
 
-.title-chevron-container {
-    grid-area: layer;
-    display: flex;
+.oblogger-content .title-chevron-container {
     align-items: center;
+    display: flex;
+    grid-area: layer;
 }
 
 .oblogger-content .title-chevron {
     align-items: center;
     display: flex;
-    height: 18px;
     justify-content: center;
-    padding-bottom: .07rem;
-    width: 18px;
 }
 
 .oblogger-content .title {
@@ -127,20 +118,20 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .title-text {
-    align-items: center;
-    display: flex;
     font-size: smaller;
     font-weight: 600;
     overflow: hidden;
     overflow-wrap: anywhere;
-    padding-top: 1px;
+    padding-top: 2px;
     text-overflow: ellipsis;
-    white-space: var(--nav-item-white-space);
+    white-space: nowrap;
+    width: 60%;
 }
 
-.tag-title-group {
-    align-items: center;
+.oblogger-content .tag-title-group {
     display: flex;
+    justify-content: flex-end;
+    width: 40%;
 }
 
 .oblogger-content .title-tag {
@@ -151,9 +142,9 @@ body.styled-scrollbars .oblogger-content {
     display: flex;
     font-size: 9px;
     font-weight: 600;
-    height: fit-content;
     max-height: 18px;
     opacity: 0.5;
+    overflow: hidden;
     padding: 2px 5px;
     transition: 0.3s;
 }
@@ -162,6 +153,11 @@ body.styled-scrollbars .oblogger-content {
 
 .oblogger-content .pill-icon { display: flex; }
 
+.oblogger-content .pill-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .oblogger-content .family-title {
     align-items: center;
     color: var(--nav-item-color);
@@ -169,7 +165,8 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .family-title .clickable-icon {
-    margin-top: 2px;
+    margin: 2px 2px 0;
+    padding: 4px;
     transition: none;
 }
 
@@ -179,7 +176,7 @@ body.styled-scrollbars .oblogger-content {
     overflow: hidden;
     overflow-wrap: anywhere;
     text-overflow: ellipsis;
-    white-space: var(--nav-item-white-space);
+    white-space: nowrap;
 }
 
 .oblogger-content .family-content {
@@ -235,7 +232,20 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .child-item-text {
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: var(--nav-item-white-space);
+    white-space: nowrap;
+}
+
+.oblogger-content .nav-file-tag {
+    align-self: center;
+    background-color: var(--background-modifier-hover);
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    line-height: 1.5;
+    margin: 0 6px;
+    padding: 0 4px;
+    text-transform: uppercase;
 }
 
 .oblogger-content .family-content.collapsed,
@@ -247,7 +257,7 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .content {
-    padding: 4px 0 15px 3px;
+    padding: 0 0 6px 4px;
     transition-duration: 0.1s;
     transition-timing-function: cubic-bezier(0.02, 0.01, 0.47, 1);
 }
@@ -348,7 +358,7 @@ body.styled-scrollbars .oblogger-content {
     display: flex;
     font-family: var(--font-monospace);
     justify-content: center;
-    margin-bottom: 15px;
+    margin-bottom: 2px;
 }
 
 .greeter-clock .date,
@@ -402,8 +412,8 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .pill-icon .svg-icon {
     color: var(--background-secondary);
     height: 9px;
-    margin-right: 1px;
     margin-left: -2px;
+    margin-right: 1px;
     width: 9px;
 }
 
@@ -424,27 +434,26 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .pin .svg-icon {
-    color: var(--nav-collapse-icon-color-collapsed);
-    fill: var(--nav-collapse-icon-color-collapsed);
-    height: 12px;
-    width: 12px;
+    color: var(--nav-indentation-guide-color);
+    height: 16px;
+    margin-left: -1px;
+    stroke-width: 3px;
+    width: 14px;
 }
 
 .oblogger-content .title-chevron svg.svg-icon {
-    color: var(--nav-collapse-icon-color);
-    stroke-width: 3px;
+    color: var(--nav-indentation-guide-color);
     height: 12px;
+    stroke-width: 3px;
     width: 12px;
 }
 
 .oblogger-content .title-chevron.is-pinned .svg-icon {
-    color: var(--background-secondary);
+    color: transparent;
 }
 
 .oblogger-content .rx-child .collapsed .svg-icon:not(.content .svg-icon),
-.oblogger-content .title-container.collapsed .svg-icon:not(.oblogger-content .pin .svg-icon) {
-    transform: rotate(-90deg);
-}
+.oblogger-content .title-container.collapsed .svg-icon { transform: rotate(-90deg); }
 
 
 /* ==========================================================================
@@ -453,9 +462,7 @@ body.styled-scrollbars .oblogger-content {
 */
 
 .oblogger-content .separator:active,
-.oblogger-content .title-tag.wiggle:active {
-    animation: wiggle 0.2s;
-}
+.oblogger-content .title-tag.wiggle:active { animation: wiggle 0.2s; }
 
 /* noinspection Stylelint */
 .oblogger-content .title-tag:hover,
@@ -465,15 +472,10 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .separator-container:hover .separator {
-    align-items: center;
-    background-color: var(--interactive-accent);
-    border-radius: 8px;
     color: var(--background-secondary);
-    display: flex;
     font-size: 8px;
     font-weight: 700;
     height: inherit;
-    justify-content: center;
     opacity: 1;
     transition: 0.2s;
     width: 85px;
@@ -498,9 +500,7 @@ body.styled-scrollbars .oblogger-content {
    ==========================================================================
 */
 
-.is-phone .oblogger-content {
-    padding: 0 25px 70px;
-}
+.is-phone .oblogger-content { padding: 0 25px 70px; }
 
 /* ==========================================================================
    MISC

@@ -337,9 +337,9 @@
 
 .logger .separator {
     align-items: center;
-    background-color: var(--interactive-accent);
+    background-color: var(--nav-indentation-guide-color);
     border-radius: 10px;
-    color: var(--interactive-accent);
+    color: var(--nav-indentation-guide-color);
     display: flex;
     font-size: 0;
     height: 3px;
@@ -413,7 +413,7 @@
 
 .logger .separator-container:hover .separator {
     align-items: center;
-    background-color: var(--interactive-accent);
+    background-color: var(--nav-indentation-guide-color);
     border-radius: 8px;
     color: var(--background-secondary);
     display: flex;
