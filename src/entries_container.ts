@@ -51,6 +51,14 @@ export class EntriesContainer extends ViewContainer {
         return "Entries";
     }
 
+    protected getTitleIcon(): string {
+        return "";
+    }
+
+    protected getTitleIconTooltip(): string {
+        return "";
+    }
+
     protected getPillText(): string {
         return "#" + this.settings.entriesTag;
     }

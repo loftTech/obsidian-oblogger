@@ -11,7 +11,20 @@ export class NewTagModal extends FuzzySuggestModal<string> {
     getItems(): string[] {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        return Object.keys(this.app.metadataCache.getTags());
+        const allTags = Object.keys(this.app.metadataCache.getTags());
+        const individualTags = new Set<string>();
+        allTags.forEach(fullTag => {
+            fullTag.split("/").forEach(splitTag => {
+                if (allTags.contains(splitTag)) {
+                    return;
+                }
+                if (splitTag.startsWith("#")) {
+                    splitTag = splitTag.substring(1);
+                }
+                individualTags.add(`.../${splitTag}/...`);
+            });
+        });
+        return allTags.concat(Array.from(individualTags));
     }
 
     getItemText(tag: string): string {

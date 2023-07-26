@@ -17,6 +17,8 @@ export abstract class ViewContainer extends GroupFolder {
     pinCallback: ((pin: boolean) => void) | undefined;
 
     protected abstract getTitleText(): string;
+    protected abstract getTitleIcon(): string;
+    protected abstract getTitleIconTooltip(): string;
     protected abstract getPillText(): string;
     protected abstract getPillTooltipText(): string;
     protected abstract getPillIcon(): string;
@@ -187,13 +189,24 @@ export abstract class ViewContainer extends GroupFolder {
     private buildTitleTextDiv() : HTMLElement {
         const titleText = document.createElement("div");
         titleText.addClass("title-text");
+
+        const titleIcon = document.createElement("div");
+        setIcon(titleIcon, this.getTitleIcon());
+        titleIcon.addClass("title-icon");
+        titleIcon.ariaLabel = this.getTitleIconTooltip();
+
+        const titleTextContainer = document.createElement("div");
+        titleTextContainer.addClass("title-text-container");
+        titleTextContainer.appendChild(titleText);
+        titleTextContainer.appendChild(titleIcon);
+
         titleText.setText(this.getTitleText().toUpperCase());
         titleText.addEventListener("contextmenu", (e) => {
             const contextMenu = this.getContextMenu();
             contextMenu && contextMenu.showAtMouseEvent(e);
         });
 
-        return titleText;
+        return titleTextContainer;
     }
 
     private buildTagTitleGroup(): HTMLElement {

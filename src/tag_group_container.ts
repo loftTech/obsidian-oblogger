@@ -4,6 +4,8 @@ import { ViewContainer } from "./view_container";
 import { ObloggerSettings } from "./settings";
 
 
+type TagFileMap = { [key: string]: TFile[] };
+
 export class TagGroupContainer extends ViewContainer {
     constructor(
         app: App,
@@ -55,17 +57,46 @@ export class TagGroupContainer extends ViewContainer {
         return true;
     }
 
+    private getIsolatedTagMatch(): RegExpMatchArray | null {
+        return this.groupName.match("\\.\\.\\./(.*)/\\.\\.\\.");
+    }
+
     protected getTitleText(): string {
-        return this.groupName.split("/").last() ?? ""
+        const match = this.getIsolatedTagMatch();
+        if (match) {
+            return `${match[1]}`
+        } else {
+            return this.groupName.split("/").last() ?? ""
+        }
+    }
+
+    protected getTitleIcon(): string {
+        if (this.getIsolatedTagMatch()) {
+            return "tags";
+        }
+        return "";
+    }
+
+    protected getTitleIconTooltip(): string {
+        return this.getIsolatedTagMatch() ? "Nested within multiple tags" : "";
     }
 
     protected getPillText(): string {
+        if (this.getIsolatedTagMatch()) {
+            return "• • •";
+        }
         return "#" + (this.groupName.split("/").first() ?? "") + (
             this.groupName.contains("/") ? "..." : ""
         )
     }
 
     protected getPillTooltipText(): string {
+        if (this.getIsolatedTagMatch()) {
+            return "All associated tags:\n\n" + Object.keys(this.getAllAssociatedTags([]))
+                .sort()
+                .map(tag => `#${tag}`)
+                .join("\n");
+        }
         return this.groupName.contains("/") ? this.groupName : "";
     }
 
@@ -77,15 +108,15 @@ export class TagGroupContainer extends ViewContainer {
         return undefined;
     }
 
-    protected buildFileStructure(excludedFolders: string[]) {
+    private getAllAssociatedTags(excludedFolders: string[]): TagFileMap {
         interface Item {
             file: TFile,
             tags: string[]
         }
 
-        type TagFileMap = { [key: string]: TFile[] };
+        const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
 
-        const tags = this.app.vault
+        return this.app.vault
             .getMarkdownFiles()
             .map((file: TFile) => {
                 // filter out excluded
@@ -100,7 +131,13 @@ export class TagGroupContainer extends ViewContainer {
                 const tags = getAllTags(cache)
                     ?.map(tag => tag.replace("#", ""))
                     ?.unique()
-                    ?.filter((tag: string) => tag.startsWith(this.groupName));
+                    ?.filter((tag: string) => {
+                        if (isolatedGroupName) {
+                            return tag.contains(isolatedGroupName);
+                        } else {
+                            return tag.startsWith(this.groupName);
+                        }
+                    });
                 if (!tags) {
                     return null;
                 }
@@ -116,13 +153,26 @@ export class TagGroupContainer extends ViewContainer {
                 });
                 return acc;
             }, {});
+    }
+
+    protected buildFileStructure(excludedFolders: string[]) {
+        const tags = this.getAllAssociatedTags(excludedFolders);
+        const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
 
         Object.keys(tags).sort().forEach((tag: string) => {
             const subTag = tag.replace(this.groupName, "");
             tags[tag].forEach((file: TFile) => {
+                let remainingTag = subTag.startsWith("/") ? subTag.slice(1) : subTag;
+                if (isolatedGroupName) {
+                    if (remainingTag.endsWith(isolatedGroupName)) {
+                        remainingTag = remainingTag.replace(isolatedGroupName, "")
+                    } else if (remainingTag.contains(isolatedGroupName)) {
+                        remainingTag = remainingTag.split("/").last() ?? "";
+                    }
+                }
                 this.addFileToFolder(
                     file,
-                    subTag.startsWith("/") ? subTag.slice(1) : subTag,
+                    remainingTag.startsWith("/") ? remainingTag.slice(1) : remainingTag,
                     "/"
                 );
             });
