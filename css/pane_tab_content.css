@@ -246,6 +246,11 @@ body.styled-scrollbars .oblogger-content {
     white-space: nowrap;
 }
 
+.oblogger-content .bookmark-icon {
+    display: flex;
+    margin: 1px -4px 0 1px;
+}
+
 .oblogger-content .nav-file-tag {
     align-self: center;
     background-color: var(--background-modifier-hover);
@@ -469,6 +474,13 @@ body.styled-scrollbars .oblogger-content {
     margin-left: 4px;
     stroke-width: 2px;
     width: 12px;
+}
+
+.oblogger-content .bookmark-icon svg.svg-icon {
+    fill: var(--nav-indentation-guide-color);
+    color: transparent;
+    height: 15px;
+    width: 13px;
 }
 
 .oblogger-content .rx-child .collapsed .svg-icon:not(.content .svg-icon),
