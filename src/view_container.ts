@@ -192,6 +192,7 @@ export abstract class ViewContainer extends GroupFolder {
 
         const titleIcon = document.createElement("div");
         setIcon(titleIcon, this.getTitleIcon());
+        titleIcon.addClass("title-icon");
         titleIcon.ariaLabel = this.getTitleIconTooltip();
 
         const titleTextContainer = document.createElement("div");
