@@ -15,6 +15,9 @@ export class NewTagModal extends FuzzySuggestModal<string> {
         const individualTags = new Set<string>();
         allTags.forEach(fullTag => {
             fullTag.split("/").forEach(splitTag => {
+                if (allTags.contains(splitTag)) {
+                    return;
+                }
                 if (splitTag.startsWith("#")) {
                     splitTag = splitTag.substring(1);
                 }
