@@ -150,7 +150,11 @@ export class TagGroupContainer extends ViewContainer {
             tags[tag].forEach((file: TFile) => {
                 let remainingTag = subTag.startsWith("/") ? subTag.slice(1) : subTag;
                 if (isolatedGroupName) {
-                    remainingTag = remainingTag.replace(isolatedGroupName, "").replace("//", "");
+                    if (remainingTag.endsWith(isolatedGroupName)) {
+                        remainingTag = remainingTag.replace(isolatedGroupName, "")
+                    } else if (remainingTag.contains(isolatedGroupName)) {
+                        remainingTag = remainingTag.split("/").last() ?? "";
+                    }
                 }
                 this.addFileToFolder(
                     file,
