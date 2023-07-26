@@ -56,7 +56,12 @@ export class TagGroupContainer extends ViewContainer {
     }
 
     protected getTitleText(): string {
-        return this.groupName.split("/").last() ?? ""
+        const match = this.groupName.match("\\.\\.\\./(.*)/\\.\\.\\.");
+        if (match) {
+            return this.groupName;
+        } else {
+            return this.groupName.split("/").last() ?? ""
+        }
     }
 
     protected getPillText(): string {
