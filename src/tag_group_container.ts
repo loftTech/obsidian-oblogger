@@ -88,6 +88,10 @@ export class TagGroupContainer extends ViewContainer {
             tags: string[]
         }
 
+        const isolatedGroupName = this.groupName
+            .match("\\.\\.\\./(.*)/\\.\\.\\.")
+            ?.at(1);
+
         type TagFileMap = { [key: string]: TFile[] };
 
         const tags = this.app.vault
@@ -105,7 +109,13 @@ export class TagGroupContainer extends ViewContainer {
                 const tags = getAllTags(cache)
                     ?.map(tag => tag.replace("#", ""))
                     ?.unique()
-                    ?.filter((tag: string) => tag.startsWith(this.groupName));
+                    ?.filter((tag: string) => {
+                        if (isolatedGroupName) {
+                            return tag.contains(isolatedGroupName);
+                        } else {
+                            return tag.startsWith(this.groupName);
+                        }
+                    });
                 if (!tags) {
                     return null;
                 }
