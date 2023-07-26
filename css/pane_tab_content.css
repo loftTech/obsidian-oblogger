@@ -123,6 +123,11 @@ body.styled-scrollbars .oblogger-content {
     width: 60%;
 }
 
+.oblogger-content .title-icon {
+    align-items: center;
+    display: flex;
+}
+
 .oblogger-content .title-text {
     font-size: smaller;
     font-weight: 600;
@@ -459,11 +464,11 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .title-text-container svg.svg-icon {
-    height: 12px;
-    width: 12px;
-    stroke-width: 3px;
-    margin-left: 4px;
     color: var(--nav-indientation-guide-color);
+    height: 12px;
+    margin-left: 4px;
+    stroke-width: 2px;
+    width: 12px;
 }
 
 .oblogger-content .rx-child .collapsed .svg-icon:not(.content .svg-icon),
