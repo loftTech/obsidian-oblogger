@@ -165,7 +165,7 @@ export abstract class ViewContainer extends GroupFolder {
         return pinContainerDiv;
     }
 
-    private buildTitleSvgHolder() : HTMLElement {
+    private buildTitleSvgHolder(): HTMLElement {
         const svgHolder = document.createElement("div");
         svgHolder.addClass("svg-holder");
 
@@ -186,7 +186,7 @@ export abstract class ViewContainer extends GroupFolder {
         return svgHolder;
     }
 
-    private buildTitleTextDiv() : HTMLElement {
+    private buildTitleTextDiv(): HTMLElement {
         const titleText = document.createElement("div");
         titleText.addClass("title-text");
 

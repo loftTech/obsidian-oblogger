@@ -165,6 +165,14 @@ export class GroupFolder {
         }
     }
 
+    protected isBookmarked(file: TFile): boolean {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return !!app.internalPlugins.plugins.bookmarks?.instance?.items?.find(item => {
+            return item.type === "file" && item.path === file.path
+        });
+    }
+
     private buildFileElement(
         file: TFile,
         fileClickCallback: FileClickCallback,
@@ -214,6 +222,14 @@ Created at ${window.moment(file.stat.ctime).format("YYYY-MM-DD HH:mm")}`;
         childItemText.setText(maybeFrontmatter?.alias ?? file.basename);
         childItemText.ariaLabel = fileTooltipText;
         childItemContent.appendChild(childItemText);
+
+        const bookmarkIcon = document.createElement("div");
+        bookmarkIcon.addClass("bookmark-icon");
+        if (this.isBookmarked(file)) {
+            setIcon(bookmarkIcon, "bookmark");
+            bookmarkIcon.ariaLabel = "Bookmarked";
+        }
+        childItemContent.appendChild(bookmarkIcon);
 
         if (file.extension.toLowerCase() !== "md") {
             const childItemTypePill = document.createElement("div");
