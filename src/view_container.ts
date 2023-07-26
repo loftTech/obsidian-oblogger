@@ -17,6 +17,8 @@ export abstract class ViewContainer extends GroupFolder {
     pinCallback: ((pin: boolean) => void) | undefined;
 
     protected abstract getTitleText(): string;
+    protected abstract getTitleIcon(): string;
+    protected abstract getTitleIconTooltip(): string;
     protected abstract getPillText(): string;
     protected abstract getPillTooltipText(): string;
     protected abstract getPillIcon(): string;
@@ -157,8 +159,7 @@ export abstract class ViewContainer extends GroupFolder {
         if (this.isPinned) {
             pinDiv.addClass("is-pinned");
         }
-        // setIcon(pinDiv, "circle");
-        setIcon(pinDiv, "circle");
+        setIcon(pinDiv, "chevrons-down");
         pinContainerDiv.appendChild(pinDiv);
 
         return pinContainerDiv;
@@ -185,21 +186,27 @@ export abstract class ViewContainer extends GroupFolder {
         return svgHolder;
     }
 
-    private buildTitleButton(): HTMLElement {
-        const titleButton = document.createElement("div");
-        titleButton.addClass("title");
-
+    private buildTitleTextDiv(): HTMLElement {
         const titleText = document.createElement("div");
         titleText.addClass("title-text");
-        titleText.setText(this.getTitleText().toUpperCase());
-        titleButton.appendChild(titleText);
 
-        titleButton.addEventListener("contextmenu", (e) => {
+        const titleIcon = document.createElement("div");
+        setIcon(titleIcon, this.getTitleIcon());
+        titleIcon.addClass("title-icon");
+        titleIcon.ariaLabel = this.getTitleIconTooltip();
+
+        const titleTextContainer = document.createElement("div");
+        titleTextContainer.addClass("title-text-container");
+        titleTextContainer.appendChild(titleText);
+        titleTextContainer.appendChild(titleIcon);
+
+        titleText.setText(this.getTitleText().toUpperCase());
+        titleText.addEventListener("contextmenu", (e) => {
             const contextMenu = this.getContextMenu();
             contextMenu && contextMenu.showAtMouseEvent(e);
         });
 
-        return titleButton;
+        return titleTextContainer;
     }
 
     private buildBookmarkContainer(): HTMLElement {
@@ -224,17 +231,17 @@ export abstract class ViewContainer extends GroupFolder {
     }
 
     private buildPill(): HTMLElement {
-        const pillDiv = document.createElement("div");
-        pillDiv.addClass("title-tag");
+        const titleTagDiv = document.createElement("div");
+        titleTagDiv.addClass("title-tag");
         const pillTooltipText = this.getPillTooltipText();
         if (pillTooltipText.length > 0) {
-            pillDiv.ariaLabel = pillTooltipText;
+            titleTagDiv.ariaLabel = pillTooltipText;
         }
         const pillClickHandler = this.getPillClickHandler();
         if (!pillClickHandler) {
-            pillDiv.addClass("wiggle");
+            titleTagDiv.addClass("wiggle");
         }
-        pillDiv.addEventListener("click", e => {
+        titleTagDiv.addEventListener("click", e => {
             e.stopPropagation();
             if (pillClickHandler) {
                 pillClickHandler(e);
@@ -245,14 +252,14 @@ export abstract class ViewContainer extends GroupFolder {
         pillIconDiv.addClass("pill-icon");
         const pillIcon = this.getPillIcon();
         pillIcon && setIcon(pillIconDiv, pillIcon);
-        pillDiv.appendChild(pillIconDiv);
+        titleTagDiv.appendChild(pillIconDiv);
 
         const pillLabelDiv = document.createElement("div");
         pillLabelDiv.addClass("pill-label");
         pillLabelDiv.setText(this.getPillText());
-        pillDiv.appendChild(pillLabelDiv);
+        titleTagDiv.appendChild(pillLabelDiv);
 
-        return pillDiv;
+        return titleTagDiv;
     }
 
     protected buildTitle() {
@@ -264,7 +271,7 @@ export abstract class ViewContainer extends GroupFolder {
         this.titleContainer.addClass("title-container");
 
         this.titleContainer.appendChild(this.buildTitleSvgHolder());
-        this.titleContainer.appendChild(this.buildTitleButton());
+        this.titleContainer.appendChild(this.buildTitleTextDiv());
         this.titleContainer.appendChild(this.buildBookmarkContainer());
         this.titleContainer.appendChild(this.buildTagTitleGroup());
 

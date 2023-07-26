@@ -651,8 +651,11 @@ export class ObloggerView extends ItemView {
         this.fileItems = {};
 
         const groupSorter = (a: SettingsTagGroup, b: SettingsTagGroup): number => {
-            const aChildTag = a.tag.split("/").last() ?? "";
-            const bChildTag = b.tag.split("/").last() ?? "";
+            const pattern = "\\.\\.\\./(.*)/\\.\\.\\.";
+            const aTag = a.tag.match(pattern)?.at(1) ?? a.tag;
+            const bTag = b.tag.match(pattern)?.at(1) ?? b.tag;
+            const aChildTag = aTag.split("/").last() ?? "";
+            const bChildTag = bTag.split("/").last() ?? "";
             return aChildTag < bChildTag ? -1 : aChildTag > bChildTag ? 1 : 0
         }
 

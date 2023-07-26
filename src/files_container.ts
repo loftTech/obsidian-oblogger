@@ -52,6 +52,14 @@ export class FilesContainer extends ViewContainer {
         return "Files";
     }
 
+    protected getTitleIcon(): string {
+        return "";
+    }
+
+    protected getTitleIconTooltip(): string {
+        return "";
+    }
+
     protected getPillText(): string {
         return getSortMethodDisplayText(this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL);
     }
