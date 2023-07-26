@@ -4,6 +4,8 @@ import { ViewContainer } from "./view_container";
 import { ObloggerSettings } from "./settings";
 
 
+type TagFileMap = { [key: string]: TFile[] };
+
 export class TagGroupContainer extends ViewContainer {
     constructor(
         app: App,
@@ -80,12 +82,21 @@ export class TagGroupContainer extends ViewContainer {
     }
 
     protected getPillText(): string {
+        if (this.getIsolatedTagMatch()) {
+            return "• • •";
+        }
         return "#" + (this.groupName.split("/").first() ?? "") + (
             this.groupName.contains("/") ? "..." : ""
         )
     }
 
     protected getPillTooltipText(): string {
+        if (this.getIsolatedTagMatch()) {
+            return "All associated tags:\n\n" + Object.keys(this.getAllAssociatedTags([]))
+                .sort()
+                .map(tag => `#${tag}`)
+                .join("\n");
+        }
         return this.groupName.contains("/") ? this.groupName : "";
     }
 
@@ -97,7 +108,7 @@ export class TagGroupContainer extends ViewContainer {
         return undefined;
     }
 
-    protected buildFileStructure(excludedFolders: string[]) {
+    private getAllAssociatedTags(excludedFolders: string[]): TagFileMap {
         interface Item {
             file: TFile,
             tags: string[]
@@ -105,9 +116,7 @@ export class TagGroupContainer extends ViewContainer {
 
         const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
 
-        type TagFileMap = { [key: string]: TFile[] };
-
-        const tags = this.app.vault
+        return this.app.vault
             .getMarkdownFiles()
             .map((file: TFile) => {
                 // filter out excluded
@@ -144,6 +153,11 @@ export class TagGroupContainer extends ViewContainer {
                 });
                 return acc;
             }, {});
+    }
+
+    protected buildFileStructure(excludedFolders: string[]) {
+        const tags = this.getAllAssociatedTags(excludedFolders);
+        const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
 
         Object.keys(tags).sort().forEach((tag: string) => {
             const subTag = tag.replace(this.groupName, "");
