@@ -227,6 +227,7 @@ Created at ${window.moment(file.stat.ctime).format("YYYY-MM-DD HH:mm")}`;
         bookmarkIcon.addClass("bookmark-icon");
         if (this.isBookmarked(file)) {
             setIcon(bookmarkIcon, "bookmark");
+            bookmarkIcon.ariaLabel = "Bookmarked";
         }
         childItemContent.appendChild(bookmarkIcon);
 
