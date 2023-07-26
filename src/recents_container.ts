@@ -60,6 +60,10 @@ export class RecentsContainer extends ViewContainer {
         return "";
     }
 
+    protected getTitleIconTooltip(): string {
+        return "";
+    }
+
     protected getPillText(): string {
         return `Last ${this.recentsCount}`;
     }

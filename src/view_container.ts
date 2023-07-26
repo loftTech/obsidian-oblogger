@@ -18,6 +18,7 @@ export abstract class ViewContainer extends GroupFolder {
 
     protected abstract getTitleText(): string;
     protected abstract getTitleIcon(): string;
+    protected abstract getTitleIconTooltip(): string;
     protected abstract getPillText(): string;
     protected abstract getPillTooltipText(): string;
     protected abstract getPillIcon(): string;
@@ -191,6 +192,7 @@ export abstract class ViewContainer extends GroupFolder {
 
         const titleIcon = document.createElement("div");
         setIcon(titleIcon, this.getTitleIcon());
+        titleIcon.ariaLabel = this.getTitleIconTooltip();
 
         const titleTextContainer = document.createElement("div");
         titleTextContainer.addClass("title-text-container");

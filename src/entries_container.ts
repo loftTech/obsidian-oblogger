@@ -55,6 +55,10 @@ export class EntriesContainer extends ViewContainer {
         return "";
     }
 
+    protected getTitleIconTooltip(): string {
+        return "";
+    }
+
     protected getPillText(): string {
         return "#" + this.settings.entriesTag;
     }

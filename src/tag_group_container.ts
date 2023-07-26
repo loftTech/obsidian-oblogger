@@ -70,11 +70,13 @@ export class TagGroupContainer extends ViewContainer {
 
     protected getTitleIcon(): string {
         if (this.getIsolatedTagMatch()) {
-            // return "list-tree";
-            // return "layers"
             return "tags";
         }
         return "";
+    }
+
+    protected getTitleIconTooltip(): string {
+        return this.getIsolatedTagMatch() ? "Nested within multiple tags" : "";
     }
 
     protected getPillText(): string {
