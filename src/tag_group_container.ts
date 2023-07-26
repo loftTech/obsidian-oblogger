@@ -135,9 +135,13 @@ export class TagGroupContainer extends ViewContainer {
         Object.keys(tags).sort().forEach((tag: string) => {
             const subTag = tag.replace(this.groupName, "");
             tags[tag].forEach((file: TFile) => {
+                let remainingTag = subTag.startsWith("/") ? subTag.slice(1) : subTag;
+                if (isolatedGroupName) {
+                    remainingTag = remainingTag.replace(isolatedGroupName, "").replace("//", "");
+                }
                 this.addFileToFolder(
                     file,
-                    subTag.startsWith("/") ? subTag.slice(1) : subTag,
+                    remainingTag.startsWith("/") ? remainingTag.slice(1) : remainingTag,
                     "/"
                 );
             });
