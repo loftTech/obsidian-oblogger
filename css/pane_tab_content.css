@@ -248,7 +248,8 @@ body.styled-scrollbars .oblogger-content {
 
 .oblogger-content .bookmark-icon {
     display: flex;
-    margin: 1px -4px 0 1px;
+    align-items: flex-end;
+    margin: 0 -4px 1px 1px;
 }
 
 .oblogger-content .nav-file-tag {
