@@ -155,13 +155,19 @@ export class GroupFolder {
                 this.contentContainer.appendChild(subFolder.rootElement);
             });
 
-            this.files.forEach(file => {
-                this.contentContainer.appendChild(
-                    this.buildFileElement(
-                        file,
-                        fileClickCallback,
-                        fileAddedCallback));
-            });
+            this.files
+                .sort((fileA, fileB) => {
+                    const sortParamA = fileA.name;
+                    const sortParamB = fileB.name;
+                    return sortParamA < sortParamB ? -1 : sortParamA > sortParamB ? 1 : 0;
+                })
+                .forEach(file => {
+                    this.contentContainer.appendChild(
+                        this.buildFileElement(
+                            file,
+                            fileClickCallback,
+                            fileAddedCallback));
+                });
         }
     }
 
