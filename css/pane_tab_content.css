@@ -150,17 +150,13 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .title-tag {
-    align-items: center;
-    background: var(--interactive-accent);
-    border-radius: 10px;
-    color: var(--background-secondary);
+    color: var(--nav-item-color);
     display: flex;
     font-size: 9px;
     font-weight: 600;
-    max-height: 18px;
-    opacity: 0.5;
+    margin-right: 8px;
+    opacity: 0.6;
     overflow: hidden;
-    padding: 2px 5px;
     transition: 0.3s;
 }
 
@@ -422,7 +418,7 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .pill-icon .svg-icon {
-    color: var(--background-secondary);
+    color: var(--nav-item-color);
     height: 9px;
     margin-left: -2px;
     margin-right: 1px;
@@ -488,15 +484,15 @@ body.styled-scrollbars .oblogger-content {
    ==========================================================================
 */
 
-.oblogger-content .separator:active,
-.oblogger-content .title-tag.wiggle:active { animation: wiggle 0.2s; }
-
-/* noinspection Stylelint */
 .oblogger-content .title-tag:hover,
 .oblogger-content .title-tag:hover .svg-icon {
+    color: var(--accent-color);
     opacity: 1;
     transition: 0.2s;
 }
+
+.oblogger-content .separator:active,
+.oblogger-content .title-tag.wiggle:active { animation: wiggle 0.2s; }
 
 .oblogger-content .separator-container:hover .separator {
     color: var(--background-secondary);
