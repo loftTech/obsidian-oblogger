@@ -386,7 +386,7 @@ body.styled-scrollbars .oblogger-content {
 */
 
 .oblogger-content .svg-icon {
-    color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/90%);
+    color: var(--nav-item-color);
     transition: transform 100ms ease-in-out;
 }
 
@@ -477,6 +477,7 @@ body.styled-scrollbars .oblogger-content {
 
 .oblogger-content .separator-container:hover .separator {
     color: var(--background-secondary);
+    background-color: var(--accent-color);
     font-size: 8px;
     font-weight: 700;
     height: inherit;
@@ -485,13 +486,18 @@ body.styled-scrollbars .oblogger-content {
     width: 85px;
 }
 
-.oblogger-content .title:hover { color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/100%); }
+.oblogger-content .title-text-container:hover { color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/100%); }
 
+.oblogger-content .child-item.active,
 .oblogger-content .child-item:hover {
-    background-color: var(--nav-item-background-hover);
-    color: var(--nav-item-color-hover);
-    font-weight: var(--nav-item-weight-hover);
-    transition: 0.2s;
+    background-color: var(--nav-indentation-guide-color);
+    color: var(--nav-item-color);
+}
+
+.oblogger-content .child-item.active .status-icon .svg-icon {
+    color: var(--nav-item-color);
+    fill: var(--background-secondary);
+    stroke-width: 4px;
 }
 
 .oblogger-content .child-item:hover .status-icon .svg-icon {
