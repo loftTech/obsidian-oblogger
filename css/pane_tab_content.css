@@ -8,7 +8,7 @@
     flex-grow: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 0 4px 70px;
+    padding: 0 2px 70px 8px;
     position: relative;
     scrollbar-gutter: stable;
 }
@@ -36,7 +36,7 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .separator-container {
-    height: 15px;
+    height: 16px;
     width: fit-content;
 }
 
@@ -47,11 +47,11 @@ body.styled-scrollbars .oblogger-content {
     color: var(--nav-indentation-guide-color);
     display: flex;
     font-size: 0;
-    height: 3px;
+    height: 4px;
     justify-content: center;
     opacity: 0.6;
     transition: 0.6s;
-    width: 65px;
+    width: 64px;
 }
 
 .oblogger-content .rx-separator {
@@ -71,8 +71,12 @@ body.styled-scrollbars .oblogger-content {
 
 .oblogger-content .title-container {
     display: flex;
-    height: 22px;
-    padding: 3px 0;
+    height: 20px;
+    padding-top: 4px;
+}
+
+.oblogger-content .folder-holder.rx-child:last-child .title-container.collapsed {
+    margin-bottom: 4px;
 }
 
 .oblogger-content .title-button {
@@ -176,8 +180,8 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .family-title .clickable-icon {
-    margin: 2px 2px 0;
     padding: 4px;
+    margin: 2px 2px 2px 1px;
     transition: none;
 }
 
@@ -191,9 +195,9 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .family-content {
-    border-left: var(--nav-indentation-guide-width) solid var(--nav-indentation-guide-color);
-    margin-left: 13px;
-    padding-left: 5px;
+    border-left: 1px solid var(--nav-indentation-guide-color);
+    margin-left: 12px;
+    padding-left: 4px;
 }
 
 .oblogger-content .status-icon { opacity: 0; }
@@ -219,9 +223,8 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .child-item {
     border-radius: var(--radius-s);
     color: var(--nav-item-color);
-    margin-left: -3px;
-    margin-top: 2px;
-    padding: 3px 0;
+    margin: 2px 0;
+    padding: 4px;
 }
 
 .oblogger-content .child-item.active {
@@ -231,14 +234,11 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .child-item-icon {
-    padding: 0 var(--size-2-3) 0 0;
+    padding: 0 4px 0 0;
     pointer-events: none;
 }
 
-.oblogger-content .child-item-content {
-    display: flex;
-    margin-left: 9px;
-}
+.oblogger-content .child-item-content { display: flex; }
 
 .oblogger-content .child-item-text {
     overflow: hidden;
@@ -248,19 +248,14 @@ body.styled-scrollbars .oblogger-content {
 
 .oblogger-content .bookmark-icon {
     display: flex;
-    align-items: flex-end;
-    margin: 0 -4px 1px 1px;
+    padding: 1px 0 1px 2px;
 }
 
 .oblogger-content .nav-file-tag {
-    align-self: center;
     background-color: var(--background-modifier-hover);
     border-radius: 4px;
-    font-size: 9px;
     font-weight: 600;
-    letter-spacing: 0.05em;
-    line-height: 1.5;
-    margin: 0 6px;
+    margin: 0 0 0 4px;
     padding: 0 4px;
     text-transform: uppercase;
 }
@@ -274,14 +269,14 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .content {
-    padding: 0 0 6px 4px;
+    padding: 2px 0 4px 12px;
     transition-duration: 0.1s;
     transition-timing-function: cubic-bezier(0.02, 0.01, 0.47, 1);
 }
 
 .oblogger-content .content.collapsed { display: none; }
 
-.oblogger-content .folder-holder:not(.family-content .folder-holder) { margin-left: 7px; }
+.oblogger-content .folder-holder:not(.family-content .folder-holder) { margin-left: 0; }
 
 /* GREETER =============================================================== */
 
@@ -293,42 +288,42 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .greeter-dot-container {
-    height: 75px;
-    margin: 5px 0 10px;
+    height: 72px;
+    margin: 4px 0 8px;
     position: relative;
     transform: translateX(50%) translateY(50%);
-    width: 75px;
+    width: 72px;
 }
 
 .greeter-title-default-avatar {
     align-items: center;
     background-color: hsla(240deg 15% 17%/60%);
-    border-radius: 50%;
+    border-radius: 40px;
     color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/90%);
     display: flex;
     font-family: sans-serif;
     font-size: 53px;
     font-weight: 800;
-    height: 70px;
+    height: 68px;
     justify-content: center;
-    padding-top: 5px;
+    padding-top: 4px;
     position: absolute;
     transform: translateX(-50%) translateY(-50%);
-    width: 70px;
+    width: 68px;
 }
 
 .greeter-title-avatar-changer {
     align-items: center;
     background-color: rgba(0 0 0/60%);
-    border-radius: 50%;
+    border-radius: 44px;
     display: flex;
-    height: 70px;
+    height: 68px;
     justify-content: center;
     opacity: 0;
     position: absolute;
     transform: translateX(-50%) translateY(-50%);
     transition: 0.3s;
-    width: 70px;
+    width: 68px;
     z-index: 10;
 }
 
@@ -341,11 +336,11 @@ body.styled-scrollbars .oblogger-content {
 
 .greeter-title-avatar {
     background-color: #000;
-    border-radius: 50%;
-    height: 70px;
+    border-radius: 44px;
+    height: 68px;
     position: absolute;
     transform: translateX(-50%) translateY(-50%);
-    width: 70px;
+    width: 68px;
     z-index: 9;
 
     /* noinspection Stylelint */
@@ -354,11 +349,11 @@ body.styled-scrollbars .oblogger-content {
 
 .greeter-title-avatar-border {
     background-color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/90%);
-    border-radius: 50%;
-    height: 75px;
+    border-radius: 44px;
+    height: 72px;
     position: absolute;
     transform: translateX(-50%) translateY(-50%);
-    width: 75px;
+    width: 72px;
     z-index: -9;
 }
 
@@ -367,7 +362,7 @@ body.styled-scrollbars .oblogger-content {
     cursor: default;
     font-size: var(--vault-name-font-size);
     font-weight: var(--vault-name-font-weight);
-    margin-bottom: 3px;
+    margin-bottom: 4px;
 }
 
 .greeter-clock {
@@ -375,7 +370,7 @@ body.styled-scrollbars .oblogger-content {
     display: flex;
     font-family: var(--font-monospace);
     justify-content: center;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
 }
 
 .greeter-clock .date,
@@ -383,7 +378,7 @@ body.styled-scrollbars .oblogger-content {
     color: var(--vault-name-color);
     cursor: default;
     font-size: .7em;
-    padding: 0 3px;
+    padding: 0 4px;
 }
 
 .greeter-clock .date::after {
