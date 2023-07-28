@@ -8,7 +8,7 @@
     flex-grow: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 0 2px 70px 8px;
+    padding: 0 4px 70px 8px;
     position: relative;
     scrollbar-gutter: stable;
 }
@@ -157,7 +157,6 @@ body.styled-scrollbars .oblogger-content {
     margin-right: 8px;
     opacity: 0.6;
     overflow: hidden;
-    transition: 0.3s;
 }
 
 .oblogger-content .collapsed .title-tag { display: none; }
@@ -392,16 +391,14 @@ body.styled-scrollbars .oblogger-content {
 
 .oblogger-pill-menu-icon .svg-icon {
     color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/90%);
-    height: 15px;
-    width: 15px;
+    height: 12px;
+    width: 12px;
 }
 
 .oblogger-content .pill-icon .svg-icon {
     color: var(--nav-item-color);
-    height: 9px;
-    margin-left: -2px;
-    margin-right: 1px;
-    width: 9px;
+    height: 12px;
+    width: 12px;
 }
 
 .oblogger-content .child-folder-icon .svg-icon {
@@ -426,14 +423,14 @@ body.styled-scrollbars .oblogger-content {
     color: var(--nav-indentation-guide-color);
     height: 16px;
     margin-left: -1px;
-    stroke-width: 3px;
+    stroke-width: 4px;
     width: 14px;
 }
 
 .oblogger-content .title-chevron svg.svg-icon {
     color: var(--nav-indentation-guide-color);
     height: 12px;
-    stroke-width: 3px;
+    stroke-width: 4px;
     width: 12px;
 }
 
@@ -452,8 +449,8 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .bookmark-icon svg.svg-icon {
     fill: var(--nav-indentation-guide-color);
     color: transparent;
-    height: 15px;
-    width: 13px;
+    height: 16px;
+    width: 12px;
 }
 
 .oblogger-content .rx-child .collapsed .svg-icon:not(.content .svg-icon),
@@ -469,7 +466,6 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .title-tag:hover .svg-icon {
     color: var(--accent-color);
     opacity: 1;
-    transition: 0.2s;
 }
 
 .oblogger-content .separator:active,
@@ -477,7 +473,7 @@ body.styled-scrollbars .oblogger-content {
 
 .oblogger-content .separator-container:hover .separator {
     color: var(--background-secondary);
-    background-color: var(--accent-color);
+    background-color: var(--nav-indentation-guide-color);
     font-size: 8px;
     font-weight: 700;
     height: inherit;
