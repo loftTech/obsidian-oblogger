@@ -182,8 +182,6 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .family-title-text {
-    align-items: center;
-    display: inline-block;
     overflow: hidden;
     overflow-wrap: anywhere;
     text-overflow: ellipsis;
@@ -210,12 +208,6 @@ body.styled-scrollbars .oblogger-content {
     color: var(--nav-item-color);
     margin: 2px 0;
     padding: 4px;
-}
-
-.oblogger-content .child-item.active {
-    background-color: var(--nav-item-background-hover);
-    color: var(--nav-item-color-hover);
-    font-weight: var(--nav-item-weight-hover);
 }
 
 .oblogger-content .child-item-icon {
@@ -260,8 +252,6 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .content.collapsed { display: none; }
-
-.oblogger-content .folder-holder:not(.family-content .folder-holder) { margin-left: 0; }
 
 /* GREETER =============================================================== */
 
@@ -511,6 +501,12 @@ body.styled-scrollbars .oblogger-content {
     stroke-width: 4px;
 }
 
+.oblogger-content .child-item.active .bookmark-icon .svg-icon,
+.oblogger-content .child-item:hover .bookmark-icon .svg-icon { fill: var(--nav-item-color);
+}
+
+.oblogger-content .child-item.active .nav-file-tag,
+.oblogger-content .child-item:hover .nav-file-tag { background-color: var(--background-secondary); }
 
 .greeter-title-avatar-changer:hover {
     opacity: 0.9;
