@@ -196,25 +196,14 @@ body.styled-scrollbars .oblogger-content {
     padding-left: 4px;
 }
 
-.oblogger-content .status-icon { opacity: 0; }
+.oblogger-content .status-icon {
+    display: flex;
+    left: 18px;
+    opacity: 0;
+    position: absolute;
+}
 
 .oblogger-content .status-icon.visible { opacity: 1; }
-
-.oblogger-content .status-container.visible,
-.oblogger-content .status-container {
-    align-items: center;
-    display: flex;
-    float: left;
-    height: 13px;
-    justify-content: center;
-    padding: 0 8px;
-    width: 10px;
-}
-
-.oblogger-content .family-content .status-container {
-    padding: 0;
-    width: 7px;
-}
 
 .oblogger-content .child-item {
     border-radius: var(--radius-s);
@@ -430,10 +419,12 @@ body.styled-scrollbars .oblogger-content {
     width: 16px;
 }
 
-.oblogger-content .status-container .svg-icon {
-    color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/60%);
-    fill: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/100%);
-    height: 5px;
+.oblogger-content .status-icon .svg-icon {
+    color: var(--background-secondary);
+    fill: var(--vault-name-color);
+    height: 8px;
+    stroke-width: 6px;
+    z-index: 1;
 }
 
 .oblogger-content .child-item-icon .svg-icon {
@@ -513,6 +504,14 @@ body.styled-scrollbars .oblogger-content {
     transition: 0.2s;
 }
 
+.oblogger-content .child-item:hover .status-icon .svg-icon {
+    animation: bounce 0.4s;
+    color: var(--nav-item-color);
+    fill: var(--background-secondary);
+    stroke-width: 4px;
+}
+
+
 .greeter-title-avatar-changer:hover {
     opacity: 0.9;
     transition: 0.2s;
@@ -542,4 +541,12 @@ body.styled-scrollbars .oblogger-content {
     80% { transform: translate(-1px, -1px) rotate(1deg); }
     90% { transform: translate(1px, 2px) rotate(0deg); }
     100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+@keyframes bounce {
+    0%, 10%, 30%, 60%, 80%, 100% {transform: translateY(0);}
+    20% {transform: translateY(-6px);}
+    40% {transform: translateY(-2px);}
+    70% {transform: translateY(-4px);}
+    90% {transform: translateY(-1px);}
 }
