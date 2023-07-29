@@ -20,8 +20,8 @@ export class GroupFolder {
 
     showStatusIcon: boolean;
 
-    subFolders: GroupFolder[];
-    files: TFile[];
+    sortedSubFolders: GroupFolder[];
+    sortedFiles: TFile[];
 
     rootElement: HTMLElement;
     titleContainer: HTMLElement;
@@ -45,8 +45,8 @@ export class GroupFolder {
         this.folderPath = folderPath;
         this.folderName = folderPath.split("/").last() ?? "";
         this.showStatusIcon = showStatusIcon;
-        this.files = [];
-        this.subFolders = [];
+        this.sortedFiles = [];
+        this.sortedSubFolders = [];
         this.collapseChangedCallback = collapseChangedCallback;
         this.getGroupIconCallback = getGroupIconCallback;
         this.getEmptyMessageCallback = getEmptyMessageCallback;
@@ -57,7 +57,7 @@ export class GroupFolder {
 
     public getCollapsedFolders(): string[] {
         return (this.isCollapsed() ? [this.folderPath] : [])
-            .concat(this.subFolders.flatMap(f => f.getCollapsedFolders()));
+            .concat(this.sortedSubFolders.flatMap(f => f.getCollapsedFolders()));
     }
 
     protected rebuild(
@@ -141,13 +141,13 @@ export class GroupFolder {
         this.contentContainer = document.createElement("div");
         this.contentContainer.addClass("family-content");
 
-        if (this.subFolders.length === 0 && this.files.length === 0) {
+        if (this.sortedSubFolders.length === 0 && this.sortedFiles.length === 0) {
             const emptyDiv = document.createElement("div");
             emptyDiv.addClass("empty-rx-message");
             emptyDiv.setText(this.getEmptyMessageCallback());
             this.contentContainer.appendChild(emptyDiv);
         } else {
-            this.subFolders.forEach((subFolder) => {
+            this.sortedSubFolders.forEach((subFolder) => {
                 subFolder.build(
                     collapsedFolders,
                     fileClickCallback,
@@ -155,12 +155,7 @@ export class GroupFolder {
                 this.contentContainer.appendChild(subFolder.rootElement);
             });
 
-            this.files
-                .sort((fileA, fileB) => {
-                    const sortParamA = fileA.name;
-                    const sortParamB = fileB.name;
-                    return sortParamA < sortParamB ? -1 : sortParamA > sortParamB ? 1 : 0;
-                })
+            this.sortedFiles
                 .forEach(file => {
                     this.contentContainer.appendChild(
                         this.buildFileElement(
@@ -288,13 +283,13 @@ Created at ${window.moment(file.stat.ctime).format("YYYY-MM-DD HH:mm")}`;
         pathPrefix: string
     ) {
         if (remainingTag.length === 0) {
-            this.files.push(file);
+            this.sortedFiles.push(file);
             return;
         }
         const tagPathParts = remainingTag.split("/");
         const folderName = tagPathParts[0];
         const fullPath = `${pathPrefix}/${folderName}`;
-        let subFolder = this.subFolders.find(
+        let subFolder = this.sortedSubFolders.find(
             (f) => f.folderPath === fullPath);
         if (!subFolder) {
             subFolder = new GroupFolder(
@@ -305,7 +300,7 @@ Created at ${window.moment(file.stat.ctime).format("YYYY-MM-DD HH:mm")}`;
                 this.showStatusIcon,
                 this.getGroupIconCallback,
                 this.getEmptyMessageCallback);
-            this.subFolders.push(subFolder);
+            this.sortedSubFolders.push(subFolder);
         }
         subFolder && subFolder.addFileToFolder(
             file,
