@@ -92,7 +92,7 @@ export class TagGroupContainer extends ViewContainer {
 
     protected getPillTooltipText(): string {
         if (this.getIsolatedTagMatch()) {
-            return "All associated tags:\n\n" + Object.keys(this.getAllAssociatedTags([]))
+            return "Associated tags:\n\n" + Object.keys(this.getAllAssociatedTags([]))
                 .sort()
                 .map(tag => `#${tag}`)
                 .join("\n");

@@ -1,2 +1,2 @@
 #gardening/plants
-#gardening/baloons
+#gardening/balloons

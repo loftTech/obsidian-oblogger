@@ -200,6 +200,10 @@ export abstract class ViewContainer extends GroupFolder {
         titleTextContainer.appendChild(titleText);
         titleTextContainer.appendChild(titleIcon);
 
+        titleTextContainer.addEventListener("click", () => {
+            this.toggleCollapse();
+        });
+
         titleText.setText(this.getTitleText().toUpperCase());
         titleText.addEventListener("contextmenu", (e) => {
             const contextMenu = this.getContextMenu();
@@ -261,10 +265,6 @@ export abstract class ViewContainer extends GroupFolder {
         this.titleContainer.appendChild(this.buildTitleSvgHolder());
         this.titleContainer.appendChild(this.buildTitleTextDiv());
         this.titleContainer.appendChild(this.buildTagTitleGroup());
-
-        this.titleContainer.addEventListener("click", () => {
-            this.toggleCollapse();
-        });
     }
 
     rebuildFileStructure(excludedFolders: string[]) {
