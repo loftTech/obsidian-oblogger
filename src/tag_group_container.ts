@@ -161,21 +161,25 @@ export class TagGroupContainer extends ViewContainer {
 
         Object.keys(tags).sort().forEach((tag: string) => {
             const subTag = tag.replace(this.groupName, "");
-            tags[tag].forEach((file: TFile) => {
-                let remainingTag = subTag.startsWith("/") ? subTag.slice(1) : subTag;
-                if (isolatedGroupName) {
-                    if (remainingTag.endsWith(isolatedGroupName)) {
-                        remainingTag = remainingTag.replace(isolatedGroupName, "")
-                    } else if (remainingTag.contains(isolatedGroupName)) {
-                        remainingTag = remainingTag.split("/").last() ?? "";
+            tags[tag]
+                .sort((fileA: TFile, fileB: TFile) => {
+                    return fileA.name < fileB.name ? -1 : fileA.name > fileB.name ? 1 : 0;
+                })
+                .forEach((file: TFile) => {
+                    let remainingTag = subTag.startsWith("/") ? subTag.slice(1) : subTag;
+                    if (isolatedGroupName) {
+                        if (remainingTag.endsWith(isolatedGroupName)) {
+                            remainingTag = remainingTag.replace(isolatedGroupName, "")
+                        } else if (remainingTag.contains(isolatedGroupName)) {
+                            remainingTag = remainingTag.split("/").last() ?? "";
+                        }
                     }
-                }
-                this.addFileToFolder(
-                    file,
-                    remainingTag.startsWith("/") ? remainingTag.slice(1) : remainingTag,
-                    "/"
-                );
-            });
+                    this.addFileToFolder(
+                        file,
+                        remainingTag.startsWith("/") ? remainingTag.slice(1) : remainingTag,
+                        "/"
+                    );
+                });
         });
     }
 
