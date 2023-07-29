@@ -194,13 +194,15 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .status-icon {
-    display: flex;
-    left: 18px;
-    opacity: 0;
-    position: absolute;
+    display: none;
 }
 
-.oblogger-content .status-icon.visible { opacity: 1; }
+.oblogger-content .status-icon.visible {
+    display: flex;
+    left: 18px;
+    opacity: 1;
+    position: absolute;
+}
 
 .oblogger-content .child-item {
     border-radius: var(--radius-s);
