@@ -3,6 +3,13 @@ import { FileAddedCallback, FileClickCallback } from "./group_folder";
 import { ObloggerSettings, ContainerSortMethod, getSortMethodDisplayText, RxGroupType, getFileType } from "./settings";
 import { App, Menu, MenuItem, moment, TFile } from "obsidian";
 
+
+const sortFilesByName = (fileA: TFile, fileB: TFile): number => {
+    const nameA = fileA.name.toLowerCase();
+    const nameB = fileB.name.toLowerCase();
+    return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
+}
+
 export class FilesContainer extends ViewContainer {
     constructor(
         app: App,
@@ -124,16 +131,21 @@ export class FilesContainer extends ViewContainer {
         return "rx-child";
     }
 
+    protected getHideText(): string {
+        return "Hide";
+    }
+
+    protected getHideIcon(): string {
+        return "eye-off"
+    }
+
     private buildAlphabeticalFileStructure(
         unsortedFiles: TFile[],
         ascending: boolean
     ): void {
         unsortedFiles
-            .sort((a, b) => {
-                const aName = a.name.toLowerCase();
-                const bName = b.name.toLowerCase();
-                const ascendingSortValue = aName < bName ? -1 : aName > bName ? 1 : 0
-                return ascending ? ascendingSortValue : -ascendingSortValue;
+            .sort((fileA: TFile, fileB: TFile) => {
+                return (ascending ? 1 : -1) * sortFilesByName(fileA, fileB);
             })
             .forEach(file => {
                 this.addFileToFolder(
@@ -173,33 +185,25 @@ export class FilesContainer extends ViewContainer {
         })
     }
 
-    protected getHideText(): string {
-        return "Hide";
-    }
-
-    protected getHideIcon(): string {
-        return "eye-off"
-    }
-
     private buildExtensionFileStructure(unsortedFiles: TFile[], ascending: boolean) {
-        unsortedFiles.sort((a, b) => {
+        unsortedFiles.sort((fileA: TFile, fileB: TFile) => {
             return (ascending ? 1 : -1) * (
-                a.extension < b.extension ? -1 :
-                a.extension > b.extension ? 1 :
-                0);
+                fileA.extension < fileB.extension ? -1 :
+                fileA.extension > fileB.extension ? 1 :
+                sortFilesByName(fileA, fileB));
         }).forEach(file => {
             this.addFileToFolder(file, file.extension, "/")
         });
     }
 
     private buildTypeFileStructure(unsortedFiles: TFile[], ascending: boolean) {
-        unsortedFiles.sort((a, b) => {
-            const aType = getFileType(a.extension) ?? "unknown";
-            const bType = getFileType(b.extension) ?? "unknown";
+        unsortedFiles.sort((fileA: TFile, fileB: TFile) => {
+            const aType = getFileType(fileA.extension) ?? "unknown";
+            const bType = getFileType(fileB.extension) ?? "unknown";
             return (ascending ? 1 : -1) * (
                 aType < bType ? -1 :
                 aType > bType ? 1 :
-                0);
+                sortFilesByName(fileA, fileB));
         }).forEach(file => {
             this.addFileToFolder(file, getFileType(file.extension) ?? "unknown", "/")
         })

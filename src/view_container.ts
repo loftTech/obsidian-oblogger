@@ -147,7 +147,7 @@ export abstract class ViewContainer extends GroupFolder {
     }
 
     private collapseInnerFolders() {
-        this.subFolders.forEach(folder => folder.setCollapsed(true, true));
+        this.sortedSubFolders.forEach(folder => folder.setCollapsed(true, true));
     }
 
     private buildPinContainer(): HTMLElement {
@@ -269,8 +269,8 @@ export abstract class ViewContainer extends GroupFolder {
 
     rebuildFileStructure(excludedFolders: string[]) {
         // Clear
-        this.files = [];
-        this.subFolders = [];
+        this.sortedFiles = [];
+        this.sortedSubFolders = [];
 
         // Build
         this.buildFileStructure(excludedFolders);
