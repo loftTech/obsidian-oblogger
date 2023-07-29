@@ -196,9 +196,6 @@ Created at ${window.moment(file.stat.ctime).format("YYYY-MM-DD HH:mm")}`;
         root_childItem.addClass("child-item");
         root_childItem.addEventListener("click", () => fileClickCallback(file));
 
-        // const statusContainerDiv = document.createElement("div");
-        // statusContainerDiv.addClass("status-container");
-
         const statusIconDiv = document.createElement("div");
         statusIconDiv.addClass("status-icon");
         setIcon(statusIconDiv, "circle");
