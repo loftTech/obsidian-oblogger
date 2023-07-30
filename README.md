@@ -39,7 +39,6 @@ oblogger is a plugin for Obsidian which focuses on two primary core features:
   - "session" logging
   - continuous logging
   - rich editor functionality in logger body field
-  - sorting and pinning tag groups
   - renaming files from side panel
   - control/command click to new tab
   - multi-select
