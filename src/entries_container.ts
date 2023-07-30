@@ -99,19 +99,33 @@ export class EntriesContainer extends ViewContainer {
     }
 
     protected buildFileStructure(excludedFolders: string[]) {
-        const getEntryDate = (entry: TFile): string => {
+        const getEntryDate = (entry: TFile, dayPrecision: boolean): string => {
             const cache = this.app.metadataCache.getFileCache(entry);
             return moment(cache?.frontmatter?.day ??
                 cache?.frontmatter?.created ??
-                entry.stat.ctime).format("YYYY-MM-DD");
+                entry.stat.ctime).format(dayPrecision ? "YYYY-MM-DD" : "YYYY-MM");
         }
 
         this.app.vault
             .getFiles()
             .sort((fileA: TFile, fileB: TFile): number => {
-                const dateA = getEntryDate(fileA);
-                const dateB = getEntryDate(fileB);
-                return dateA > dateB ? -1 : dateA < dateB ? 1 : 0;
+                const monthA = getEntryDate(fileA, false);
+                const monthB = getEntryDate(fileB, false);
+                if (monthA > monthB) {
+                    return -1;
+                }
+                if (monthA < monthB) {
+                    return 1;
+                }
+
+                const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
+                if (bookmarkSorting != 0) {
+                    return bookmarkSorting;
+                }
+
+                const dayA = getEntryDate(fileA, true);
+                const dayB = getEntryDate(fileB, true);
+                return dayA > dayB ? -1 : dayA < dayB ? 1 : 0;
             })
             .forEach((file: TFile) => {
                 if (file.parent && excludedFolders.contains(file.parent.path)) {
@@ -127,7 +141,7 @@ export class EntriesContainer extends ViewContainer {
                     return;
                 }
 
-                const entryDateString = getEntryDate(file);
+                const entryDateString = getEntryDate(file, true);
                 const entryDate = moment(entryDateString);
                 const entryDateYear = entryDate.format("YYYY");
                 const entryDateMonth = entryDate.format("MM");

@@ -135,13 +135,14 @@ export class UntaggedContainer extends ViewContainer {
         ascending: boolean
     ): void {
         unsortedFiles
-            .sort((a, b) => {
-                const aName = a.name.toLowerCase();
-                const bName = b.name.toLowerCase();
-                const ascendingSortValue = aName < bName ? -1 : aName > bName ? 1 : 0
-                return ascending ? ascendingSortValue : -ascendingSortValue;
+            .sort((fileA: TFile, fileB: TFile) => {
+                const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
+                if (bookmarkSorting != 0) {
+                    return bookmarkSorting;
+                }
+                return (ascending ? 1 : -1) * this.sortFilesByName(fileA, fileB);
             })
-            .forEach(file => {
+            .forEach((file: TFile) => {
                 const cache = this.app.metadataCache.getFileCache(file);
                 if (cache === null) {
                     return;
@@ -162,12 +163,24 @@ export class UntaggedContainer extends ViewContainer {
         ascending: boolean,
         useCTime: boolean
     ) {
-        unsortedFiles.sort((a, b) => {
-            return (ascending ? 1 : -1) * (
-                useCTime ?
-                    (b.stat.ctime - a.stat.ctime) :
-                    (b.stat.mtime - a.stat.mtime)
-            );
+        unsortedFiles.sort((fileA: TFile, fileB: TFile) => {
+            const timestampA = useCTime ? fileA.stat.ctime : fileA.stat.mtime;
+            const timestampB = useCTime ? fileB.stat.ctime : fileB.stat.mtime;
+
+            const monthA = moment(timestampA).format("YYYY-MM");
+            const monthB = moment(timestampB).format("YYYY-MM");
+            if (monthA < monthB) {
+                return 1;
+            } else if (monthA > monthB) {
+                return -1;
+            }
+
+            const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
+            if (bookmarkSorting != 0) {
+                return bookmarkSorting;
+            }
+
+            return (ascending ? 1 : -1) * (timestampB - timestampA);
         }).forEach(file => {
             const cache = this.app.metadataCache.getFileCache(file);
             if (cache === null) {
@@ -183,7 +196,7 @@ export class UntaggedContainer extends ViewContainer {
                 `${entryDateYear}/${entryDateMonth}`,
                 "/"
             );
-        })
+        });
     }
 
     protected buildFileStructure(excludedFolders: string[]): void {
@@ -195,18 +208,14 @@ export class UntaggedContainer extends ViewContainer {
             if (
                 file.parent &&
                 excludedFolders.some(
-                    excludedFolder =>
+                    (excludedFolder: string) =>
                         file.parent?.path.startsWith(excludedFolder))
             ) {
                 return false;
             }
 
             const cache = this.app.metadataCache.getFileCache(file);
-            if (cache === null || ((getAllTags(cache)?.length ?? 1) > 0)) {
-                return false;
-            }
-
-            return true;
+            return cache !== null && ((getAllTags(cache)?.length ?? 1) <= 0);
         });
 
         switch (this.getGroupSetting()?.sortMethod) {
