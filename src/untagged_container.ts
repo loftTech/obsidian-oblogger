@@ -164,15 +164,23 @@ export class UntaggedContainer extends ViewContainer {
         useCTime: boolean
     ) {
         unsortedFiles.sort((fileA: TFile, fileB: TFile) => {
+            const timestampA = useCTime ? fileA.stat.ctime : fileA.stat.mtime;
+            const timestampB = useCTime ? fileB.stat.ctime : fileB.stat.mtime;
+
+            const monthA = moment(timestampA).format("YYYY-MM");
+            const monthB = moment(timestampB).format("YYYY-MM");
+            if (monthA < monthB) {
+                return 1;
+            } else if (monthA > monthB) {
+                return -1;
+            }
+
             const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
             if (bookmarkSorting != 0) {
                 return bookmarkSorting;
             }
-            return (ascending ? 1 : -1) * (
-                useCTime ?
-                    (fileB.stat.ctime - fileA.stat.ctime) :
-                    (fileB.stat.mtime - fileA.stat.mtime)
-            );
+
+            return (ascending ? 1 : -1) * (timestampB - timestampA);
         }).forEach(file => {
             const cache = this.app.metadataCache.getFileCache(file);
             if (cache === null) {
