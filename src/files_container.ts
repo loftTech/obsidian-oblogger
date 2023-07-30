@@ -165,9 +165,9 @@ export class FilesContainer extends ViewContainer {
             const monthA = moment(timestampA).format("YYYY-MM");
             const monthB = moment(timestampB).format("YYYY-MM");
             if (monthA < monthB) {
-                return 1;
+                return ascending ? 1 : -1;
             } else if (monthA > monthB) {
-                return -1;
+                return ascending ? -1 : -1;
             }
 
             const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
