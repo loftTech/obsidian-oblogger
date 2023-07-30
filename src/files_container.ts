@@ -138,6 +138,10 @@ export class FilesContainer extends ViewContainer {
     ): void {
         unsortedFiles
             .sort((fileA: TFile, fileB: TFile) => {
+                const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
+                if (bookmarkSorting != 0) {
+                    return bookmarkSorting;
+                }
                 return (ascending ? 1 : -1) * this.sortFilesByName(fileA, fileB);
             })
             .forEach(file => {
@@ -154,12 +158,24 @@ export class FilesContainer extends ViewContainer {
         ascending: boolean,
         useCTime: boolean
     ) {
-        unsortedFiles.sort((a, b) => {
-            return (ascending ? 1 : -1) * (
-                useCTime ?
-                    (b.stat.ctime - a.stat.ctime) :
-                    (b.stat.mtime - a.stat.mtime)
-            );
+        unsortedFiles.sort((fileA: TFile, fileB: TFile) => {
+            const timestampA = useCTime ? fileA.stat.ctime : fileA.stat.mtime;
+            const timestampB = useCTime ? fileB.stat.ctime : fileB.stat.mtime;
+
+            const monthA = moment(timestampA).format("YYYY-MM");
+            const monthB = moment(timestampB).format("YYYY-MM");
+            if (monthA < monthB) {
+                return 1;
+            } else if (monthA > monthB) {
+                return -1;
+            }
+
+            const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
+            if (bookmarkSorting != 0) {
+                return bookmarkSorting;
+            }
+
+            return (ascending ? 1 : -1) * (timestampB - timestampA);
         }).forEach(file => {
             const cache = this.app.metadataCache.getFileCache(file);
             if (cache === null) {
@@ -180,10 +196,16 @@ export class FilesContainer extends ViewContainer {
 
     private buildExtensionFileStructure(unsortedFiles: TFile[], ascending: boolean) {
         unsortedFiles.sort((fileA: TFile, fileB: TFile) => {
-            return (ascending ? 1 : -1) * (
-                fileA.extension < fileB.extension ? -1 :
-                fileA.extension > fileB.extension ? 1 :
-                this.sortFilesByName(fileA, fileB));
+            if (fileA.extension != fileB.extension) {
+                return (ascending ? 1 : -1) * (fileA.extension < fileB.extension ? -1 : 1);
+            }
+
+            const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
+            if (bookmarkSorting != 0) {
+                return bookmarkSorting;
+            }
+
+            return this.sortFilesByName(fileA, fileB);
         }).forEach(file => {
             this.addFileToFolder(file, file.extension, "/")
         });
@@ -193,10 +215,16 @@ export class FilesContainer extends ViewContainer {
         unsortedFiles.sort((fileA: TFile, fileB: TFile) => {
             const aType = getFileType(fileA.extension) ?? "unknown";
             const bType = getFileType(fileB.extension) ?? "unknown";
-            return (ascending ? 1 : -1) * (
-                aType < bType ? -1 :
-                aType > bType ? 1 :
-                this.sortFilesByName(fileA, fileB));
+            if (aType != bType) {
+                return (ascending ? 1 : -1) * (aType < bType ? -1 : 1);
+            }
+
+            const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
+            if (bookmarkSorting != 0) {
+                return bookmarkSorting;
+            }
+
+            return this.sortFilesByName(fileA, fileB);
         }).forEach(file => {
             this.addFileToFolder(file, getFileType(file.extension) ?? "unknown", "/")
         })
