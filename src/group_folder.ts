@@ -72,12 +72,18 @@ export class GroupFolder {
         this.build(
             collapsedFolders,
             fileClickCallback,
-            fileAddedCallback);
+            fileAddedCallback,
+            0);
     }
 
-    protected buildTitle(isCollapsed: boolean) {
+    protected buildTitle(
+        isCollapsed: boolean,
+        recursionDepth: number
+    ) {
         this.titleContainer = document.createElement("div");
         this.titleContainer.addClass("family-title");
+        this.titleContainer.style.marginLeft = `-${12+17*recursionDepth}px`
+        this.titleContainer.style.paddingLeft = `${16+17*recursionDepth}px`
         this.titleContainer.setAttribute("familyName", this.folderName);
         this.titleContainer.setAttribute(
             "tag-group-tag",
@@ -109,11 +115,12 @@ export class GroupFolder {
     private build(
         collapsedFolders: string[],
         fileClickCallback: FileClickCallback,
-        fileAddedCallback: FileAddedCallback
+        fileAddedCallback: FileAddedCallback,
+        recursionDepth: number
     ): void {
         const isCollapsed = collapsedFolders.contains(this.folderPath);
         // Build the title
-        this.buildTitle(isCollapsed);
+        this.buildTitle(isCollapsed, recursionDepth - 1);
 
         // Add the title
         this.rootElement.appendChild(this.titleContainer);
@@ -122,7 +129,8 @@ export class GroupFolder {
         this.buildContent(
             collapsedFolders,
             fileClickCallback,
-            fileAddedCallback);
+            fileAddedCallback,
+            recursionDepth);
 
         // Add the content
         this.rootElement.appendChild(this.contentContainer);
@@ -136,7 +144,8 @@ export class GroupFolder {
     private buildContent(
         collapsedFolders: string[],
         fileClickCallback: FileClickCallback,
-        fileAddedCallback: FileAddedCallback
+        fileAddedCallback: FileAddedCallback,
+        recursionDepth: number
     ) {
         this.contentContainer = document.createElement("div");
         this.contentContainer.addClass("family-content");
@@ -151,7 +160,8 @@ export class GroupFolder {
                 subFolder.build(
                     collapsedFolders,
                     fileClickCallback,
-                    fileAddedCallback);
+                    fileAddedCallback,
+                    recursionDepth + 1);
                 this.contentContainer.appendChild(subFolder.rootElement);
             });
 
@@ -161,7 +171,8 @@ export class GroupFolder {
                         this.buildFileElement(
                             file,
                             fileClickCallback,
-                            fileAddedCallback));
+                            fileAddedCallback,
+                            recursionDepth));
                 });
         }
     }
@@ -177,7 +188,8 @@ export class GroupFolder {
     private buildFileElement(
         file: TFile,
         fileClickCallback: FileClickCallback,
-        fileAddedCallback: FileAddedCallback
+        fileAddedCallback: FileAddedCallback,
+        recursionDepth: number
     ) {
         const cache = this.app.metadataCache.getFileCache(file);
         const maybeFrontmatter = cache?.frontmatter;
@@ -189,6 +201,8 @@ Created at ${window.moment(file.stat.ctime).format("YYYY-MM-DD HH:mm")}`;
 
         const root_childItem = document.createElement("div");
         root_childItem.addClass("child-item");
+        root_childItem.style.marginLeft = `-${12+17*recursionDepth}px`
+        root_childItem.style.paddingLeft = `${16+17*recursionDepth}px`
         root_childItem.addEventListener("click", () => fileClickCallback(file));
 
         const statusIconDiv = document.createElement("div");
