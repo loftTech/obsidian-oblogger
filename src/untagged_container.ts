@@ -136,6 +136,10 @@ export class UntaggedContainer extends ViewContainer {
     ): void {
         unsortedFiles
             .sort((fileA: TFile, fileB: TFile) => {
+                const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
+                if (bookmarkSorting != 0) {
+                    return bookmarkSorting;
+                }
                 return (ascending ? 1 : -1) * this.sortFilesByName(fileA, fileB);
             })
             .forEach((file: TFile) => {
@@ -159,11 +163,15 @@ export class UntaggedContainer extends ViewContainer {
         ascending: boolean,
         useCTime: boolean
     ) {
-        unsortedFiles.sort((a, b) => {
+        unsortedFiles.sort((fileA: TFile, fileB: TFile) => {
+            const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
+            if (bookmarkSorting != 0) {
+                return bookmarkSorting;
+            }
             return (ascending ? 1 : -1) * (
                 useCTime ?
-                    (b.stat.ctime - a.stat.ctime) :
-                    (b.stat.mtime - a.stat.mtime)
+                    (fileB.stat.ctime - fileA.stat.ctime) :
+                    (fileB.stat.mtime - fileA.stat.mtime)
             );
         }).forEach(file => {
             const cache = this.app.metadataCache.getFileCache(file);

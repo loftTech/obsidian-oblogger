@@ -172,6 +172,15 @@ export class GroupFolder {
         return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
     }
 
+    protected sortFilesByBookmark(fileA: TFile, fileB: TFile): number {
+        const isABookmarked = this.isBookmarked(fileA);
+        const isBBookmarked = this.isBookmarked(fileB);
+        return (
+            isABookmarked && !isBBookmarked ? -1 :
+            !isABookmarked && isBBookmarked ? 1 : 0
+        );
+    }
+
     protected isBookmarked(file: TFile): boolean {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
