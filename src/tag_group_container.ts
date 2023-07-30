@@ -163,6 +163,10 @@ export class TagGroupContainer extends ViewContainer {
             const subTag = tag.replace(this.groupName, "");
             tags[tag]
                 .sort((fileA: TFile, fileB: TFile) => {
+                    const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
+                    if (bookmarkSorting != 0) {
+                        return bookmarkSorting;
+                    }
                     return fileA.name < fileB.name ? -1 : fileA.name > fileB.name ? 1 : 0;
                 })
                 .forEach((file: TFile) => {
