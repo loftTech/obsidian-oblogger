@@ -493,13 +493,13 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .family-title:hover {
-    background-color: var(--nav-indentation-guide-color);
+    background-color: var(--nav-item-background-hover);
     color: var(--nav-item-color);
 }
 
 .oblogger-content .child-item.active,
 .oblogger-content .child-item:hover {
-    background-color: var(--nav-indentation-guide-color);
+    background-color: var(--nav-item-background-hover);
     color: var(--nav-item-color);
 }
 
