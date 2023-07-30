@@ -341,6 +341,7 @@ body.styled-scrollbars .oblogger-content {
     font-size: var(--vault-name-font-size);
     font-weight: var(--vault-name-font-weight);
     margin-bottom: 4px;
+    z-index: 11;
 }
 
 .greeter-clock {
@@ -357,6 +358,7 @@ body.styled-scrollbars .oblogger-content {
     cursor: default;
     font-size: .7em;
     padding: 0 4px;
+    z-index: 11;
 }
 
 .greeter-clock .date::after {
@@ -465,6 +467,8 @@ body.styled-scrollbars .oblogger-content {
    HOVER AND ACTIVE
    ==========================================================================
 */
+
+.oblogger-content .greeter-vault-name:active { animation: wiggle 0.2s; }
 
 .oblogger-content .title-tag:hover,
 .oblogger-content .title-tag:hover .svg-icon {
