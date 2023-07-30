@@ -135,13 +135,10 @@ export class UntaggedContainer extends ViewContainer {
         ascending: boolean
     ): void {
         unsortedFiles
-            .sort((a, b) => {
-                const aName = a.name.toLowerCase();
-                const bName = b.name.toLowerCase();
-                const ascendingSortValue = aName < bName ? -1 : aName > bName ? 1 : 0
-                return ascending ? ascendingSortValue : -ascendingSortValue;
+            .sort((fileA: TFile, fileB: TFile) => {
+                return (ascending ? 1 : -1) * this.sortFilesByName(fileA, fileB);
             })
-            .forEach(file => {
+            .forEach((file: TFile) => {
                 const cache = this.app.metadataCache.getFileCache(file);
                 if (cache === null) {
                     return;
@@ -183,7 +180,7 @@ export class UntaggedContainer extends ViewContainer {
                 `${entryDateYear}/${entryDateMonth}`,
                 "/"
             );
-        })
+        });
     }
 
     protected buildFileStructure(excludedFolders: string[]): void {
@@ -195,18 +192,14 @@ export class UntaggedContainer extends ViewContainer {
             if (
                 file.parent &&
                 excludedFolders.some(
-                    excludedFolder =>
+                    (excludedFolder: string) =>
                         file.parent?.path.startsWith(excludedFolder))
             ) {
                 return false;
             }
 
             const cache = this.app.metadataCache.getFileCache(file);
-            if (cache === null || ((getAllTags(cache)?.length ?? 1) > 0)) {
-                return false;
-            }
-
-            return true;
+            return cache !== null && ((getAllTags(cache)?.length ?? 1) <= 0);
         });
 
         switch (this.getGroupSetting()?.sortMethod) {

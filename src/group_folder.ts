@@ -166,6 +166,12 @@ export class GroupFolder {
         }
     }
 
+    protected sortFilesByName(fileA: TFile, fileB: TFile): number {
+        const nameA = fileA.name.toLowerCase();
+        const nameB = fileB.name.toLowerCase();
+        return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
+    }
+
     protected isBookmarked(file: TFile): boolean {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore

@@ -3,13 +3,6 @@ import { FileAddedCallback, FileClickCallback } from "./group_folder";
 import { ObloggerSettings, ContainerSortMethod, getSortMethodDisplayText, RxGroupType, getFileType } from "./settings";
 import { App, Menu, MenuItem, moment, TFile } from "obsidian";
 
-
-const sortFilesByName = (fileA: TFile, fileB: TFile): number => {
-    const nameA = fileA.name.toLowerCase();
-    const nameB = fileB.name.toLowerCase();
-    return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
-}
-
 export class FilesContainer extends ViewContainer {
     constructor(
         app: App,
@@ -145,7 +138,7 @@ export class FilesContainer extends ViewContainer {
     ): void {
         unsortedFiles
             .sort((fileA: TFile, fileB: TFile) => {
-                return (ascending ? 1 : -1) * sortFilesByName(fileA, fileB);
+                return (ascending ? 1 : -1) * this.sortFilesByName(fileA, fileB);
             })
             .forEach(file => {
                 this.addFileToFolder(
@@ -190,7 +183,7 @@ export class FilesContainer extends ViewContainer {
             return (ascending ? 1 : -1) * (
                 fileA.extension < fileB.extension ? -1 :
                 fileA.extension > fileB.extension ? 1 :
-                sortFilesByName(fileA, fileB));
+                this.sortFilesByName(fileA, fileB));
         }).forEach(file => {
             this.addFileToFolder(file, file.extension, "/")
         });
@@ -203,7 +196,7 @@ export class FilesContainer extends ViewContainer {
             return (ascending ? 1 : -1) * (
                 aType < bType ? -1 :
                 aType > bType ? 1 :
-                sortFilesByName(fileA, fileB));
+                this.sortFilesByName(fileA, fileB));
         }).forEach(file => {
             this.addFileToFolder(file, getFileType(file.extension) ?? "unknown", "/")
         })
