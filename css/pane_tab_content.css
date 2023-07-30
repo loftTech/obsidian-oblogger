@@ -169,15 +169,17 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .family-title {
-    align-items: center;
+    border-radius: var(--radius-s);
     color: var(--nav-item-color);
     display: flex;
+    margin: 2px 0;
+    padding: 4px;
 }
 
 .oblogger-content .family-title .clickable-icon {
-    padding: 4px;
-    margin: 2px 2px 2px 1px;
-    transition: none;
+    margin: 0;
+    padding: 0 4px 0 0;
+    pointer-events: none;
 }
 
 .oblogger-content .family-title-text {
@@ -485,6 +487,15 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .title-text-container:hover { color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/100%); }
+
+.oblogger-content .clickable-icon:hover {
+    background-color: transparent;
+}
+
+.oblogger-content .family-title:hover {
+    background-color: var(--nav-indentation-guide-color);
+    color: var(--nav-item-color);
+}
 
 .oblogger-content .child-item.active,
 .oblogger-content .child-item:hover {
