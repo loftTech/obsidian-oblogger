@@ -4,7 +4,7 @@ import { ViewContainer } from "./view_container";
 import { ObloggerSettings, RxGroupType } from "./settings";
 import { NewTagModal } from "./new_tag_modal";
 
-export class EntriesContainer extends ViewContainer {
+export class DailiesContainer extends ViewContainer {
     constructor(
         app: App,
         fileClickCallback: FileClickCallback,
@@ -18,7 +18,7 @@ export class EntriesContainer extends ViewContainer {
     ) {
         super(
             app,
-            RxGroupType.ENTRIES,
+            RxGroupType.DAILIES,
             fileClickCallback,
             fileAddedCallback,
             collapseChangedCallback,
@@ -36,7 +36,7 @@ export class EntriesContainer extends ViewContainer {
     }
 
     protected getEmptyMessage(): string {
-        return `No documents tagged #${this.settings.entriesTag};`
+        return `No documents tagged #${this.settings.dailiesTag};`
     }
 
     protected getHideText(): string {
@@ -48,7 +48,7 @@ export class EntriesContainer extends ViewContainer {
     }
 
     protected getTitleText(): string {
-        return "Entries";
+        return "Daily Notes";
     }
 
     protected getTitleIcon(): string {
@@ -60,11 +60,11 @@ export class EntriesContainer extends ViewContainer {
     }
 
     protected getPillText(): string {
-        return "#" + this.settings.entriesTag;
+        return "#" + this.settings.dailiesTag;
     }
 
     protected getPillTooltipText(): string {
-        return "Change default tag associated with entries";
+        return "Change default tag associated with dailies";
     }
 
     protected getPillIcon(): string {
@@ -75,15 +75,15 @@ export class EntriesContainer extends ViewContainer {
         return (e: MouseEvent) => {
             const menu = new Menu();
             menu.addItem(item => {
-                item.setTitle("Change entry tag");
+                item.setTitle("Change daily tag");
                 item.setIcon("replace");
                 item.onClick(() => {
                     const modal = new NewTagModal(this.app, async (result: string) => {
                         if (!result) {
-                            new Notice("Not setting entries tag")
+                            new Notice("Not setting dailies tag")
                             return;
                         }
-                        this.settings.entriesTag = result;
+                        this.settings.dailiesTag = result;
                         this.saveSettingsCallback();
                         this.requestRender();
                     });
@@ -99,18 +99,18 @@ export class EntriesContainer extends ViewContainer {
     }
 
     protected buildFileStructure(excludedFolders: string[]) {
-        const getEntryDate = (entry: TFile, dayPrecision: boolean): string => {
-            const cache = this.app.metadataCache.getFileCache(entry);
+        const getDailyDate = (daily: TFile, dayPrecision: boolean): string => {
+            const cache = this.app.metadataCache.getFileCache(daily);
             return moment(cache?.frontmatter?.day ??
                 cache?.frontmatter?.created ??
-                entry.stat.ctime).format(dayPrecision ? "YYYY-MM-DD" : "YYYY-MM");
+                daily.stat.ctime).format(dayPrecision ? "YYYY-MM-DD" : "YYYY-MM");
         }
 
         this.app.vault
             .getFiles()
             .sort((fileA: TFile, fileB: TFile): number => {
-                const monthA = getEntryDate(fileA, false);
-                const monthB = getEntryDate(fileB, false);
+                const monthA = getDailyDate(fileA, false);
+                const monthB = getDailyDate(fileB, false);
                 if (monthA > monthB) {
                     return -1;
                 }
@@ -123,8 +123,8 @@ export class EntriesContainer extends ViewContainer {
                     return bookmarkSorting;
                 }
 
-                const dayA = getEntryDate(fileA, true);
-                const dayB = getEntryDate(fileB, true);
+                const dayA = getDailyDate(fileA, true);
+                const dayB = getDailyDate(fileB, true);
                 return dayA > dayB ? -1 : dayA < dayB ? 1 : 0;
             })
             .forEach((file: TFile) => {
@@ -137,17 +137,17 @@ export class EntriesContainer extends ViewContainer {
                     return;
                 }
 
-                if (!getAllTags(cache)?.contains("#" + this.settings.entriesTag)) {
+                if (!getAllTags(cache)?.contains("#" + this.settings.dailiesTag)) {
                     return;
                 }
 
-                const entryDateString = getEntryDate(file, true);
-                const entryDate = moment(entryDateString);
-                const entryDateYear = entryDate.format("YYYY");
-                const entryDateMonth = entryDate.format("MM");
+                const dailyDateString = getDailyDate(file, true);
+                const dailyDate = moment(dailyDateString);
+                const dailyDateYear = dailyDate.format("YYYY");
+                const dailyDateMonth = dailyDate.format("MM");
                 this.addFileToFolder(
                     file,
-                    `${entryDateYear}/${entryDateMonth}`,
+                    `${dailyDateYear}/${dailyDateMonth}`,
                     "/"
                 );
             });

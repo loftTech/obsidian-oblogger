@@ -35,7 +35,7 @@ export const RxGroupType = {
     RECENTS: "recents",
     FILES: "files",
     UNTAGGED: "untagged",
-    ENTRIES: "entries"
+    DAILIES: "dailies"
 }
 
 interface RxGroupSettings {
@@ -61,7 +61,7 @@ export interface ObloggerSettings {
     avatarVisible: boolean;
     postLogAction: string;
     rxGroups: RxGroupSettings[];
-    entriesTag: string;
+    dailiesTag: string;
 }
 
 export const DEFAULT_SETTINGS: Partial<ObloggerSettings> = {
@@ -69,7 +69,7 @@ export const DEFAULT_SETTINGS: Partial<ObloggerSettings> = {
     postLogAction: PostLogAction.QUIETLY,
     rxGroups: [
         {
-            groupName: RxGroupType.ENTRIES,
+            groupName: RxGroupType.DAILIES,
             collapsedFolders: [],
             isVisible: true,
             sortMethod: ContainerSortMethod.ALPHABETICAL,
@@ -97,7 +97,7 @@ export const DEFAULT_SETTINGS: Partial<ObloggerSettings> = {
             sortAscending: true
         }
     ],
-    entriesTag: "entry"
+    dailiesTag: "daily"
 };
 
 export enum FileType {

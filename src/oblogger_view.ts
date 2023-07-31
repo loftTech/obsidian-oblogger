@@ -10,7 +10,7 @@ import {
 } from "obsidian";
 import { ObloggerSettings, RxGroupType, TagGroup as SettingsTagGroup } from "./settings";
 import { TagGroupContainer } from "./tag_group_container";
-import { EntriesContainer } from "./entries_container";
+import { DailiesContainer } from "./dailies_container";
 import { GroupFolder } from "./group_folder";
 import { RecentsContainer } from "./recents_container";
 import { UntaggedContainer } from "./untagged_container";
@@ -300,8 +300,8 @@ export class ObloggerView extends ItemView {
         container.render(groupSetting.collapsedFolders ?? [], excludedFolders);
     }
 
-    private renderEntries() {
-        this.renderRxGroup(RxGroupType.ENTRIES, this.settings?.excludedFolders ?? []);
+    private renderDailies() {
+        this.renderRxGroup(RxGroupType.DAILIES, this.settings?.excludedFolders ?? []);
     }
 
     private renderFiles() {
@@ -323,7 +323,7 @@ export class ObloggerView extends ItemView {
         await this.renderAvatar();
 
         this.renderRecents();
-        this.renderEntries();
+        this.renderDailies();
         this.renderUntagged();
         this.renderFiles();
 
@@ -704,8 +704,8 @@ export class ObloggerView extends ItemView {
             switch(groupName) {
                 case RxGroupType.RECENTS:
                     return RecentsContainer;
-                case RxGroupType.ENTRIES:
-                    return EntriesContainer;
+                case RxGroupType.DAILIES:
+                    return DailiesContainer;
                 case RxGroupType.UNTAGGED:
                     return UntaggedContainer;
                 case RxGroupType.FILES:
