@@ -245,7 +245,7 @@ Created at ${window.moment(file.stat.ctime).format("YYYY-MM-DD HH:mm")}`;
 
         const childItemText = document.createElement("div");
         childItemText.addClass("child-item-text");
-        childItemText.setText(maybeFrontmatter?.alias ?? file.basename);
+        childItemText.setText((maybeFrontmatter?.alias || maybeFrontmatter?.aliases) ?? file.basename);
         childItemText.ariaLabel = fileTooltipText;
         childItemContent.appendChild(childItemText);
 
