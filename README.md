@@ -1,7 +1,7 @@
 ## about
 
-oblogger is a plugin for Obsidian which focuses on two primary core features:
-1. a **tag explorer** panel that lets you choose the tag groups you want to display as well as some pre-defined groups such as entries, recent documents, files, and all of your untagged documents (these pre-defined groups can be hidden)
+oblogger is a side-panel plugin for Obsidian which focuses on two primary core features:
+1. a **tag explorer** panel that lets you choose the tag groups you want to display as well as some pre-defined groups such as dailies, recent documents, files, and all of your untagged documents (these pre-defined groups can be hidden)
 2. a helpful modal for **logging** information to a new document's frontmatter
 
 <p align="center">
@@ -14,19 +14,26 @@ oblogger is a plugin for Obsidian which focuses on two primary core features:
 ## features
 
 - tag explorer
-  - custom document icons
-  - recent document list with untagged notifier
-  - non-md files 
+  - custom note icons using frontmatter
+  - support for obsidian bookmarks
+    - bookmarked notes/files will be denoted with a bookmark icon
+    - bookmarked notes/files will appear at the top of their respectve group 
+  - **recent** list
+    - status indicator reveals notes that haven't been tagged in any way
+    - can cycle between 5, 10, and 15 recents in list
+  - non-md **file list**
     - organized automatically regardless of folder
     - different sort groups
-  - avatar for adding some personality to the side panel
-  - choose a tag to associate with your daily note and the side panel will automatically organize all of your dailies by year and month
-  - list for untagged documents
-  - custom tag group viewer
-    - supports tag nesting
+  - **daily notes** section for sorting notes tagged "#daily" by year/month/day
+    - "#daily" can be changed to any tag you'd like to assoicate with daily notes
+  - **untagged note list**
+  - **custom tag groups** let you add any of your tags as a group
+    - supports tag nesting 
     - supports multiple tags per file and multiple files per tag
     - supports tags in body and frontmatter
-- logger modal
+  - use a photo as an **avatar** to add some personality to the side panel
+    - default avatar will show first letter of vault  
+- **logger modal**
   - custom logging path (does not support logging to root of vault)
   - easy frontmatter generation
     - add new fields
@@ -46,7 +53,7 @@ oblogger is a plugin for Obsidian which focuses on two primary core features:
 
 ## faq
 
-- why can't I rename files from the side panel?
+- why can't I rename notes/files from the side panel?
   - because it's hard :(. if you figure out how to link into the FileExplorer core plugin in a clean way, please let us know!
 - why can't I log to the root vault folder?
   - because you didn't eat your vegetables
@@ -56,8 +63,8 @@ oblogger is a plugin for Obsidian which focuses on two primary core features:
   - yup! click on the nav bar gear. you can hide all sorts of stuff.
 - how do i set a custom document icon?
   - add `icon: "..."` to a file's frontmatter. the `...` can be almost anything from https://lucide.dev. eg: try adding `icon: "dog"` to a file :)
-- I created an entry for yesterday and now my entries are out of order?
-  - by default, we use the `file.ctime` to sort the entries. However, you can override the date by adding either `created: YYYY-MM-DD` or `day: YYYY-MM-DD` to the frontmatter.
+- I created a daily for yesterday and now my dalies are out of order?
+  - by default, we use the `file.ctime` to sort the dailies. However, you can override the date by adding either `created: YYYY-MM-DD` or `day: YYYY-MM-DD` to the frontmatter.
 - how can I give you guys money for all your hard work?
   - thank you so much! see [buy me a coffee](#buy-me-a-coffee)
 
