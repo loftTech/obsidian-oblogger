@@ -482,8 +482,8 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .title-tag.wiggle:active { animation: wiggle 0.2s; }
 
 .oblogger-content .separator-container:hover .separator {
-    color: var(--background-secondary);
     background-color: var(--nav-indentation-guide-color);
+    color: var(--background-secondary);
     font-size: 8px;
     font-weight: 700;
     height: inherit;
