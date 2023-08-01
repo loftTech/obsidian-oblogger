@@ -415,24 +415,24 @@ export class ObloggerView extends ItemView {
 
         greeter.appendChild(greeterTitle);
 
+        const greeterContent = document.createElement("div");
+        greeterContent.classList.add("greeter-content");
+        greeter.appendChild(greeterContent);
+
         const vaultNameDiv = document.createElement("div");
         vaultNameDiv.addClass("greeter-vault-name");
-        greeterTitle.appendChild(vaultNameDiv);
+        greeterContent.appendChild(vaultNameDiv);
         vaultNameDiv.setText(this.app.vault.getName());
 
         const clockDiv = document.createElement("div");
         clockDiv.addClass("greeter-clock");
-        greeterTitle.appendChild(clockDiv);
+        greeterContent.appendChild(clockDiv);
         this.renderClock(clockDiv);
         this.registerInterval(window.setInterval(
             () => {
                 this.renderClock(clockDiv);
             },
             1000))
-
-        const greeterContent = document.createElement("div");
-        greeterContent.classList.add("greeter-content");
-        greeter.appendChild(greeterContent);
 
         return greeter;
     }
