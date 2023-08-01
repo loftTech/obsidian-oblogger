@@ -475,7 +475,7 @@ export class ObloggerView extends ItemView {
         new ButtonComponent(buttonBar)
             .setClass("button-bar-button")
             .setIcon("folder-plus")
-            .setTooltip("Show tag in side panel")
+            .setTooltip("Add a new user tag group")
             .onClick(() => this.showNewTagModal());
 
         new ButtonComponent(buttonBar)
@@ -745,7 +745,7 @@ export class ObloggerView extends ItemView {
 
         body.appendChild(buildSeparator(
             "rx-separator",
-            "rx-groups",
+            "oblogger-groups",
             "Prescribed tag groups"
         ));
 
@@ -758,7 +758,7 @@ export class ObloggerView extends ItemView {
 
         body.appendChild(buildSeparator(
             "otc-separator",
-            "otc-groups",
+            "user-groups",
             "Over-the-counter tag groups"
         ));
 
