@@ -338,8 +338,10 @@ body.styled-scrollbars .oblogger-content {
 .greeter-vault-name {
     color: var(--vault-name-color);
     cursor: default;
+    display: flex;
     font-size: var(--vault-name-font-size);
     font-weight: var(--vault-name-font-weight);
+    justify-content: center;
     margin-bottom: 4px;
     z-index: 11;
 }
