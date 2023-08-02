@@ -1,6 +1,6 @@
 ## about
 
-oblogger is still in beta and will update frequently! Be sure to check here or the obsidian community plugins for updates.
+oblogger is still in beta and will update frequently!
 
 oblogger is a side-panel plugin for Obsidian which focuses on two primary core features:
 1. a **tag explorer** panel that lets you choose the tag groups you want to display as well as some pre-defined groups such as dailies, recent documents, files, and all of your untagged documents (these pre-defined groups can be hidden)
