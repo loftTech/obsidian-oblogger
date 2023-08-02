@@ -1,16 +1,16 @@
 ## about
 
-oblogger is still in beta and will update frequently!
+**oblogger is still in beta and will update frequently!**
 
 oblogger is a side-panel plugin for Obsidian which focuses on two primary core features:
 1. a **tag explorer** panel that lets you choose the tag groups you want to display as well as some pre-defined groups such as dailies, recent documents, files, and all of your untagged documents (these pre-defined groups can be hidden)
 2. a helpful modal for **logging** information to a new document's frontmatter
 
 <p align="center">
-    <img width="500" alt="side panel preview" src="https://github.com/loftTech/obsidian-oblogger/assets/1900880/4103f8c6-28d3-4c03-98ca-f200262ab581">
+    <img width="500" alt="side panel preview" src="https://github.com/loftTech/obsidian-oblogger/assets/69363905/2b62b8cf-3579-498a-b3ef-19938c6eb362">
 </p>
 <p align="center">
-    <img width="364" alt="logger" src="https://github.com/loftTech/obsidian-oblogger/assets/1900880/43a4e169-2242-4d1c-a364-08de3ec9bcbf">
+    <img width="500" alt="logger" src="https://github.com/loftTech/obsidian-oblogger/assets/69363905/f4562622-e843-44b9-a2f9-c65356e11379">
 </p>
 
 ## features
