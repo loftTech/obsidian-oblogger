@@ -69,10 +69,11 @@ interface TagGroup {
     tag: string,
     container: TagGroupContainer
 }
+
 export class ObloggerView extends ItemView {
     settings: ObloggerSettings;
     avatarDiv: HTMLElement;
-    greeter: HTMLElement;
+    greeterDiv: HTMLElement;
     greeterContainerDiv: HTMLElement;
     otcGroups: TagGroup[]
     rxContainers: ViewContainer[]
@@ -338,10 +339,10 @@ export class ObloggerView extends ItemView {
     private async renderAvatar() {
         if (this.settings?.avatarVisible) {
             this.greeterContainerDiv?.removeClass("hidden");
-            this.greeter?.removeClass("no-avatar");
+            this.greeterDiv?.removeClass("no-avatar");
         } else {
             this.greeterContainerDiv?.addClass("hidden");
-            this.greeter?.addClass("no-avatar");
+            this.greeterDiv?.addClass("no-avatar");
         }
         const myImage = new Image();
         if (this.settings?.avatarPath) {
@@ -374,15 +375,15 @@ export class ObloggerView extends ItemView {
     }
 
     private async buildGreeter() {
-        this.greeter = document.createElement("div");
-        this.greeter.classList.add("greeter");
+        this.greeterDiv = document.createElement("div");
+        this.greeterDiv.classList.add("greeter");
 
-        const greeterTitle = document.createElement("div");
-        greeterTitle.classList.add("greeter-title");
+        const greeterTitleDiv = document.createElement("div");
+        greeterTitleDiv.classList.add("greeter-title");
 
         this.greeterContainerDiv = document.createElement("div");
         this.greeterContainerDiv.addClass("greeter-dot-container");
-        greeterTitle.appendChild(this.greeterContainerDiv);
+        greeterTitleDiv.appendChild(this.greeterContainerDiv);
 
         const avatarBorderDiv = document.createElement("div");
         avatarBorderDiv.addClass("greeter-title-avatar-border");
@@ -416,20 +417,20 @@ export class ObloggerView extends ItemView {
 
         this.greeterContainerDiv.appendChild(avatarChangerDiv);
 
-        this.greeter.appendChild(greeterTitle);
+        this.greeterDiv.appendChild(greeterTitleDiv);
 
-        const greeterContent = document.createElement("div");
-        greeterContent.classList.add("greeter-content");
-        this.greeter.appendChild(greeterContent);
+        const greeterContentDiv = document.createElement("div");
+        greeterContentDiv.classList.add("greeter-content");
+        this.greeterDiv.appendChild(greeterContentDiv);
 
         const vaultNameDiv = document.createElement("div");
         vaultNameDiv.addClass("greeter-vault-name");
-        greeterContent.appendChild(vaultNameDiv);
+        greeterContentDiv.appendChild(vaultNameDiv);
         vaultNameDiv.setText(this.app.vault.getName());
 
         const clockDiv = document.createElement("div");
         clockDiv.addClass("greeter-clock");
-        greeterContent.appendChild(clockDiv);
+        greeterContentDiv.appendChild(clockDiv);
         this.renderClock(clockDiv);
         this.registerInterval(window.setInterval(
             () => {
@@ -437,7 +438,7 @@ export class ObloggerView extends ItemView {
             },
             1000))
 
-        return this.greeter;
+        return this.greeterDiv;
     }
 
     private showNewTagModal() {
@@ -457,11 +458,11 @@ export class ObloggerView extends ItemView {
     }
 
     private buildHeaderInto(header: HTMLElement): void {
-        const buttonBar = document.createElement("div");
-        buttonBar.addClass("nav-buttons-container");
-        header.appendChild(buttonBar);
+        const buttonBarDiv = document.createElement("div");
+        buttonBarDiv.addClass("nav-buttons-container");
+        header.appendChild(buttonBarDiv);
 
-        new ButtonComponent(buttonBar)
+        new ButtonComponent(buttonBarDiv)
             .setClass("button-bar-button")
             .setIcon("edit")
             .setTooltip("New note")
@@ -475,19 +476,19 @@ export class ObloggerView extends ItemView {
                 await this.app.workspace.getLeaf(false).openFile(ret);
             })
 
-        new ButtonComponent(buttonBar)
+        new ButtonComponent(buttonBarDiv)
             .setClass("button-bar-button")
             .setIcon("folder-plus")
             .setTooltip("Show tag in side panel")
             .onClick(() => this.showNewTagModal());
 
-        new ButtonComponent(buttonBar)
+        new ButtonComponent(buttonBarDiv)
             .setClass("button-bar-button")
             .setIcon("form-input")
             .setTooltip("Create a log entry")
             .onClick(this.showLoggerCallbackFn);
 
-        new ButtonComponent(buttonBar)
+        new ButtonComponent(buttonBarDiv)
             .setClass("button-bar-button")
             .setIcon("gear")
             .setTooltip("Settings")
@@ -771,21 +772,20 @@ export class ObloggerView extends ItemView {
         this.reloadOtcGroups();
 
         body.appendChild(this.otcGroupsDiv);
-
     }
 
     async onOpen() {
         this.containerEl.empty();
 
-        const header = document.createElement("div");
-        header.addClass("oblogger-header");
-        this.buildHeaderInto(header);
-        this.containerEl.appendChild(header);
+        const headerDiv = document.createElement("div");
+        headerDiv.addClass("oblogger-header");
+        this.buildHeaderInto(headerDiv);
+        this.containerEl.appendChild(headerDiv);
 
-        const body = document.createElement("div");
-        body.addClass("oblogger-content");
-        await this.buildBodyInto(body);
-        this.containerEl.appendChild(body);
+        const bodyDiv = document.createElement("div");
+        bodyDiv.addClass("oblogger-content");
+        await this.buildBodyInto(bodyDiv);
+        this.containerEl.appendChild(bodyDiv);
 
         this.requestRender();
 
