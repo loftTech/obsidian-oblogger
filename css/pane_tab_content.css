@@ -540,11 +540,11 @@ body.styled-scrollbars .oblogger-content {
 */
 
 .is-phone .greeter {
+    align-items: center;
     display: grid;
     grid-template-columns: 100px;
-    justify-items: center;
-    align-items: center;
     justify-content: center;
+    justify-items: center;
 }
 
 .is-phone .greeter.no-avatar {
