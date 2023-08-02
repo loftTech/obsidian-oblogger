@@ -72,6 +72,7 @@ interface TagGroup {
 export class ObloggerView extends ItemView {
     settings: ObloggerSettings;
     avatarDiv: HTMLElement;
+    greeter: HTMLElement;
     greeterContainerDiv: HTMLElement;
     otcGroups: TagGroup[]
     rxContainers: ViewContainer[]
@@ -336,9 +337,11 @@ export class ObloggerView extends ItemView {
 
     private async renderAvatar() {
         if (this.settings?.avatarVisible) {
-            this.greeterContainerDiv && this.greeterContainerDiv.removeClass("hidden");
+            this.greeterContainerDiv?.removeClass("hidden");
+            this.greeter?.removeClass("no-avatar");
         } else {
-            this.greeterContainerDiv && this.greeterContainerDiv.addClass("hidden");
+            this.greeterContainerDiv?.addClass("hidden");
+            this.greeter?.addClass("no-avatar");
         }
         const myImage = new Image();
         if (this.settings?.avatarPath) {
@@ -371,8 +374,8 @@ export class ObloggerView extends ItemView {
     }
 
     private async buildGreeter() {
-        const greeter = document.createElement("div");
-        greeter.classList.add("greeter");
+        this.greeter = document.createElement("div");
+        this.greeter.classList.add("greeter");
 
         const greeterTitle = document.createElement("div");
         greeterTitle.classList.add("greeter-title");
@@ -413,11 +416,11 @@ export class ObloggerView extends ItemView {
 
         this.greeterContainerDiv.appendChild(avatarChangerDiv);
 
-        greeter.appendChild(greeterTitle);
+        this.greeter.appendChild(greeterTitle);
 
         const greeterContent = document.createElement("div");
         greeterContent.classList.add("greeter-content");
-        greeter.appendChild(greeterContent);
+        this.greeter.appendChild(greeterContent);
 
         const vaultNameDiv = document.createElement("div");
         vaultNameDiv.addClass("greeter-vault-name");
@@ -434,7 +437,7 @@ export class ObloggerView extends ItemView {
             },
             1000))
 
-        return greeter;
+        return this.greeter;
     }
 
     private showNewTagModal() {
@@ -768,6 +771,7 @@ export class ObloggerView extends ItemView {
         this.reloadOtcGroups();
 
         body.appendChild(this.otcGroupsDiv);
+
     }
 
     async onOpen() {
