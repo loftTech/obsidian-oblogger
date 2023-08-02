@@ -338,8 +338,10 @@ body.styled-scrollbars .oblogger-content {
 .greeter-vault-name {
     color: var(--vault-name-color);
     cursor: default;
+    display: flex;
     font-size: var(--vault-name-font-size);
     font-weight: var(--vault-name-font-weight);
+    justify-content: center;
     margin-bottom: 4px;
     z-index: 11;
 }
@@ -480,8 +482,8 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .title-tag.wiggle:active { animation: wiggle 0.2s; }
 
 .oblogger-content .separator-container:hover .separator {
-    color: var(--background-secondary);
     background-color: var(--nav-indentation-guide-color);
+    color: var(--background-secondary);
     font-size: 8px;
     font-weight: 700;
     height: inherit;
@@ -537,7 +539,60 @@ body.styled-scrollbars .oblogger-content {
    ==========================================================================
 */
 
-.is-phone .oblogger-content { padding: 0 25px 70px; }
+.is-phone .greeter {
+    align-items: center;
+    display: grid;
+    grid-template-columns: 100px;
+    justify-content: center;
+    justify-items: center;
+}
+
+.is-phone .greeter.no-avatar {
+    display: flex;
+}
+
+.is-phone .greeter-title { grid-column: 1; }
+
+.is-phone .greeter-content { grid-column: 2; }
+
+.is-phone .greeter-vault-name {
+    display: flex;
+    justify-content: center;
+}
+
+.is-phone .oblogger-content { padding: 0 15px 70px 25px; }
+
+.is-phone .oblogger-content .status-icon { left: 34px; }
+
+.is-phone .oblogger-content .child-item {
+    margin-bottom: 6px;
+    margin-top: 6px;
+}
+
+.is-phone .oblogger-content .content {
+    padding-bottom:0px;
+    padding-top:0px;
+}
+
+.is-phone .oblogger-content .title-container { margin: 8px 0px}
+
+.is-phone .oblogger-content .title-text-container {
+    align-items: center;
+    color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/100%);
+    display: flex;
+    font-size: 16px;
+}
+
+.is-phone .oblogger-content .separator-container .separator {
+    background-color: var(--nav-indentation-guide-color);
+    color: var(--background-secondary);
+    font-size: 8px;
+    font-weight: 700;
+    height: inherit;
+    opacity: 1;
+    transition: 0.2s;
+    width: 88px;
+}
 
 /* ==========================================================================
    MISC
