@@ -205,7 +205,7 @@ export class ObloggerView extends ItemView {
         this.app.workspace.onLayoutReady(() => {
             // Hook up to the file-explorer plugin
             const fileExplorerLeaf = this.app.workspace.getLeavesOfType("file-explorer")[0] as FileExplorerLeaf;
-            const fileExplorer = fileExplorerLeaf.view as FileExplorerView;
+            const fileExplorer = fileExplorerLeaf?.view as FileExplorerView;
             this.openFileContextMenu = fileExplorer.openFileContextMenu;
             this.setFocusedItem = fileExplorer.setFocusedItem;
             this.afterCreate = fileExplorer.afterCreate;
