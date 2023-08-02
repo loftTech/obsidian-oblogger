@@ -547,6 +547,10 @@ body.styled-scrollbars .oblogger-content {
     justify-content: center;
 }
 
+.is-phone .greeter.no-avatar {
+    display: flex;
+}
+
 .is-phone .greeter-title { grid-column: 1; }
 
 .is-phone .greeter-content { grid-column: 2; }
