@@ -7,22 +7,15 @@
 .oblogger-pill-menu-icon {
     height: var(--icon-size);
     width: var(--icon-size);
-
 }
 
-.oblogger-header {
-    padding: 8px;
-}
+.oblogger-header { padding: 8px 12px 8px 8px; }
 
 /* modification for macos */
-.mod-macos .oblogger-header {
-    padding: 8px 20px 8px 8px;
-}
+.mod-macos .oblogger-header { padding: 8px 20px 8px 8px; }
 
 /* modification for minimal styled scrollbars setting */
-body.styled-scrollbars .oblogger-header {
-    padding: 8px;
-}
+body.styled-scrollbars .oblogger-header { padding: 8px; }
 
 .button-bar-button {
     background-color: transparent !important;

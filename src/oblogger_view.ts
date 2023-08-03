@@ -750,7 +750,7 @@ export class ObloggerView extends ItemView {
         body.appendChild(buildSeparator(
             "rx-separator",
             "oblogger-groups",
-            "Prescribed tag groups"
+            "Built in groups"
         ));
 
         this.rxGroupsDiv = document.createElement("div");
@@ -763,7 +763,7 @@ export class ObloggerView extends ItemView {
         body.appendChild(buildSeparator(
             "otc-separator",
             "user-groups",
-            "Over-the-counter tag groups"
+            "User created tag groups"
         ));
 
         this.otcGroupsDiv = document.createElement("div");
