@@ -65,7 +65,7 @@ oblogger is a side-panel plugin for Obsidian which focuses on two primary core f
   - yup! click on the nav bar gear. you can hide all sorts of stuff.
 - how do i set a custom document icon?
   - add `icon: "..."` to a file's frontmatter. the `...` can be almost anything from https://lucide.dev. eg: try adding `icon: "dog"` to a file :)
-- I created a daily for yesterday and now my dalies are out of order?
+- I created a daily for yesterday and now my dailies are out of order?
   - by default, we use the `file.ctime` to sort the dailies. However, you can override the date by adding either `created: YYYY-MM-DD` or `day: YYYY-MM-DD` to the frontmatter.
 - how can I give you guys money for all your hard work?
   - thank you so much! see [buy me a coffee](#buy-me-a-coffee)
