@@ -76,6 +76,10 @@ oblogger is a side-panel plugin for Obsidian which focuses on two primary core f
 
 `npm run build` for release
 
+## acknowledgements
+
+we want to thank the [obsidian plugin-dev discord server](https://discordapp.com/channels/686053708261228577/840286264964022302) for all the help they gave us when we felt stuck. if you're reading this and working on a theme, plugin, or just want to engage more with the obsidian community, do yourself a favor and [join that discord channel](https://discord.gg/obsidianmd).
+
 ## buy me a coffee:
 
 <a href="https://www.buymeacoffee.com/lofttech" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-blue.png" alt="Buy Me A Coffee" height="41" width="174"></a>
