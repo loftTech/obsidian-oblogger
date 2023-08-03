@@ -1,3 +1,4 @@
+/* stylelint-disable no-descending-specificity */
 
 /* ==========================================================================
    PANE-TAB CONTENT
@@ -622,3 +623,5 @@ body.styled-scrollbars .oblogger-content {
     70% {transform: translateY(-4px);}
     90% {transform: translateY(-1px);}
 }
+
+/* stylelint-enable no-descending-specificity */
