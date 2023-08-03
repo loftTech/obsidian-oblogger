@@ -571,11 +571,11 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .is-phone .oblogger-content .content {
-    padding-bottom:0px;
-    padding-top:0px;
+    padding-bottom:0;
+    padding-top:0;
 }
 
-.is-phone .oblogger-content .title-container { margin: 8px 0px}
+.is-phone .oblogger-content .title-container { margin: 8px 0}
 
 .is-phone .oblogger-content .title-text-container {
     align-items: center;
