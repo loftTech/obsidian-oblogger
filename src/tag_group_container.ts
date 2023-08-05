@@ -82,16 +82,11 @@ export class TagGroupContainer extends ViewContainer {
     }
 
     protected getPillText(): string {
-        if (this.getIsolatedTagMatch()) {
-            return "• • •";
-        }
-        return "#" + (this.groupName.split("/").first() ?? "") + (
-            this.groupName.contains("/") ? "..." : ""
-        )
+        return getSortMethodDisplayText(this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL);
     }
 
     protected getPillTooltipText(): string {
-        return "";
+        return "Sort";
     }
 
     protected getTitleTooltip(): string {
@@ -105,7 +100,9 @@ export class TagGroupContainer extends ViewContainer {
     }
 
     protected getPillIcon(): string {
-        return "";
+        return (this.getGroupSetting()?.sortAscending ?? true) ?
+            "down-arrow-with-tail" :
+            "up-arrow-with-tail"
     }
 
     protected getPillClickHandler(): ((e: MouseEvent) => void) | undefined {
