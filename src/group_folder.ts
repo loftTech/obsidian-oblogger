@@ -235,11 +235,7 @@ Created at ${window.moment(file.stat.ctime).format("YYYY-MM-DD HH:mm")}`;
 
         root_childItem.appendChild(statusIconDiv);
 
-        const namelessBufferDiv = document.createElement("div");
-
-        const childItemContent = document.createElement("div");
-        childItemContent.addClass("child-item-content");
-        new ExtraButtonComponent(childItemContent)
+        new ExtraButtonComponent(root_childItem)
             .setIcon(maybeFrontmatter?.icon ?? getFileTypeIcon(file)).setDisabled(true)
             .extraSettingsEl.addClass("child-item-icon");
 
@@ -247,7 +243,7 @@ Created at ${window.moment(file.stat.ctime).format("YYYY-MM-DD HH:mm")}`;
         childItemText.addClass("child-item-text");
         childItemText.setText((maybeFrontmatter?.alias || maybeFrontmatter?.aliases) ?? file.basename);
         childItemText.ariaLabel = fileTooltipText;
-        childItemContent.appendChild(childItemText);
+        root_childItem.appendChild(childItemText);
 
         const bookmarkIcon = document.createElement("div");
         bookmarkIcon.addClass("bookmark-icon");
@@ -255,18 +251,15 @@ Created at ${window.moment(file.stat.ctime).format("YYYY-MM-DD HH:mm")}`;
             setIcon(bookmarkIcon, "bookmark");
             bookmarkIcon.ariaLabel = "Bookmarked";
         }
-        childItemContent.appendChild(bookmarkIcon);
+        root_childItem.appendChild(bookmarkIcon);
 
         if (file.extension.toLowerCase() !== "md") {
             const childItemTypePill = document.createElement("div");
             childItemTypePill.addClass("nav-file-tag");
             childItemTypePill.setText(file.extension.toUpperCase());
-            childItemContent.appendChild(childItemTypePill);
+            root_childItem.appendChild(childItemTypePill);
         }
 
-        namelessBufferDiv.appendChild(childItemContent);
-
-        root_childItem.appendChild(namelessBufferDiv);
         root_childItem.setAttribute("data-path", file.path);
 
         // This callback is because we're leveraging the build in FileExplorer's
