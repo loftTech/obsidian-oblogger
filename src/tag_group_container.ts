@@ -155,11 +155,26 @@ export class TagGroupContainer extends ViewContainer {
             }, {});
     }
 
-    protected buildAlphabeticalFileStructure(
-        tagFiles: TagFileMap,
-        ascending: boolean,
-        isolatedGroupName?: string
-    ) {
+    private getFileSortingFn(ascending: boolean) {
+        switch (this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL) {
+            case ContainerSortMethod.MTIME:
+                return (fileA: TFile, fileB: TFile) => {
+                    return fileA.stat.mtime - fileB.stat.mtime;
+                }
+            case ContainerSortMethod.ALPHABETICAL:
+            default:
+                return (fileA: TFile, fileB: TFile) => {
+                    return fileA.name < fileB.name ? -1 : fileA.name > fileB.name ? 1 : 0;
+                }
+        }
+    }
+
+    protected buildFileStructure(excludedFolders: string[]) {
+        const tagFiles = this.getAllAssociatedTags(excludedFolders);
+        const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
+        const ascending = this.getGroupSetting()?.sortAscending ?? true;
+        const fileSortingFn = this.getFileSortingFn(ascending);
+
         Object.keys(tagFiles).sort((tagA: string, tagB: string) => {
             return (ascending ? 1 : -1) * (tagA < tagB ? -1 : tagA > tagB ? 1 : 0);
         }).forEach((tag: string) => {
@@ -170,7 +185,7 @@ export class TagGroupContainer extends ViewContainer {
                     if (bookmarkSorting != 0) {
                         return bookmarkSorting;
                     }
-                    return (ascending ? 1 : -1) * (fileA.name < fileB.name ? -1 : fileA.name > fileB.name ? 1 : 0);
+                    return (ascending ? 1 : -1) * fileSortingFn(fileA, fileB);
                 })
                 .forEach((file: TFile) => {
                     let remainingTag = subTag.startsWith("/") ? subTag.slice(1) : subTag;
@@ -188,29 +203,6 @@ export class TagGroupContainer extends ViewContainer {
                     );
                 });
         });
-    }
-
-    protected buildDateFileStructure(
-        tagFiles: TagFileMap,
-        ascending: boolean,
-        isolatedGroupName?: string
-    ) {
-    }
-
-    protected buildFileStructure(excludedFolders: string[]) {
-        const tagFiles = this.getAllAssociatedTags(excludedFolders);
-        const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
-        const ascending = this.getGroupSetting()?.sortAscending ?? true;
-
-        switch (this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL) {
-            case ContainerSortMethod.MTIME:
-                this.buildDateFileStructure(tagFiles, ascending, isolatedGroupName);
-                break;
-            case ContainerSortMethod.ALPHABETICAL:
-            default:
-                this.buildAlphabeticalFileStructure(tagFiles, ascending, isolatedGroupName);
-                break;
-        }
     }
 
     protected getContainerClass(): string {
