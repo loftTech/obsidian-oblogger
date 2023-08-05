@@ -264,7 +264,7 @@ Created at ${window.moment(file.stat.ctime).format("YYYY-MM-DD HH:mm")}`;
 
         // This callback is because we're leveraging the build in FileExplorer's
         // context menu. It needs to know all files that might be clicked.
-        fileAddedCallback(file, root_childItem, namelessBufferDiv, childItemContent);
+        fileAddedCallback(file, root_childItem, childItemText, bookmarkIcon);
 
         return root_childItem;
     }
