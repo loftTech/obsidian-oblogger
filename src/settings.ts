@@ -1,6 +1,6 @@
 import { TFile } from "obsidian";
 
-export interface TagGroup {
+export interface OtcGroupSettings {
     tag: string;
     collapsedFolders: string[];
     isPinned: boolean;
@@ -55,7 +55,7 @@ export const PostLogAction = {
 export interface ObloggerSettings {
     loggingPath: string;
     avatarPath: string;
-    tagGroups: TagGroup[];
+    tagGroups: OtcGroupSettings[];
     excludedFolders: string[];
     recentsCount: number;
     avatarVisible: boolean;
