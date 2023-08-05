@@ -1,7 +1,7 @@
-import { App, getAllTags, TFile } from "obsidian";
+import { App, getAllTags, Menu, MenuItem, TFile } from "obsidian";
 import { FileClickCallback, FileAddedCallback } from "./group_folder";
 import { ViewContainer } from "./view_container";
-import { ContainerSortMethod, ObloggerSettings } from "./settings";
+import { ContainerSortMethod, getSortMethodDisplayText, ObloggerSettings } from "./settings";
 
 
 type TagFileMap = { [key: string]: TFile[] };
@@ -104,8 +104,58 @@ export class TagGroupContainer extends ViewContainer {
         return "";
     }
 
-    protected getPillClickHandler(): (() => void) | undefined {
-        return undefined;
+    protected getPillClickHandler(): ((e: MouseEvent) => void) | undefined {
+        return (e: MouseEvent) => {
+            const menu = new Menu();
+
+            const changeSortMethod = async (method: string) => {
+                const groupSetting = this.getGroupSetting();
+                if (groupSetting === undefined) {
+                    console.warn("undefined group settings")
+                    return;
+                }
+
+                if (groupSetting.sortMethod === method) {
+                    groupSetting.sortAscending = !groupSetting.sortAscending;
+                } else {
+                    groupSetting.sortMethod = method;
+                    groupSetting.sortAscending = true;
+                }
+                await this.saveSettingsCallback();
+                this.requestRender();
+            }
+
+            const setupItem = (item: MenuItem, method: string) => {
+                item.onClick(() => {
+                    changeSortMethod(method);
+                });
+                if (method === this.getGroupSetting()?.sortMethod) {
+
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    item.iconEl.addClass("untagged-sort-confirmation");
+
+                    item.setIcon(
+                        this.getGroupSetting()?.sortAscending ?
+                            "down-arrow-with-tail" :
+                            "up-arrow-with-tail");
+                } else {
+                    item.setIcon("down-arrow-with-tail");
+                }
+            }
+
+            [
+                ContainerSortMethod.ALPHABETICAL,
+                ContainerSortMethod.MTIME
+            ].forEach(method => {
+                menu.addItem(item => {
+                    item.setTitle(getSortMethodDisplayText(method));
+                    setupItem(item, method);
+                })
+            })
+
+            menu.showAtMouseEvent(e);
+        }
     }
 
     private getAllAssociatedTags(excludedFolders: string[]): TagFileMap {
@@ -155,7 +205,7 @@ export class TagGroupContainer extends ViewContainer {
             }, {});
     }
 
-    private getFileSortingFn(ascending: boolean) {
+    private getFileSortingFn() {
         switch (this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL) {
             case ContainerSortMethod.MTIME:
                 return (fileA: TFile, fileB: TFile) => {
@@ -173,7 +223,7 @@ export class TagGroupContainer extends ViewContainer {
         const tagFiles = this.getAllAssociatedTags(excludedFolders);
         const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
         const ascending = this.getGroupSetting()?.sortAscending ?? true;
-        const fileSortingFn = this.getFileSortingFn(ascending);
+        const fileSortingFn = this.getFileSortingFn();
 
         Object.keys(tagFiles).sort((tagA: string, tagB: string) => {
             return (ascending ? 1 : -1) * (tagA < tagB ? -1 : tagA > tagB ? 1 : 0);

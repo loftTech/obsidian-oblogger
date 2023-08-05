@@ -1,6 +1,6 @@
 import { App, Menu, setIcon, TFile } from "obsidian";
 import { FileClickCallback, GroupFolder, FileAddedCallback } from "./group_folder";
-import { ObloggerSettings } from "./settings";
+import { ObloggerSettings, RxGroupSettings } from "./settings";
 
 export abstract class ViewContainer extends GroupFolder {
     settings: ObloggerSettings;
@@ -73,11 +73,17 @@ export abstract class ViewContainer extends GroupFolder {
     }
 
     protected isVisible(): boolean {
-        return this.getGroupSetting()?.isVisible ?? true;
+        return (this.getGroupSetting() as RxGroupSettings)?.isVisible ?? true;
     }
 
     protected getGroupSetting() {
-        return this.settings.rxGroups.find(group => group.groupName === this.groupName);
+        console.log(`looking for ${this.groupName} in rx groups: ${this.settings.rxGroups.map(g => g.groupName)} and otc groups: ${this.settings.tagGroups.map(g => g.tag)}`)
+        const settings = (
+            (this.settings.rxGroups.find(group => group.groupName === this.groupName)) ??
+            (this.settings.tagGroups.find(group => group.tag === this.groupName))
+        );
+        console.log(`settings found: ${settings}`)
+        return settings;
     }
 
     protected requestRender() {

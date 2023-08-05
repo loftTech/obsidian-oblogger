@@ -40,7 +40,8 @@ export const RxGroupType = {
     DAILIES: "dailies"
 }
 
-interface RxGroupSettings {
+// todo: combine this with OtcGroupSettings
+export interface RxGroupSettings {
     groupName: string;
     collapsedFolders: string[];
     isVisible: boolean;
