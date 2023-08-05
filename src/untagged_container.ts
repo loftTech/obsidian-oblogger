@@ -50,6 +50,10 @@ export class UntaggedContainer extends ViewContainer {
         return "Untagged";
     }
 
+    protected getTitleTooltip(): string {
+        return "";
+    }
+
     protected getTitleIcon(): string {
         return "";
     }

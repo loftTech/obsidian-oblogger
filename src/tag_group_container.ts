@@ -91,13 +91,17 @@ export class TagGroupContainer extends ViewContainer {
     }
 
     protected getPillTooltipText(): string {
+        return "";
+    }
+
+    protected getTitleTooltip(): string {
         if (this.getIsolatedTagMatch()) {
             return "Associated tags:\n\n" + Object.keys(this.getAllAssociatedTags([]))
                 .sort()
                 .map(tag => `#${tag}`)
                 .join("\n");
         }
-        return this.groupName.contains("/") ? this.groupName : "";
+        return `#${this.groupName}`;
     }
 
     protected getPillIcon(): string {
@@ -225,6 +229,8 @@ export class TagGroupContainer extends ViewContainer {
         const ascending = this.getGroupSetting()?.sortAscending ?? true;
         const fileSortingFn = this.getFileSortingFn();
 
+        // todo: don't always sort tags. only sort them if sorting is alphabetical,
+        //  otherwise default to alpha ascending
         Object.keys(tagFiles).sort((tagA: string, tagB: string) => {
             return (ascending ? 1 : -1) * (tagA < tagB ? -1 : tagA > tagB ? 1 : 0);
         }).forEach((tag: string) => {

@@ -52,6 +52,10 @@ export class FilesContainer extends ViewContainer {
         return "Files";
     }
 
+    protected getTitleTooltip(): string {
+        return "";
+    }
+
     protected getTitleIcon(): string {
         return "";
     }

@@ -17,6 +17,7 @@ export abstract class ViewContainer extends GroupFolder {
     pinCallback: ((pin: boolean) => void) | undefined;
 
     protected abstract getTitleText(): string;
+    protected abstract getTitleTooltip(): string;
     protected abstract getTitleIcon(): string;
     protected abstract getTitleIconTooltip(): string;
     protected abstract getPillText(): string;
@@ -212,6 +213,7 @@ export abstract class ViewContainer extends GroupFolder {
             const contextMenu = this.getContextMenu();
             contextMenu && contextMenu.showAtMouseEvent(e);
         });
+        titleText.ariaLabel = this.getTitleTooltip();
 
         return titleTextContainer;
     }
