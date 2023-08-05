@@ -202,7 +202,8 @@ body.styled-scrollbars .oblogger-content {
 
 .oblogger-content .status-icon.visible {
     display: flex;
-    left: 18px;
+    grid-column: 1;
+    left: 19px;
     opacity: 1;
     position: absolute;
 }
@@ -210,11 +211,14 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .child-item {
     border-radius: var(--radius-s);
     color: var(--nav-item-color);
+    display: grid;
+    justify-content: start;
     margin: 2px 0;
     padding: 4px;
 }
 
 .oblogger-content .child-item-icon {
+    grid-column: 1;
     padding: 0 4px 0 0;
     pointer-events: none;
 }
@@ -222,20 +226,25 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .child-item-content { display: flex; }
 
 .oblogger-content .child-item-text {
+    grid-column: 2;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 .oblogger-content .bookmark-icon {
+    align-items: center;
     display: flex;
-    padding: 1px 0 1px 2px;
+    grid-column: 3;
+    justify-content: center;
+    padding-left: 2px;
 }
 
 .oblogger-content .nav-file-tag {
     background-color: var(--background-modifier-hover);
     border-radius: 4px;
     font-weight: 600;
+    grid-column: 4;
     margin: 0 0 0 4px;
     padding: 0 4px;
     text-transform: uppercase;
@@ -564,6 +573,8 @@ body.styled-scrollbars .oblogger-content {
 .is-phone .oblogger-content { padding: 0 15px 70px 25px; }
 
 .is-phone .oblogger-content .status-icon { left: 34px; }
+
+.is-phone .oblogger-content .bookmark-icon { padding-top: 3px; }
 
 .is-phone .oblogger-content .child-item {
     margin-bottom: 6px;
