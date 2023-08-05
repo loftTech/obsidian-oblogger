@@ -244,7 +244,7 @@ export class FilesContainer extends ViewContainer {
             return file.extension !== "md";
         });
 
-        switch (this.getGroupSetting()?.sortMethod) {
+        switch (this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.TYPE) {
             case ContainerSortMethod.ALPHABETICAL:
                 this.buildAlphabeticalFileStructure(
                     includedFiles,
