@@ -41,11 +41,11 @@ export const RxGroupType = {
 }
 
 interface RxGroupSettings {
-    groupName: string,
-    collapsedFolders: string[],
-    isVisible: boolean,
-    sortMethod: string,
-    sortAscending: boolean
+    groupName: string;
+    collapsedFolders: string[];
+    isVisible: boolean;
+    sortMethod: string;
+    sortAscending: boolean;
 }
 
 export const PostLogAction = {

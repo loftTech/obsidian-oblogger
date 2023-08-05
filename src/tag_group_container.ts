@@ -110,8 +110,8 @@ export class TagGroupContainer extends ViewContainer {
 
     private getAllAssociatedTags(excludedFolders: string[]): TagFileMap {
         interface Item {
-            file: TFile,
-            tags: string[]
+            file: TFile;
+            tags: string[];
         }
 
         const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
