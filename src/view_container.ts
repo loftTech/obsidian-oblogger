@@ -77,13 +77,10 @@ export abstract class ViewContainer extends GroupFolder {
     }
 
     protected getGroupSetting() {
-        console.log(`looking for ${this.groupName} in rx groups: ${this.settings.rxGroups.map(g => g.groupName)} and otc groups: ${this.settings.tagGroups.map(g => g.tag)}`)
-        const settings = (
+        return (
             (this.settings.rxGroups.find(group => group.groupName === this.groupName)) ??
             (this.settings.tagGroups.find(group => group.tag === this.groupName))
         );
-        console.log(`settings found: ${settings}`)
-        return settings;
     }
 
     protected requestRender() {
