@@ -207,8 +207,8 @@ export class TagGroupContainer extends ViewContainer {
             }, {});
     }
 
-    private getFileSortingFn() {
-        switch (this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL) {
+    private getFileSortingFn(sortMethod: string) {
+        switch (sortMethod) {
             case ContainerSortMethod.MTIME:
                 return (fileA: TFile, fileB: TFile) => {
                     return fileA.stat.mtime - fileB.stat.mtime;
@@ -229,12 +229,14 @@ export class TagGroupContainer extends ViewContainer {
         const tagFiles = this.getAllAssociatedTags(excludedFolders);
         const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
         const ascending = this.getGroupSetting()?.sortAscending ?? true;
-        const fileSortingFn = this.getFileSortingFn();
+        const sortMethod = this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL;
+        const fileSortingFn = this.getFileSortingFn(sortMethod);
 
-        // todo: don't always sort tags. only sort them if sorting is alphabetical,
-        //  otherwise default to alpha ascending
         Object.keys(tagFiles).sort((tagA: string, tagB: string) => {
-            return (ascending ? 1 : -1) * (tagA < tagB ? -1 : tagA > tagB ? 1 : 0);
+            // don't always sort tags. only sort them if sorting is alphabetical,
+            // otherwise default to alpha ascending
+            const modifier = sortMethod === ContainerSortMethod.ALPHABETICAL ? (ascending ? 1 : -1) : 1;
+            return modifier * (tagA < tagB ? -1 : tagA > tagB ? 1 : 0);
         }).forEach((tag: string) => {
             const subTag = tag.replace(this.groupName, "");
             tagFiles[tag]
