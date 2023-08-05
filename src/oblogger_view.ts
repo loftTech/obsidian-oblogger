@@ -8,7 +8,7 @@ import {
     View,
     Notice
 } from "obsidian";
-import { ObloggerSettings, RxGroupType, TagGroup as SettingsTagGroup } from "./settings";
+import { ObloggerSettings, RxGroupType, OtcGroupSettings as SettingsTagGroup } from "./settings";
 import { TagGroupContainer } from "./tag_group_container";
 import { DailiesContainer } from "./dailies_container";
 import { GroupFolder } from "./group_folder";

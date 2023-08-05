@@ -1,6 +1,6 @@
 import { App, Menu, setIcon, TFile } from "obsidian";
 import { FileClickCallback, GroupFolder, FileAddedCallback } from "./group_folder";
-import { ObloggerSettings } from "./settings";
+import { ObloggerSettings, RxGroupSettings } from "./settings";
 
 export abstract class ViewContainer extends GroupFolder {
     settings: ObloggerSettings;
@@ -17,6 +17,7 @@ export abstract class ViewContainer extends GroupFolder {
     pinCallback: ((pin: boolean) => void) | undefined;
 
     protected abstract getTitleText(): string;
+    protected abstract getTitleTooltip(): string;
     protected abstract getTitleIcon(): string;
     protected abstract getTitleIconTooltip(): string;
     protected abstract getPillText(): string;
@@ -73,11 +74,14 @@ export abstract class ViewContainer extends GroupFolder {
     }
 
     protected isVisible(): boolean {
-        return this.getGroupSetting()?.isVisible ?? true;
+        return (this.getGroupSetting() as RxGroupSettings)?.isVisible ?? true;
     }
 
     protected getGroupSetting() {
-        return this.settings.rxGroups.find(group => group.groupName === this.groupName);
+        return (
+            (this.settings.rxGroups.find(group => group.groupName === this.groupName)) ??
+            (this.settings.tagGroups.find(group => group.tag === this.groupName))
+        );
     }
 
     protected requestRender() {
@@ -209,6 +213,7 @@ export abstract class ViewContainer extends GroupFolder {
             const contextMenu = this.getContextMenu();
             contextMenu && contextMenu.showAtMouseEvent(e);
         });
+        titleText.ariaLabel = this.getTitleTooltip();
 
         return titleTextContainer;
     }

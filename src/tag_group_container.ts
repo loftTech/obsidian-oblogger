@@ -1,7 +1,7 @@
-import { App, getAllTags, TFile } from "obsidian";
+import { App, getAllTags, Menu, MenuItem, TFile } from "obsidian";
 import { FileClickCallback, FileAddedCallback } from "./group_folder";
 import { ViewContainer } from "./view_container";
-import { ObloggerSettings } from "./settings";
+import { ContainerSortMethod, getSortMethodDisplayText, ObloggerSettings } from "./settings";
 
 
 type TagFileMap = { [key: string]: TFile[] };
@@ -82,36 +82,88 @@ export class TagGroupContainer extends ViewContainer {
     }
 
     protected getPillText(): string {
-        if (this.getIsolatedTagMatch()) {
-            return "• • •";
-        }
-        return "#" + (this.groupName.split("/").first() ?? "") + (
-            this.groupName.contains("/") ? "..." : ""
-        )
+        return getSortMethodDisplayText(this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL);
     }
 
     protected getPillTooltipText(): string {
+        return "Sort";
+    }
+
+    protected getTitleTooltip(): string {
         if (this.getIsolatedTagMatch()) {
             return "Associated tags:\n\n" + Object.keys(this.getAllAssociatedTags([]))
                 .sort()
                 .map(tag => `#${tag}`)
                 .join("\n");
         }
-        return this.groupName.contains("/") ? this.groupName : "";
+        return `#${this.groupName}`;
     }
 
     protected getPillIcon(): string {
-        return "";
+        return (this.getGroupSetting()?.sortAscending ?? true) ?
+            "down-arrow-with-tail" :
+            "up-arrow-with-tail"
     }
 
-    protected getPillClickHandler(): (() => void) | undefined {
-        return undefined;
+    protected getPillClickHandler(): ((e: MouseEvent) => void) | undefined {
+        return (e: MouseEvent) => {
+            const menu = new Menu();
+
+            const changeSortMethod = async (method: string) => {
+                const groupSetting = this.getGroupSetting();
+                if (groupSetting === undefined) {
+                    console.warn("undefined group settings")
+                    return;
+                }
+
+                if (groupSetting.sortMethod === method) {
+                    groupSetting.sortAscending = !groupSetting.sortAscending;
+                } else {
+                    groupSetting.sortMethod = method;
+                    groupSetting.sortAscending = true;
+                }
+                await this.saveSettingsCallback();
+                this.requestRender();
+            }
+
+            const setupItem = (item: MenuItem, method: string) => {
+                item.onClick(() => {
+                    changeSortMethod(method);
+                });
+                if (method === this.getGroupSetting()?.sortMethod) {
+
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    item.iconEl.addClass("untagged-sort-confirmation");
+
+                    item.setIcon(
+                        this.getGroupSetting()?.sortAscending ?
+                            "down-arrow-with-tail" :
+                            "up-arrow-with-tail");
+                } else {
+                    item.setIcon("down-arrow-with-tail");
+                }
+            }
+
+            [
+                ContainerSortMethod.ALPHABETICAL,
+                ContainerSortMethod.CTIME,
+                ContainerSortMethod.MTIME
+            ].forEach(method => {
+                menu.addItem(item => {
+                    item.setTitle(getSortMethodDisplayText(method));
+                    setupItem(item, method);
+                })
+            })
+
+            menu.showAtMouseEvent(e);
+        }
     }
 
     private getAllAssociatedTags(excludedFolders: string[]): TagFileMap {
         interface Item {
-            file: TFile,
-            tags: string[]
+            file: TFile;
+            tags: string[];
         }
 
         const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
@@ -155,19 +207,45 @@ export class TagGroupContainer extends ViewContainer {
             }, {});
     }
 
-    protected buildFileStructure(excludedFolders: string[]) {
-        const tags = this.getAllAssociatedTags(excludedFolders);
-        const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
+    private getFileSortingFn(sortMethod: string) {
+        switch (sortMethod) {
+            case ContainerSortMethod.MTIME:
+                return (fileA: TFile, fileB: TFile) => {
+                    return fileA.stat.mtime - fileB.stat.mtime;
+                }
+            case ContainerSortMethod.CTIME:
+                return (fileA: TFile, fileB: TFile) => {
+                    return fileA.stat.ctime - fileB.stat.ctime;
+                }
+            case ContainerSortMethod.ALPHABETICAL:
+            default:
+                return (fileA: TFile, fileB: TFile) => {
+                    return fileA.name < fileB.name ? -1 : fileA.name > fileB.name ? 1 : 0;
+                }
+        }
+    }
 
-        Object.keys(tags).sort().forEach((tag: string) => {
+    protected buildFileStructure(excludedFolders: string[]) {
+        const tagFiles = this.getAllAssociatedTags(excludedFolders);
+        const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
+        const ascending = this.getGroupSetting()?.sortAscending ?? true;
+        const sortMethod = this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL;
+        const fileSortingFn = this.getFileSortingFn(sortMethod);
+
+        Object.keys(tagFiles).sort((tagA: string, tagB: string) => {
+            // don't always sort tags. only sort them if sorting is alphabetical,
+            // otherwise default to alpha ascending
+            const modifier = sortMethod === ContainerSortMethod.ALPHABETICAL ? (ascending ? 1 : -1) : 1;
+            return modifier * (tagA < tagB ? -1 : tagA > tagB ? 1 : 0);
+        }).forEach((tag: string) => {
             const subTag = tag.replace(this.groupName, "");
-            tags[tag]
+            tagFiles[tag]
                 .sort((fileA: TFile, fileB: TFile) => {
                     const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
                     if (bookmarkSorting != 0) {
                         return bookmarkSorting;
                     }
-                    return fileA.name < fileB.name ? -1 : fileA.name > fileB.name ? 1 : 0;
+                    return (ascending ? 1 : -1) * fileSortingFn(fileA, fileB);
                 })
                 .forEach((file: TFile) => {
                     let remainingTag = subTag.startsWith("/") ? subTag.slice(1) : subTag;

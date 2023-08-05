@@ -56,6 +56,10 @@ export class RecentsContainer extends ViewContainer {
         return "Recents";
     }
 
+    protected getTitleTooltip(): string {
+        return "";
+    }
+
     protected getTitleIcon(): string {
         return "";
     }

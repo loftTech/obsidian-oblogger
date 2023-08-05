@@ -51,6 +51,10 @@ export class DailiesContainer extends ViewContainer {
         return "Daily Notes";
     }
 
+    protected getTitleTooltip(): string {
+        return "";
+    }
+
     protected getTitleIcon(): string {
         return "";
     }

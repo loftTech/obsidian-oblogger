@@ -1,9 +1,11 @@
 import { TFile } from "obsidian";
 
-export interface TagGroup {
+export interface OtcGroupSettings {
     tag: string;
     collapsedFolders: string[];
     isPinned: boolean;
+    sortMethod?: string;
+    sortAscending?: boolean;
 }
 
 export const ContainerSortMethod = {
@@ -38,12 +40,13 @@ export const RxGroupType = {
     DAILIES: "dailies"
 }
 
-interface RxGroupSettings {
-    groupName: string,
-    collapsedFolders: string[],
-    isVisible: boolean,
-    sortMethod: string,
-    sortAscending: boolean
+// TODO(#64): combine this with OtcGroupSettings
+export interface RxGroupSettings {
+    groupName: string;
+    collapsedFolders: string[];
+    isVisible: boolean;
+    sortMethod: string;
+    sortAscending: boolean;
 }
 
 export const PostLogAction = {
@@ -55,7 +58,7 @@ export const PostLogAction = {
 export interface ObloggerSettings {
     loggingPath: string;
     avatarPath: string;
-    tagGroups: TagGroup[];
+    tagGroups: OtcGroupSettings[];
     excludedFolders: string[];
     recentsCount: number;
     avatarVisible: boolean;
