@@ -160,7 +160,9 @@ export class TagGroupContainer extends ViewContainer {
         ascending: boolean,
         isolatedGroupName?: string
     ) {
-        Object.keys(tagFiles).sort().forEach((tag: string) => {
+        Object.keys(tagFiles).sort((tagA: string, tagB: string) => {
+            return (ascending ? 1 : -1) * (tagA < tagB ? -1 : tagA > tagB ? 1 : 0);
+        }).forEach((tag: string) => {
             const subTag = tag.replace(this.groupName, "");
             tagFiles[tag]
                 .sort((fileA: TFile, fileB: TFile) => {
@@ -168,7 +170,7 @@ export class TagGroupContainer extends ViewContainer {
                     if (bookmarkSorting != 0) {
                         return bookmarkSorting;
                     }
-                    return fileA.name < fileB.name ? -1 : fileA.name > fileB.name ? 1 : 0;
+                    return (ascending ? 1 : -1) * (fileA.name < fileB.name ? -1 : fileA.name > fileB.name ? 1 : 0);
                 })
                 .forEach((file: TFile) => {
                     let remainingTag = subTag.startsWith("/") ? subTag.slice(1) : subTag;
