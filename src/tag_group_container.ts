@@ -147,6 +147,7 @@ export class TagGroupContainer extends ViewContainer {
 
             [
                 ContainerSortMethod.ALPHABETICAL,
+                ContainerSortMethod.CTIME,
                 ContainerSortMethod.MTIME
             ].forEach(method => {
                 menu.addItem(item => {
@@ -211,6 +212,10 @@ export class TagGroupContainer extends ViewContainer {
             case ContainerSortMethod.MTIME:
                 return (fileA: TFile, fileB: TFile) => {
                     return fileA.stat.mtime - fileB.stat.mtime;
+                }
+            case ContainerSortMethod.CTIME:
+                return (fileA: TFile, fileB: TFile) => {
+                    return fileA.stat.ctime - fileB.stat.ctime;
                 }
             case ContainerSortMethod.ALPHABETICAL:
             default:
