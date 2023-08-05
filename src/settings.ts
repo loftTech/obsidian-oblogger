@@ -4,6 +4,8 @@ export interface OtcGroupSettings {
     tag: string;
     collapsedFolders: string[];
     isPinned: boolean;
+    sortMethod?: string;
+    sortAscending?: boolean;
 }
 
 export const ContainerSortMethod = {
