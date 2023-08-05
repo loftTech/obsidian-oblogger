@@ -244,33 +244,24 @@ export class FilesContainer extends ViewContainer {
             return file.extension !== "md";
         });
 
+        const ascending = this.getGroupSetting()?.sortAscending ?? true;
+
         switch (this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.TYPE) {
             case ContainerSortMethod.ALPHABETICAL:
-                this.buildAlphabeticalFileStructure(
-                    includedFiles,
-                    this.getGroupSetting()?.sortAscending ?? true);
+                this.buildAlphabeticalFileStructure(includedFiles, ascending);
                 break;
             case ContainerSortMethod.CTIME:
-                this.buildDateFileStructure(
-                    includedFiles,
-                    this.getGroupSetting()?.sortAscending ?? true,
-                    true);
+                this.buildDateFileStructure(includedFiles, ascending, true);
                 break;
             case ContainerSortMethod.MTIME:
-                this.buildDateFileStructure(
-                    includedFiles,
-                    this.getGroupSetting()?.sortAscending ?? true,
-                    false);
+                this.buildDateFileStructure(includedFiles, ascending, false);
                 break;
             case ContainerSortMethod.EXTENSION:
-                this.buildExtensionFileStructure(
-                    includedFiles,
-                    this.getGroupSetting()?.sortAscending ?? true);
+                this.buildExtensionFileStructure(includedFiles, ascending);
                 break;
             case ContainerSortMethod.TYPE:
-                this.buildTypeFileStructure(
-                    includedFiles,
-                    this.getGroupSetting()?.sortAscending ?? true);
+            default:
+                this.buildTypeFileStructure(includedFiles, ascending);
                 break;
         }
     }
