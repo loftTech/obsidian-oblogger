@@ -1,7 +1,7 @@
 import { App, getAllTags, TFile } from "obsidian";
 import { FileClickCallback, FileAddedCallback } from "./group_folder";
 import { ViewContainer } from "./view_container";
-import { ObloggerSettings } from "./settings";
+import { ContainerSortMethod, ObloggerSettings } from "./settings";
 
 
 type TagFileMap = { [key: string]: TFile[] };
@@ -155,13 +155,14 @@ export class TagGroupContainer extends ViewContainer {
             }, {});
     }
 
-    protected buildFileStructure(excludedFolders: string[]) {
-        const tags = this.getAllAssociatedTags(excludedFolders);
-        const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
-
-        Object.keys(tags).sort().forEach((tag: string) => {
+    protected buildAlphabeticalFileStructure(
+        tagFiles: TagFileMap,
+        ascending: boolean,
+        isolatedGroupName?: string
+    ) {
+        Object.keys(tagFiles).sort().forEach((tag: string) => {
             const subTag = tag.replace(this.groupName, "");
-            tags[tag]
+            tagFiles[tag]
                 .sort((fileA: TFile, fileB: TFile) => {
                     const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
                     if (bookmarkSorting != 0) {
@@ -185,6 +186,29 @@ export class TagGroupContainer extends ViewContainer {
                     );
                 });
         });
+    }
+
+    protected buildDateFileStructure(
+        tagFiles: TagFileMap,
+        ascending: boolean,
+        isolatedGroupName?: string
+    ) {
+    }
+
+    protected buildFileStructure(excludedFolders: string[]) {
+        const tagFiles = this.getAllAssociatedTags(excludedFolders);
+        const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
+        const ascending = this.getGroupSetting()?.sortAscending ?? true;
+
+        switch (this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL) {
+            case ContainerSortMethod.MTIME:
+                this.buildDateFileStructure(tagFiles, ascending, isolatedGroupName);
+                break;
+            case ContainerSortMethod.ALPHABETICAL:
+            default:
+                this.buildAlphabeticalFileStructure(tagFiles, ascending, isolatedGroupName);
+                break;
+        }
     }
 
     protected getContainerClass(): string {
