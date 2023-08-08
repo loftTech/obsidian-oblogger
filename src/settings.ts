@@ -56,6 +56,7 @@ export const PostLogAction = {
 }
 
 export interface ObloggerSettings {
+    version: number;
     loggingPath: string;
     avatarPath: string;
     tagGroups: OtcGroupSettings[];
@@ -67,7 +68,25 @@ export interface ObloggerSettings {
     dailiesTag: string;
 }
 
+const UPGRADE_FUNCTIONS: {[id: number]: (settings: any)=> void} = {
+    0: (settings: any) => {
+        settings.version = 1;
+    }
+};
+
+export const upgradeSettings = (currentVersion: number, settings: any) => {
+    const availableUpgrades = Object.keys(UPGRADE_FUNCTIONS);
+    if (!availableUpgrades.contains(currentVersion.toString())) {
+        console.warn(`Unable to upgrade ${currentVersion}. No upgrade function defined.`)
+        return;
+    }
+    UPGRADE_FUNCTIONS[currentVersion](settings);
+}
+
+export const CURRENT_VERSION = 1;
+
 export const DEFAULT_SETTINGS: Partial<ObloggerSettings> = {
+    version: 1,
     recentsCount: 10,
     postLogAction: PostLogAction.QUIETLY,
     rxGroups: [
