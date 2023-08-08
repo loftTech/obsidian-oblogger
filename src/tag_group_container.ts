@@ -35,6 +35,7 @@ export class TagGroupContainer extends ViewContainer {
             moveCallback,
             removeCallback,
             false, // isMovable
+            true, // canCollapseInnerFolders
             true, // canBePinned
             pinCallback,
             isPinned
