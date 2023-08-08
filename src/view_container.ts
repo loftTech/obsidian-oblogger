@@ -211,6 +211,7 @@ export abstract class ViewContainer extends GroupFolder {
         return titleTextContainer;
     }
 
+        return titleText;
     }
 
     private buildPill(): HTMLElement {
@@ -235,7 +236,6 @@ export abstract class ViewContainer extends GroupFolder {
         pillIconDiv.addClass("pill-icon");
         const pillIcon = this.getPillIcon();
         pillIcon && setIcon(pillIconDiv, pillIcon);
-        titleTagDiv.appendChild(pillIconDiv);
 
         const pillLabelDiv = document.createElement("div");
         pillLabelDiv.addClass("pill-label");
