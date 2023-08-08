@@ -211,13 +211,6 @@ export abstract class ViewContainer extends GroupFolder {
         return titleTextContainer;
     }
 
-    private buildTagTitleGroup(): HTMLElement {
-        const tagTitleGroupDiv = document.createElement("div");
-        tagTitleGroupDiv.addClass("tag-title-group")
-
-        tagTitleGroupDiv.appendChild(this.buildPill());
-
-        return tagTitleGroupDiv;
     }
 
     private buildPill(): HTMLElement {
@@ -262,7 +255,7 @@ export abstract class ViewContainer extends GroupFolder {
 
         this.titleContainer.appendChild(this.buildTitleSvgHolder());
         this.titleContainer.appendChild(this.buildTitleTextDiv());
-        this.titleContainer.appendChild(this.buildTagTitleGroup());
+        this.titleContainer.appendChild(this.buildPill());
     }
 
     rebuildFileStructure(excludedFolders: string[]) {
