@@ -171,24 +171,16 @@ export abstract class ViewContainer extends GroupFolder {
     }
 
     private buildTitleSvgHolder(): HTMLElement {
-        const svgHolder = document.createElement("div");
-        svgHolder.addClass("svg-holder");
-
-        const titleChevronContainer = document.createElement("div");
-        titleChevronContainer.addClass("title-chevron-container")
-
         const titleChevron = document.createElement("div");
         setIcon(titleChevron, "chevron-down");
         titleChevron.addClass("title-chevron");
         if (this.isPinned) {
             titleChevron.addClass("is-pinned");
         }
-        titleChevronContainer.appendChild(titleChevron)
 
-        svgHolder.appendChild(this.buildPinContainer());
-        svgHolder.appendChild(titleChevronContainer);
+        titleChevron.appendChild(this.buildPinContainer());
 
-        return svgHolder;
+        return titleChevron;
     }
 
     private buildTitleTextDiv(): HTMLElement {
