@@ -311,7 +311,7 @@ export class ObloggerView extends ItemView {
     }
 
     private renderUntagged() {
-        this.renderRxGroup(RxGroupType.UNTAGGED, [this.settings?.loggingPath]);
+        this.renderRxGroup(RxGroupType.UNTAGGED, [this.settings?.loggingPath].concat(this.settings?.excludedFolders ?? []));
     }
 
     private renderRecents() {
