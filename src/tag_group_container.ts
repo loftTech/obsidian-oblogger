@@ -187,7 +187,7 @@ export class TagGroupContainer extends ViewContainer {
                         if (isolatedGroupName) {
                             return tag.contains(isolatedGroupName);
                         } else {
-                            return tag.startsWith(this.groupName);
+                            return tag.split("/")[0] === this.groupName;
                         }
                     });
                 if (!tags) {
