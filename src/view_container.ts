@@ -160,18 +160,14 @@ export abstract class ViewContainer extends GroupFolder {
     }
 
     private buildPinContainer(): HTMLElement {
-        const pinContainerDiv = document.createElement("div");
-        pinContainerDiv.addClass("pin-container");
-
         const pinDiv = document.createElement("div");
         pinDiv.addClass("pin");
         if (this.isPinned) {
             pinDiv.addClass("is-pinned");
         }
         setIcon(pinDiv, "chevrons-down");
-        pinContainerDiv.appendChild(pinDiv);
 
-        return pinContainerDiv;
+        return pinDiv;
     }
 
     private buildTitleSvgHolder(): HTMLElement {
