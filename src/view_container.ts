@@ -19,8 +19,8 @@ export abstract class ViewContainer extends GroupFolder {
 
     protected abstract getTitleText(): string;
     protected abstract getTitleTooltip(): string;
-    protected abstract getTitleIcon(): string;
-    protected abstract getTitleIconTooltip(): string;
+    protected abstract getTextIcon(): string;
+    protected abstract getTextIconTooltip(): string;
     protected abstract getPillText(): string;
     protected abstract getPillTooltipText(): string;
     protected abstract getPillIcon(): string;
@@ -184,32 +184,29 @@ export abstract class ViewContainer extends GroupFolder {
     }
 
     private buildTitleTextDiv(): HTMLElement {
+        const textLabel = document.createElement("div");
+        textLabel.addClass("text-label");
+
+        const textIcon = document.createElement("div");
+        setIcon(textIcon, this.getTextIcon());
+        textIcon.addClass("text-icon");
+        textIcon.ariaLabel = this.getTextIconTooltip();
+
         const titleText = document.createElement("div");
         titleText.addClass("title-text");
+        titleText.appendChild(textLabel);
+        titleText.appendChild(textIcon);
 
-        const titleIcon = document.createElement("div");
-        setIcon(titleIcon, this.getTitleIcon());
-        titleIcon.addClass("title-icon");
-        titleIcon.ariaLabel = this.getTitleIconTooltip();
-
-        const titleTextContainer = document.createElement("div");
-        titleTextContainer.addClass("title-text-container");
-        titleTextContainer.appendChild(titleText);
-        titleTextContainer.appendChild(titleIcon);
-
-        titleTextContainer.addEventListener("click", () => {
+        titleText.addEventListener("click", () => {
             this.toggleCollapse();
         });
 
-        titleText.setText(this.getTitleText().toUpperCase());
-        titleText.addEventListener("contextmenu", (e) => {
+        textLabel.setText(this.getTitleText().toUpperCase());
+        textLabel.addEventListener("contextmenu", (e) => {
             const contextMenu = this.getContextMenu();
             contextMenu && contextMenu.showAtMouseEvent(e);
         });
-        titleText.ariaLabel = this.getTitleTooltip();
-
-        return titleTextContainer;
-    }
+        textLabel.ariaLabel = this.getTitleTooltip();
 
         return titleText;
     }
@@ -232,15 +229,13 @@ export abstract class ViewContainer extends GroupFolder {
             }
         });
 
-        const pillIconDiv = document.createElement("div");
-        pillIconDiv.addClass("pill-icon");
         const pillIcon = this.getPillIcon();
-        pillIcon && setIcon(pillIconDiv, pillIcon);
+        pillIcon && setIcon(titleTagDiv, pillIcon);
 
-        const pillLabelDiv = document.createElement("div");
-        pillLabelDiv.addClass("pill-label");
-        pillLabelDiv.setText(this.getPillText());
-        titleTagDiv.appendChild(pillLabelDiv);
+        const tagLabelDiv = document.createElement("div");
+        tagLabelDiv.addClass("tag-label");
+        tagLabelDiv.setText(this.getPillText());
+        titleTagDiv.appendChild(tagLabelDiv);
 
         return titleTagDiv;
     }

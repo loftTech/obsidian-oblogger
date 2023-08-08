@@ -57,11 +57,11 @@ export class FilesContainer extends ViewContainer {
         return "";
     }
 
-    protected getTitleIcon(): string {
+    protected getTextIcon(): string {
         return "";
     }
 
-    protected getTitleIconTooltip(): string {
+    protected getTextIconTooltip(): string {
         return "";
     }
 
