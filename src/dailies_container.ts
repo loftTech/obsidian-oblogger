@@ -30,6 +30,7 @@ export class DailiesContainer extends ViewContainer {
             moveCallback,
             hideCallback,
             true, // isMovable
+            true, // canCollapseInnerFolders
             false, // canBePinned
             undefined,
             false); // isPinned
