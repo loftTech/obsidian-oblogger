@@ -38,7 +38,7 @@ export default class Oblogger extends Plugin {
             }
         }
         if (needsSaving) {
-            this.saveSettings();
+            return this.saveSettings();
         }
     }
 

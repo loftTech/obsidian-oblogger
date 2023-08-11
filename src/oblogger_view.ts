@@ -7,8 +7,7 @@ import {
     Menu,
     View,
     Notice,
-    CachedMetadata,
-    TAbstractFile
+    CachedMetadata
 } from "obsidian";
 import { ObloggerSettings, RxGroupType, OtcGroupSettings as SettingsTagGroup } from "./settings";
 import { TagGroupContainer } from "./tag_group_container";
@@ -154,26 +153,19 @@ export class ObloggerView extends ItemView {
         );
 
         this.registerEvent(
-            this.app.vault.on("create", (
-                itemCreated: TAbstractFile
-            ) => {
+            this.app.vault.on("create", () => {
                 this.requestRender();
             })
         );
 
         this.registerEvent(
-            this.app.vault.on("rename", (
-                itemRenamed: TAbstractFile,
-                oldName: string
-            ) => {
+            this.app.vault.on("rename", () => {
                 this.requestRender();
             })
         );
 
         this.registerEvent(
-            this.app.vault.on("delete", (
-                itemDeleted: TAbstractFile
-            ) => {
+            this.app.vault.on("delete", () => {
                 this.requestRender();
             })
         );
@@ -191,7 +183,7 @@ export class ObloggerView extends ItemView {
 
         this.fileClickCallback = (file: TFile) => {
             const { workspace } = this.app;
-            workspace.getLeaf(false).openFile(file);
+            return workspace.getLeaf(false).openFile(file);
         }
         this.fileAddedCallback = (
             file: TFile,
@@ -217,7 +209,7 @@ export class ObloggerView extends ItemView {
             const groupSetting = this.settings?.rxGroups.find(group => group.groupName === groupName);
             if (groupSetting) {
                 groupSetting.collapsedFolders = collapsedFolders;
-                this.saveSettingsCallback();
+                return this.saveSettingsCallback();
             }
         }
 
@@ -237,7 +229,7 @@ export class ObloggerView extends ItemView {
                 return;
             }
             group.collapsedFolders = collapsedFolders;
-            this.saveSettingsCallback();
+            return this.saveSettingsCallback();
         }
 
         this.dom = {
@@ -332,7 +324,7 @@ export class ObloggerView extends ItemView {
             () => {
                 const modified = this.filesModifiedSinceRender;
                 this.filesModifiedSinceRender = [];
-                this.renderNow(modified)
+                return this.renderNow(modified);
             },
             RENDER_DELAY_MS
         );
@@ -617,7 +609,7 @@ export class ObloggerView extends ItemView {
         new Notice(`"${tag}" removed`);
     }
 
-    private moveRxGroup(groupName: string, up: boolean): void {
+    private async moveRxGroup(groupName: string, up: boolean) {
         if (!this.settings) {
             return;
         }
@@ -649,7 +641,7 @@ export class ObloggerView extends ItemView {
         this.settings.rxGroups.remove(group);
         this.settings.rxGroups.splice(newIndex, 0, group);
 
-        this.saveSettingsCallback();
+        await this.saveSettingsCallback();
         this.reloadRxGroups();
         this.requestRender();
     }
@@ -696,8 +688,8 @@ export class ObloggerView extends ItemView {
         parent: HTMLElement
     ) {
         const removeCallback = async () => { return await this.removeOtcGroup(tag); }
-        const moveCallback = (up: boolean) => { this.moveOtcGroup(tag, up); }
-        const pinCallback = (pin: boolean) => { this.pinOtcGroup(tag, pin); }
+        const moveCallback = (up: boolean) => { return this.moveOtcGroup(tag, up); }
+        const pinCallback = (pin: boolean) => { return this.pinOtcGroup(tag, pin); }
 
         const container = new TagGroupContainer(
             this.app,
@@ -802,8 +794,8 @@ export class ObloggerView extends ItemView {
                 () => { this.requestRender() },
                 this.settings,
                 this.saveSettingsCallback,
-                (up: boolean) => { this.moveRxGroup(groupName, up); },
-                () => { this.hideRxGroup(groupName); });
+                (up: boolean) => { return this.moveRxGroup(groupName, up); },
+                () => { return this.hideRxGroup(groupName); });
         }
 
         this.rxContainers = this.settings?.rxGroups.map(rxGroupSetting => {

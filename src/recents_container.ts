@@ -43,8 +43,7 @@ export class RecentsContainer extends ViewContainer {
     }
 
     protected shouldRerenderOnModification(
-        modifiedFile: FileModificationEventDetails,
-        excludedFolders: string[]
+        modifiedFile: FileModificationEventDetails
     ): boolean {
         // if the first of the sorted files isn't the modified file, then we
         // need to redraw.

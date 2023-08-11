@@ -98,7 +98,7 @@ export class FilesContainer extends ViewContainer {
 
             const setupItem = (item: MenuItem, method: string) => {
                 item.onClick(() => {
-                    changeSortMethod(method);
+                    return changeSortMethod(method);
                 });
                 if (method === this.getGroupSetting()?.sortMethod) {
 

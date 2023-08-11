@@ -142,10 +142,8 @@ export class DailiesContainer extends ViewContainer {
             return false;
         }
 
-        if (!getAllTags(cache)?.contains("#" + this.settings.dailiesTag)) {
-            return false;
-        }
-        return true;
+        return getAllTags(cache)?.contains("#" + this.settings.dailiesTag) ?? false;
+
     }
 
     private getDailyDate(daily: TFile, dayPrecision: boolean): string {

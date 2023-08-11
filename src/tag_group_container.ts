@@ -172,10 +172,10 @@ export class TagGroupContainer extends ViewContainer {
 
             const setupItem = (item: MenuItem, method: string) => {
                 item.onClick(() => {
-                    changeSortMethod(method);
+                    return changeSortMethod(method);
                 });
                 if (method === this.getGroupSetting()?.sortMethod) {
-
+                    // Note: iconEl is added to MenuItem at run time
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
                     item.iconEl.addClass("untagged-sort-confirmation");
@@ -238,11 +238,10 @@ export class TagGroupContainer extends ViewContainer {
         const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
 
         // This is fine, we're filtering out nulls
-        // @ts-ignore
         this.renderedFileTags = this.app.vault
             .getMarkdownFiles()
             .map(file => this.getFileTags(file, excludedFolders, isolatedGroupName))
-            .filter(item => item !== null);
+            .filter(item => item !== null) as FileTags[];
         return this.renderedFileTags
             .reduce((acc: TagFileMap, item: FileTags) => {
                 item.tags.forEach((tag: string) => {

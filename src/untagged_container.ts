@@ -72,19 +72,15 @@ export class UntaggedContainer extends ViewContainer {
         }
         // if we're sorting by modified and the modified time changed and
         // the file is not in the top or bottom depending on ordering, redraw
-        if (
-            renderedFile?.mtime !== modifiedFile.file.stat.mtime &&
-            this.getGroupSetting()?.sortMethod === ContainerSortMethod.MTIME &&
-            (
-                this.getGroupSetting()?.sortAscending ?
-                    this.renderedFiles.first() :
-                    this.renderedFiles.last()
-            )?.file !== modifiedFile.file
-        ) {
-            return true;
-        }
+        return renderedFile?.mtime !== modifiedFile.file.stat.mtime &&
+          this.getGroupSetting()?.sortMethod === ContainerSortMethod.MTIME &&
+          (
+            this.getGroupSetting()?.sortAscending ?
+              this.renderedFiles.first() :
+              this.renderedFiles.last()
+          )?.file !== modifiedFile.file;
 
-        return false;
+
     }
 
     protected getEmptyMessage(): string {
@@ -151,7 +147,7 @@ export class UntaggedContainer extends ViewContainer {
 
             const setupItem = (item: MenuItem, method: string) => {
                 item.onClick(() => {
-                    changeSortMethod(method);
+                    return changeSortMethod(method);
                 });
                 if (method === this.getGroupSetting()?.sortMethod) {
 
