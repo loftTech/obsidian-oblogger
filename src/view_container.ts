@@ -30,7 +30,10 @@ export abstract class ViewContainer extends GroupFolder {
     protected abstract getHideText(): string;
     protected abstract getHideIcon(): string;
     protected abstract getEmptyMessage(): string;
-    protected abstract shouldRerenderOnModification(modifiedFile: FileModificationEventDetails): boolean;
+    protected abstract shouldRerenderOnModification(
+        modifiedFile: FileModificationEventDetails,
+        excludedFolders: string[]
+    ): boolean;
 
     protected constructor(
         app: App,
@@ -298,7 +301,9 @@ export abstract class ViewContainer extends GroupFolder {
         excludedFolders: string[],
         modifiedFiles: FileModificationEventDetails[]
     ) {
-        if (modifiedFiles.length > 0 && !modifiedFiles.some(f => this.shouldRerenderOnModification(f))) {
+        if (modifiedFiles.length > 0 && !modifiedFiles.some(
+            f => this.shouldRerenderOnModification(f, excludedFolders))
+        ) {
             console.log(`ignoring render for ${this.groupName}`);
             return;
         } else {

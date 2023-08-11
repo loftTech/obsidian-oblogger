@@ -40,10 +40,10 @@ export class DailiesContainer extends ViewContainer {
         this.fileEntryDates = [];
     }
 
-    protected shouldRerenderOnModification(modifiedFile: FileModificationEventDetails): boolean {
-        // todo: get this from somewhere else
-        const excludedFolders: string[] = [];
-
+    protected shouldRerenderOnModification(
+        modifiedFile: FileModificationEventDetails,
+        excludedFolders: string[]
+    ): boolean {
         const shouldBeIncluded = this.shouldIncludeFile(modifiedFile.file, excludedFolders);
         const isIncluded = this.hasFileWithin(modifiedFile.file);
 

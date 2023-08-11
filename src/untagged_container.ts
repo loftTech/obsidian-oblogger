@@ -35,7 +35,10 @@ export class UntaggedContainer extends ViewContainer {
             false); // isPinned
     }
 
-    protected shouldRerenderOnModification(modifiedFile: FileModificationEventDetails): boolean {
+    protected shouldRerenderOnModification(
+        modifiedFile: FileModificationEventDetails,
+        excludedFolders: string[]
+    ): boolean {
         // todo: enhance
         //  1. check if tag status changed
         //  2. check if modified time changed

@@ -41,7 +41,10 @@ export class RecentsContainer extends ViewContainer {
         this.recentsCount = settings.recentsCount;
     }
 
-    protected shouldRerenderOnModification(modifiedFile: FileModificationEventDetails): boolean {
+    protected shouldRerenderOnModification(
+        modifiedFile: FileModificationEventDetails,
+        excludedFolders: string[]
+    ): boolean {
         // if the first of the sorted files isn't the modified file, then we
         // need to redraw.
         return this.sortedFiles[0] !== modifiedFile.file;

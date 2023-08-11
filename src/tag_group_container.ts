@@ -50,11 +50,9 @@ export class TagGroupContainer extends ViewContainer {
     }
 
     protected shouldRerenderOnModification(
-        modifiedFile: FileModificationEventDetails
+        modifiedFile: FileModificationEventDetails,
+        excludedFolders: string[]
     ): boolean {
-        // todo: get this from somewhere else
-        const excludedFolders: string[] = [];
-
         const currentFileTags = this.getFileTags(
             modifiedFile.file,
             excludedFolders,
