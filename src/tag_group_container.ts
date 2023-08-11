@@ -13,6 +13,8 @@ interface FileTags {
 }
 
 export class TagGroupContainer extends ViewContainer {
+    renderedFileTags: FileTags[];
+
     constructor(
         app: App,
         baseTag: string,
@@ -53,16 +55,33 @@ export class TagGroupContainer extends ViewContainer {
         // todo: get this from somewhere else
         const excludedFolders: string[] = [];
 
-        // todo: this doesn't work when adding/removing sub tags
-        //  if it was already included, then adding a subtag means it's
-        //  still included. maybe i need to recurse into "this.sortedFolders"
-        const shouldBeIncluded = this.getFileTags(
+        const currentFileTags = this.getFileTags(
             modifiedFile.file,
             excludedFolders,
-            this.getIsolatedTagMatch()?.at(1)) !== null;
-        const isIncluded = this.sortedFiles.contains(modifiedFile.file);
-        console.log(`for tag ${this.groupName} file ${modifiedFile.file.name} is included (${isIncluded}) and should be included ${shouldBeIncluded}`)
-        return shouldBeIncluded !== isIncluded;
+            this.getIsolatedTagMatch()?.at(1));
+        const shouldBeIncluded = currentFileTags !== null;
+        const isIncluded = this.hasFileWithin(modifiedFile.file);
+        if (shouldBeIncluded !== isIncluded) {
+            return true;
+        }
+
+        if (!isIncluded) {
+            // irrelevant
+            return false;
+        }
+
+        const fileTags = this.renderedFileTags.find(fileTags => fileTags.file === modifiedFile.file);
+        if (!fileTags) {
+            // something went wrong with the caching, default to re-rendering
+            console.debug("Cache invalidation error with rendered file tags.");
+            return true;
+        }
+
+        const currentTags = currentFileTags?.tags;
+        // todo: O(n^2). better to compare lengths, sort both, then compare in O(n) => O(nlogn)
+        const currentTagsInCache = currentTags?.every(tag => fileTags.tags.contains(tag)) ?? false;
+        const cachedTagsInCurrent = fileTags.tags.every(tag => currentTags?.contains(tag)) ?? false;
+        return !currentTagsInCache || !cachedTagsInCurrent;
     }
 
     protected getEmptyMessage(): string {
@@ -217,10 +236,13 @@ export class TagGroupContainer extends ViewContainer {
     private getAllAssociatedTags(excludedFolders: string[]): TagFileMap {
         const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
 
-        return this.app.vault
+        // This is fine, we're filtering out nulls
+        // @ts-ignore
+        this.renderedFileTags = this.app.vault
             .getMarkdownFiles()
             .map(file => this.getFileTags(file, excludedFolders, isolatedGroupName))
-            .filter(item => item !== null)
+            .filter(item => item !== null);
+        return this.renderedFileTags
             .reduce((acc: TagFileMap, item: FileTags) => {
                 item.tags.forEach((tag: string) => {
                     if (!Object.keys(acc).contains(tag)) {
@@ -251,6 +273,9 @@ export class TagGroupContainer extends ViewContainer {
     }
 
     protected buildFileStructure(excludedFolders: string[]) {
+        // clear the cache
+        this.renderedFileTags = [];
+
         const tagFiles = this.getAllAssociatedTags(excludedFolders);
         const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
         const ascending = this.getGroupSetting()?.sortAscending ?? true;
