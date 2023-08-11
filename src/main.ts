@@ -1,4 +1,4 @@
-import { CachedMetadata, Plugin, TAbstractFile, TFile } from "obsidian";
+import { Plugin } from "obsidian";
 import { ObloggerView, VIEW_TYPE_OBLOGGER } from "./oblogger_view";
 import { ObloggerSettings, DEFAULT_SETTINGS } from "./settings";
 import { LoggerModal } from "./logger_modal";

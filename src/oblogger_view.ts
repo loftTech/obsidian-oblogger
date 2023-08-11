@@ -6,7 +6,9 @@ import {
     moment,
     Menu,
     View,
-    Notice, CachedMetadata, TAbstractFile
+    Notice,
+    CachedMetadata,
+    TAbstractFile
 } from "obsidian";
 import { ObloggerSettings, RxGroupType, OtcGroupSettings as SettingsTagGroup } from "./settings";
 import { TagGroupContainer } from "./tag_group_container";
