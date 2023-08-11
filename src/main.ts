@@ -44,30 +44,35 @@ export default class Oblogger extends Plugin {
         await this.loadSettings();
 
         this.registerEvent(
+            // todo: what changed?
             this.app.metadataCache.on("changed", async () => {
                 await this.getObloggerView()?.requestRender();
             })
         );
 
         this.registerEvent(
+            // todo: what was created?
             this.app.vault.on("create", async () => {
                 await this.getObloggerView()?.requestRender();
             })
         );
 
         this.registerEvent(
+            // todo: what was modified?
             this.app.vault.on("modify", async () => {
                 await this.getObloggerView()?.requestRender();
             })
         );
 
         this.registerEvent(
+            // todo: what was renamed?
             this.app.vault.on("rename", async () => {
                 await this.getObloggerView()?.requestRender();
             })
         );
 
         this.registerEvent(
+            // todo: what was deleted?
             this.app.vault.on("delete", async () => {
                 await this.getObloggerView()?.requestRender();
             })
