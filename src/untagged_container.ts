@@ -37,6 +37,9 @@ export class UntaggedContainer extends ViewContainer {
 
     protected shouldRerenderOnModification(modifiedFile: FileModificationEventDetails): boolean {
         // todo: enhance
+        //  1. check if tag status changed
+        //  2. check if modified time changed
+        //  3. check if created time changed
         return true;
     }
 
