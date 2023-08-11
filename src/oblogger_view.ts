@@ -384,7 +384,7 @@ export class ObloggerView extends ItemView {
     private renderUntagged(modifiedFiles: FileModificationEventDetails[]) {
         this.renderRxGroup(
             RxGroupType.UNTAGGED,
-            [this.settings?.loggingPath],
+            [this.settings?.loggingPath].concat(this.settings?.excludedFolders ?? []),
             modifiedFiles);
     }
 

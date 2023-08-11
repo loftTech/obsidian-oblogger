@@ -6,6 +6,7 @@ import { FileModificationEventDetails } from "./constants";
 export abstract class ViewContainer extends GroupFolder {
     settings: ObloggerSettings;
     isMovable: boolean;
+    canCollapseInnerFolders: boolean;
     canBePinned: boolean;
     isPinned: boolean;
 
@@ -49,6 +50,7 @@ export abstract class ViewContainer extends GroupFolder {
         moveCallback: (up: boolean) => void,
         hideCallback: () => void,
         isMovable: boolean,
+        canCollapseInnerFolders: boolean,
         canBePinned: boolean,
         pinCallback: ((pin: boolean) => void) | undefined,
         isPinned: boolean
@@ -66,6 +68,7 @@ export abstract class ViewContainer extends GroupFolder {
 
         this.settings = settings;
         this.isMovable = isMovable;
+        this.canCollapseInnerFolders = canCollapseInnerFolders;
         this.canBePinned = canBePinned;
         this.isPinned = isPinned;
 
@@ -130,15 +133,17 @@ export abstract class ViewContainer extends GroupFolder {
             );
         }
 
-        menu.addItem(item =>
-            item
-                .setTitle("Collapse inner folders")
-                .setIcon("chevrons-down-up")
-                .setSection("collapsing")
-                .onClick(() => {
-                    this.collapseInnerFolders();
-                })
-        );
+        if (this.canCollapseInnerFolders) {
+            menu.addItem(item =>
+                item
+                    .setTitle("Collapse inner folders")
+                    .setIcon("chevrons-down-up")
+                    .setSection("collapsing")
+                    .onClick(() => {
+                        this.collapseInnerFolders();
+                    })
+            );
+        }
 
         menu.addItem(item =>
             item

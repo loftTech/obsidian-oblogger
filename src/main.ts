@@ -1,6 +1,6 @@
 import { Plugin } from "obsidian";
 import { ObloggerView, VIEW_TYPE_OBLOGGER } from "./oblogger_view";
-import { ObloggerSettings, DEFAULT_SETTINGS } from "./settings";
+import { ObloggerSettings, DEFAULT_SETTINGS, CURRENT_VERSION, upgradeSettings } from "./settings";
 import { LoggerModal } from "./logger_modal";
 
 import "../css/logger.css";
@@ -25,6 +25,21 @@ export default class Oblogger extends Plugin {
             DEFAULT_SETTINGS,
             await this.loadData()
         );
+        let needsSaving = false;
+        while ((this.settings.version ?? 0) < CURRENT_VERSION) {
+            // save when we're done upgrading
+            needsSaving = true;
+
+            const initialVersion = this.settings.version ?? 0;
+            upgradeSettings(initialVersion, this.settings);
+            if (this.settings.version != initialVersion + 1) {
+                console.warn("Something went wrong upgrading settings.");
+                return;
+            }
+        }
+        if (needsSaving) {
+            this.saveSettings();
+        }
     }
 
     async saveSettings() {

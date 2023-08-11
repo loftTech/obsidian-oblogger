@@ -34,6 +34,7 @@ export class RecentsContainer extends ViewContainer {
             moveCallback,
             hideCallback,
             true, // isMovable
+            false, // canCollapseInnerFolders
             false, // canBePinned
             undefined,
             false); // isPinned
