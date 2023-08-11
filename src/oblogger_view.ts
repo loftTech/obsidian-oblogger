@@ -6,7 +6,7 @@ import {
     moment,
     Menu,
     View,
-    Notice, CachedMetadata
+    Notice, CachedMetadata, TAbstractFile
 } from "obsidian";
 import { ObloggerSettings, RxGroupType, OtcGroupSettings as SettingsTagGroup } from "./settings";
 import { TagGroupContainer } from "./tag_group_container";
@@ -141,6 +141,14 @@ export class ObloggerView extends ItemView {
                 fileChanged: TFile,
                 fileContents: string,
                 fileMetadata: CachedMetadata
+            ) => {
+                this.requestRender();
+            })
+        );
+
+        this.registerEvent(
+            this.app.vault.on("create", (
+                itemCreated: TAbstractFile
             ) => {
                 this.requestRender();
             })
