@@ -2,9 +2,15 @@ import { App, getAllTags, Menu, MenuItem, TFile } from "obsidian";
 import { FileClickCallback, FileAddedCallback } from "./group_folder";
 import { ViewContainer } from "./view_container";
 import { ContainerSortMethod, getSortMethodDisplayText, ObloggerSettings } from "./settings";
+import { FileModificationEventDetails } from "./constants";
 
 
 type TagFileMap = { [key: string]: TFile[] };
+
+interface FileTags {
+    file: TFile;
+    tags: string[];
+}
 
 export class TagGroupContainer extends ViewContainer {
     constructor(
@@ -39,6 +45,24 @@ export class TagGroupContainer extends ViewContainer {
             pinCallback,
             isPinned
         );
+    }
+
+    protected shouldRerenderOnModification(
+        modifiedFile: FileModificationEventDetails
+    ): boolean {
+        // todo: get this from somewhere else
+        const excludedFolders: string[] = [];
+
+        // todo: this doesn't work when adding/removing sub tags
+        //  if it was already included, then adding a subtag means it's
+        //  still included. maybe i need to recurse into "this.sortedFolders"
+        const shouldBeIncluded = this.getFileTags(
+            modifiedFile.file,
+            excludedFolders,
+            this.getIsolatedTagMatch()?.at(1)) !== null;
+        const isIncluded = this.sortedFiles.contains(modifiedFile.file);
+        console.log(`for tag ${this.groupName} file ${modifiedFile.file.name} is included (${isIncluded}) and should be included ${shouldBeIncluded}`)
+        return shouldBeIncluded !== isIncluded;
     }
 
     protected getEmptyMessage(): string {
@@ -160,43 +184,44 @@ export class TagGroupContainer extends ViewContainer {
         }
     }
 
-    private getAllAssociatedTags(excludedFolders: string[]): TagFileMap {
-        interface Item {
-            file: TFile;
-            tags: string[];
+    private getFileTags(
+        file: TFile,
+        excludedFolders: string[],
+        isolatedGroupName: string | undefined
+    ): FileTags | null {
+        // filter out excluded
+        if (file.parent && excludedFolders.contains(file.parent.path)) {
+            return null;
         }
+        const cache = this.app.metadataCache.getFileCache(file);
+        // filter out files missing cache
+        if (cache === null) {
+            return null;
+        }
+        const tags = getAllTags(cache)
+            ?.map(tag => tag.replace("#", ""))
+            ?.unique()
+            ?.filter((tag: string) => {
+                if (isolatedGroupName) {
+                    return tag.contains(isolatedGroupName);
+                } else {
+                    return tag.startsWith(this.groupName);
+                }
+            });
+        if (!tags?.length) {
+            return null;
+        }
+        return { file, tags };
+    }
 
+    private getAllAssociatedTags(excludedFolders: string[]): TagFileMap {
         const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
 
         return this.app.vault
             .getMarkdownFiles()
-            .map((file: TFile) => {
-                // filter out excluded
-                if (file.parent && excludedFolders.contains(file.parent.path)) {
-                    return null;
-                }
-                const cache = this.app.metadataCache.getFileCache(file);
-                // filter out files missing cache
-                if (cache === null) {
-                    return null;
-                }
-                const tags = getAllTags(cache)
-                    ?.map(tag => tag.replace("#", ""))
-                    ?.unique()
-                    ?.filter((tag: string) => {
-                        if (isolatedGroupName) {
-                            return tag.contains(isolatedGroupName);
-                        } else {
-                            return tag.startsWith(this.groupName);
-                        }
-                    });
-                if (!tags) {
-                    return null;
-                }
-                return { file, tags };
-            })
+            .map(file => this.getFileTags(file, excludedFolders, isolatedGroupName))
             .filter(item => item !== null)
-            .reduce((acc: TagFileMap, item: Item) => {
+            .reduce((acc: TagFileMap, item: FileTags) => {
                 item.tags.forEach((tag: string) => {
                     if (!Object.keys(acc).contains(tag)) {
                         acc[tag] = [];

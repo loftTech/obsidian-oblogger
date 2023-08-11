@@ -2,6 +2,7 @@ import { ViewContainer } from "./view_container";
 import { FileAddedCallback, FileClickCallback } from "./group_folder";
 import { ObloggerSettings, ContainerSortMethod, getSortMethodDisplayText, RxGroupType, getFileType } from "./settings";
 import { App, Menu, MenuItem, moment, TFile } from "obsidian";
+import { FileModificationEventDetails } from "./constants";
 
 export class FilesContainer extends ViewContainer {
     constructor(
@@ -32,6 +33,11 @@ export class FilesContainer extends ViewContainer {
             false, // canBePinned
             undefined,
             false); // isPinned
+    }
+
+    protected shouldRerenderOnModification(modifiedFile: FileModificationEventDetails): boolean {
+        // todo: enhance
+        return true;
     }
 
     protected getEmptyMessage(): string {

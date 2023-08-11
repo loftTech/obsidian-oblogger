@@ -55,6 +55,10 @@ export class GroupFolder {
         this.rootElement.addClass("folder-holder")
     }
 
+    protected hasFileWithin(file: TFile): boolean {
+        return this.sortedFiles.contains(file) || this.sortedSubFolders.some(subFolder => subFolder.hasFileWithin(file));
+    }
+
     public getCollapsedFolders(): string[] {
         return (this.isCollapsed() ? [this.folderPath] : [])
             .concat(this.sortedSubFolders.flatMap(f => f.getCollapsedFolders()));
