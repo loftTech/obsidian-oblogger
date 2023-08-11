@@ -155,9 +155,11 @@ export class ObloggerView extends ItemView {
         );
 
         this.registerEvent(
-            this.app.workspace.on("file-open", (file) => {
-                if (file) {
-                    this.lastOpenFile = file;
+            this.app.workspace.on("file-open", (
+                fileOpened: TFile | null
+            ) => {
+                if (fileOpened) {
+                    this.lastOpenFile = fileOpened;
                     this.highlightLastOpenFile();
                 }
             })
