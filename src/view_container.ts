@@ -304,10 +304,7 @@ export abstract class ViewContainer extends GroupFolder {
         if (modifiedFiles.length > 0 && !modifiedFiles.some(
             f => this.shouldRerenderOnModification(f, excludedFolders))
         ) {
-            console.log(`ignoring render for ${this.groupName}`);
             return;
-        } else {
-            console.log(`rendering ${this.groupName}`);
         }
 
         this.rebuildFileStructure(excludedFolders);
