@@ -172,6 +172,14 @@ export class ObloggerView extends ItemView {
         );
 
         this.registerEvent(
+            this.app.vault.on("delete", (
+                itemDeleted: TAbstractFile
+            ) => {
+                this.requestRender();
+            })
+        );
+
+        this.registerEvent(
             this.app.workspace.on("file-open", (
                 fileOpened: TFile | null
             ) => {

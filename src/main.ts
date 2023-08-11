@@ -43,13 +43,6 @@ export default class Oblogger extends Plugin {
     async onload() {
         await this.loadSettings();
 
-        this.registerEvent(
-            // todo: what was deleted?
-            this.app.vault.on("delete", async () => {
-                await this.getObloggerView()?.requestRender();
-            })
-        );
-
         this.registerView(
             VIEW_TYPE_OBLOGGER,
             (leaf) => new ObloggerView(
