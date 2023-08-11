@@ -6,7 +6,7 @@ import {
     moment,
     Menu,
     View,
-    Notice
+    Notice, CachedMetadata
 } from "obsidian";
 import { ObloggerSettings, RxGroupType, OtcGroupSettings as SettingsTagGroup } from "./settings";
 import { TagGroupContainer } from "./tag_group_container";
@@ -134,6 +134,17 @@ export class ObloggerView extends ItemView {
         }
 
         this.lastOpenFile = this.app.workspace.getActiveFile() ?? undefined;
+
+
+        this.registerEvent(
+            this.app.metadataCache.on("changed", (
+                fileChanged: TFile,
+                fileContents: string,
+                fileMetadata: CachedMetadata
+            ) => {
+                this.requestRender();
+            })
+        );
 
         this.registerEvent(
             this.app.workspace.on("file-open", (file) => {
