@@ -163,6 +163,15 @@ export class ObloggerView extends ItemView {
         );
 
         this.registerEvent(
+            this.app.vault.on("rename", (
+                itemRenamed: TAbstractFile,
+                oldName: string
+            ) => {
+                this.requestRender();
+            })
+        );
+
+        this.registerEvent(
             this.app.workspace.on("file-open", (
                 fileOpened: TFile | null
             ) => {

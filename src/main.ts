@@ -44,13 +44,6 @@ export default class Oblogger extends Plugin {
         await this.loadSettings();
 
         this.registerEvent(
-            // todo: what was renamed?
-            this.app.vault.on("rename", async () => {
-                await this.getObloggerView()?.requestRender();
-            })
-        );
-
-        this.registerEvent(
             // todo: what was deleted?
             this.app.vault.on("delete", async () => {
                 await this.getObloggerView()?.requestRender();
