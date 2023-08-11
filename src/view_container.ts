@@ -1,6 +1,7 @@
 import { App, Menu, setIcon, TFile } from "obsidian";
 import { FileClickCallback, GroupFolder, FileAddedCallback } from "./group_folder";
 import { ObloggerSettings, RxGroupSettings } from "./settings";
+import { FileModificationEventDetails } from "./constants";
 
 export abstract class ViewContainer extends GroupFolder {
     settings: ObloggerSettings;
@@ -291,7 +292,11 @@ export abstract class ViewContainer extends GroupFolder {
         });
     }
 
-    public render(collapsedFolders: string[], excludedFolders: string[]) {
+    public render(
+        collapsedFolders: string[],
+        excludedFolders: string[],
+        modifiedFiles: FileModificationEventDetails[]
+    ) {
         this.rebuildFileStructure(excludedFolders);
 
         if (this.isVisible()) {

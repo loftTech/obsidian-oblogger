@@ -21,6 +21,7 @@ import { ImageFileSuggestModal } from "./image_file_suggest_modal";
 import { ViewContainer } from "./view_container";
 import { buildSeparator } from "./misc_components";
 import { NewTagModal } from "./new_tag_modal";
+import { FileModificationEventDetails } from "./constants";
 
 export const VIEW_TYPE_OBLOGGER = "oblogger-view";
 const RENDER_DELAY_MS = 100;
@@ -68,8 +69,8 @@ class UnknownDomObject {
 }
 
 interface TagGroup {
-    tag: string,
-    container: TagGroupContainer
+    tag: string;
+    container: TagGroupContainer;
 }
 
 export class ObloggerView extends ItemView {
@@ -81,6 +82,7 @@ export class ObloggerView extends ItemView {
     rxContainers: ViewContainer[]
     lastOpenFile: TFile | undefined;
     renderTimeout: number | null = null;
+    filesModifiedSinceRender: FileModificationEventDetails[];
     otcGroupsDiv: HTMLElement | undefined;
     rxGroupsDiv: HTMLElement | undefined;
     showLoggerCallbackFn: () => Promise<void>;
@@ -144,7 +146,10 @@ export class ObloggerView extends ItemView {
                 fileContents: string,
                 fileMetadata: CachedMetadata
             ) => {
-                this.requestRender();
+                this.requestRender({
+                    file: fileChanged,
+                    metadata: fileMetadata
+                });
             })
         );
 
@@ -307,28 +312,48 @@ export class ObloggerView extends ItemView {
         return "tags";
     }
 
-    requestRender() {
+    requestRender(maybeFileDetails?: FileModificationEventDetails) {
+        if (!maybeFileDetails) {
+            this.filesModifiedSinceRender = [];
+        } else {
+            const index = this.filesModifiedSinceRender.findIndex(
+                details => details.file === maybeFileDetails.file);
+            if (index >= 0) {
+                this.filesModifiedSinceRender[index] = maybeFileDetails;
+            } else {
+                this.filesModifiedSinceRender.push(maybeFileDetails);
+            }
+        }
+
         if (this.renderTimeout) {
             return;
         }
         this.renderTimeout = window.setTimeout(
-            () => this.renderNow(),
+            () => {
+                const modified = this.filesModifiedSinceRender;
+                this.filesModifiedSinceRender = [];
+                this.renderNow(modified)
+            },
             RENDER_DELAY_MS
         );
         this.registerInterval(this.renderTimeout);
     }
 
-    private renderTagGroup(group: GroupFolder) {
+    private renderTagGroup(group: GroupFolder, modifiedFiles: FileModificationEventDetails[]) {
         const excludedFolders = this.settings?.excludedFolders ?? [];
         const collapsedFolders = this.settings?.tagGroups.find(
             settingsGroup => settingsGroup.tag === group.groupName
         )?.collapsedFolders ?? [];
         if (group instanceof TagGroupContainer) {
-            group.render(collapsedFolders, excludedFolders);
+            group.render(collapsedFolders, excludedFolders, modifiedFiles);
         }
     }
 
-    private renderRxGroup(groupName: string, excludedFolders: string[]) {
+    private renderRxGroup(
+        groupName: string,
+        excludedFolders: string[],
+        modifiedFiles: FileModificationEventDetails[]
+    ) {
         const groupSetting = this.settings?.rxGroups.find(group => group.groupName === groupName);
         if (!groupSetting) {
             console.warn(`unable to find settings for rx group ${groupName}`);
@@ -339,37 +364,46 @@ export class ObloggerView extends ItemView {
             console.warn(`unable to find container for rx group ${groupName}`);
             return;
         }
-        container.render(groupSetting.collapsedFolders ?? [], excludedFolders);
+        container.render(
+            groupSetting.collapsedFolders ?? [],
+            excludedFolders,
+            modifiedFiles);
     }
 
-    private renderDailies() {
-        this.renderRxGroup(RxGroupType.DAILIES, this.settings?.excludedFolders ?? []);
+    private renderDailies(modifiedFiles: FileModificationEventDetails[]) {
+        this.renderRxGroup(
+            RxGroupType.DAILIES,
+            this.settings?.excludedFolders ?? [],
+            modifiedFiles);
     }
 
-    private renderFiles() {
-        this.renderRxGroup(RxGroupType.FILES, []);
+    private renderFiles(modifiedFiles: FileModificationEventDetails[]) {
+        this.renderRxGroup(RxGroupType.FILES, [], modifiedFiles);
     }
 
-    private renderUntagged() {
-        this.renderRxGroup(RxGroupType.UNTAGGED, [this.settings?.loggingPath]);
+    private renderUntagged(modifiedFiles: FileModificationEventDetails[]) {
+        this.renderRxGroup(
+            RxGroupType.UNTAGGED,
+            [this.settings?.loggingPath],
+            modifiedFiles);
     }
 
-    private renderRecents() {
-        this.renderRxGroup(RxGroupType.RECENTS, []);
+    private renderRecents(modifiedFiles: FileModificationEventDetails[]) {
+        this.renderRxGroup(RxGroupType.RECENTS, [], modifiedFiles);
     }
 
-    private async renderNow() {
+    private async renderNow(modifiedFiles: FileModificationEventDetails[]) {
         this.files = new WeakMap();
         this.fileItems = {};
 
         await this.renderAvatar();
 
-        this.renderRecents();
-        this.renderDailies();
-        this.renderUntagged();
-        this.renderFiles();
+        this.renderRecents(modifiedFiles);
+        this.renderDailies(modifiedFiles);
+        this.renderUntagged(modifiedFiles);
+        this.renderFiles(modifiedFiles);
 
-        this.otcGroups.forEach(group => this.renderTagGroup(group.container));
+        this.otcGroups.forEach(group => this.renderTagGroup(group.container, modifiedFiles));
 
         this.highlightLastOpenFile();
 
