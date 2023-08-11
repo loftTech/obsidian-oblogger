@@ -77,11 +77,13 @@ export class TagGroupContainer extends ViewContainer {
             return true;
         }
 
-        const currentTags = currentFileTags?.tags;
-        // todo: O(n^2). better to compare lengths, sort both, then compare in O(n) => O(nlogn)
-        const currentTagsInCache = currentTags?.every(tag => fileTags.tags.contains(tag)) ?? false;
-        const cachedTagsInCurrent = fileTags.tags.every(tag => currentTags?.contains(tag)) ?? false;
-        return !currentTagsInCache || !cachedTagsInCurrent;
+        const currentTags = currentFileTags?.tags.sort();
+        if (currentTags?.length !== fileTags.tags.length) {
+            return true;
+        }
+        return fileTags.tags.sort().some((tag, index) => {
+            return tag !== currentTags.at(index);
+        });
     }
 
     protected getEmptyMessage(): string {
