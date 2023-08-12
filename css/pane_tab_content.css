@@ -455,7 +455,7 @@ body.styled-scrollbars .oblogger-content {
     width: 85px;
 }
 
-.oblogger-content .title-text-container:hover { color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/100%); }
+.oblogger-content .text-label:hover { color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/100%); }
 
 .oblogger-content .clickable-icon:hover {
     background-color: transparent;
