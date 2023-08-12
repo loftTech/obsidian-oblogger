@@ -182,6 +182,9 @@ export abstract class ViewContainer extends GroupFolder {
         if (this.isPinned) {
             titleChevron.addClass("is-pinned");
         }
+        titleChevron.addEventListener("click", () => {
+            this.toggleCollapse();
+        });
 
         titleChevron.appendChild(this.buildPinContainer());
 
