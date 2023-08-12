@@ -7,6 +7,7 @@
 
 .oblogger-content {
     flex-grow: 1;
+    line-height: 1;
     overflow-y: auto;
     overflow-x: hidden;
     padding: 0 4px 70px 8px;
@@ -38,6 +39,7 @@ body.styled-scrollbars .oblogger-content {
 
 .oblogger-content .separator-container {
     height: 16px;
+    padding: 8px 0 12px;
     width: fit-content;
 }
 
@@ -56,49 +58,67 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .rx-separator {
-    margin: auto;
-    display: flex;
     align-items: center;
+    display: flex;
+    margin: auto;
 }
 
 .oblogger-content .otc-separator {
-    margin: auto;
-    display: flex;
     align-items: center;
+    display: flex;
+    margin: auto;
 }
 
 .menu-item-icon.untagged-sort-confirmation,
 .menu-item-icon.files-sort-confirmation { color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/90%); }
 
 .oblogger-content .title-container {
-    align-items: center;
     display: grid;
     grid-template-columns: min-content;
     height: 20px;
-    padding-top: 4px;
+}
+
+.oblogger-content .folder-holder.rx-child:last-child .content {
+    padding-bottom: 0;
 }
 
 .oblogger-content .folder-holder.rx-child:last-child .title-container.collapsed {
-    margin-bottom: 4px;
+    margin-bottom: 1px;
 }
 
 .oblogger-content .pin { display: none; }
 
 .oblogger-content .pin.is-pinned {
     display: flex;
-    grid-column: 1;
-    justify-content: center;
 }
 
 .oblogger-content .title-chevron {
+    align-items: center;
     display: flex;
     grid-column: 1;
-    margin-right: 4px;
-    max-width: 12px;
+    height: 20px;
+}
+
+.oblogger-content .title-chevron .svg-icon.lucide-chevron-down {
+    color: var(--nav-indentation-guide-color);
+    height: 12px;
+    stroke-width: 4px;
+}
+
+.oblogger-content .pin .svg-icon.lucide-chevrons-down {
+    color: var(--nav-indentation-guide-color);
+    height: 16px;
+    stroke-width: 3px;
+}
+
+.oblogger-content .title-chevron.is-pinned .svg-icon.lucide-chevron-down {
+    display: none;
 }
 
 .oblogger-content .title-text {
+    align-items: center;
     display: flex;
+    font-size: 12px;
     grid-column: 2;
     overflow: hidden;
 }
@@ -110,16 +130,15 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .text-label {
-    font-size: smaller;
     font-weight: 600;
     overflow: hidden;
     overflow-wrap: anywhere;
-    padding-top: 2px;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 .oblogger-content .title-tag {
+    align-items: center;
     color: var(--nav-item-color);
     display: flex;
     grid-column: 3;
@@ -131,18 +150,17 @@ body.styled-scrollbars .oblogger-content {
 
 .oblogger-content .collapsed .title-tag { display: none; }
 
-
 .oblogger-content .tag-label {
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 600;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .oblogger-content .family-title {
     border-radius: var(--radius-s);
     color: var(--nav-item-color);
     display: flex;
+    font-size: small;
+    line-height: initial;
     margin: 2px 0;
     padding: 4px;
 }
@@ -182,7 +200,9 @@ body.styled-scrollbars .oblogger-content {
     border-radius: var(--radius-s);
     color: var(--nav-item-color);
     display: grid;
+    font-size: small;
     justify-content: start;
+    line-height: initial;
     margin: 2px 0;
     padding: 4px;
 }
@@ -196,6 +216,8 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .child-item-content { display: flex; }
 
 .oblogger-content .child-item-text {
+    align-items: center;
+    display: flex;
     grid-column: 2;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -203,10 +225,8 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .bookmark-icon {
-    align-items: center;
     display: flex;
     grid-column: 3;
-    justify-content: center;
     padding-left: 2px;
 }
 
@@ -229,7 +249,7 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .content {
-    padding: 2px 0 4px 12px;
+    padding: 0 0 4px 12px;
     transition-duration: 0.1s;
     transition-timing-function: cubic-bezier(0.02, 0.01, 0.47, 1);
 }
@@ -322,7 +342,9 @@ body.styled-scrollbars .oblogger-content {
     font-size: var(--vault-name-font-size);
     font-weight: var(--vault-name-font-weight);
     justify-content: center;
-    margin-bottom: 4px;
+    margin: 0 auto 4px;
+    position: relative;
+    width: fit-content;
     z-index: 11;
 }
 
@@ -348,25 +370,6 @@ body.styled-scrollbars .oblogger-content {
     padding-left: 6px;
 }
 
-/* RX ==================================================================== */
-
-.rx-child,
-.otc-child {
-    cursor: var(--cursor);
-    font-size: var(--nav-item-size);
-    font-weight: var(--nav-item-weight);
-    line-height: var(--line-height-tight);
-}
-
-.rx-child::before,
-.otc-child::before {
-    color: var(--nav-item-color);
-    cursor: var(--cursor);
-    font-size: var(--nav-item-size);
-    font-weight: var(--nav-item-weight);
-    line-height: var(--line-height-tight);
-}
-
 /* ==========================================================================
    SVG
    ==========================================================================
@@ -383,7 +386,12 @@ body.styled-scrollbars .oblogger-content {
     width: 12px;
 }
 
-.oblogger-content .title-tag .svg-icon,
+.oblogger-content .title-tag .svg-icon {
+    color: var(--nav-item-color);
+    height: 11px;
+    width: 11px;
+}
+
 .oblogger-content .text-icon .svg-icon {
     color: var(--nav-item-color);
     height: 12px;
@@ -408,22 +416,11 @@ body.styled-scrollbars .oblogger-content {
     width: 16px;
 }
 
-.oblogger-content .title-chevron svg.svg-icon {
-    color: var(--nav-indentation-guide-color);
-    stroke-width: 4px;
-}
-
 .oblogger-content .bookmark-icon svg.svg-icon {
     fill: var(--nav-indentation-guide-color);
     color: transparent;
     height: 16px;
     width: 12px;
-}
-
-.oblogger-content .pin .svg-icon {
-    height: 16px;
-    margin-left: -1px;
-    width: 14px;
 }
 
 .oblogger-content .rx-child .collapsed .svg-icon:not(.content .svg-icon),
@@ -528,8 +525,6 @@ body.styled-scrollbars .oblogger-content {
 .is-phone .oblogger-content { padding: 0 15px 70px 25px; }
 
 .is-phone .oblogger-content .status-icon { left: 34px; }
-
-.is-phone .oblogger-content .bookmark-icon { padding-top: 3px; }
 
 .is-phone .oblogger-content .child-item {
     margin-bottom: 6px;
