@@ -196,6 +196,9 @@ body.styled-scrollbars .oblogger-content {
     position: absolute;
 }
 
+/* modification for macos */
+.mod-macos .oblogger-content .status-icon.visible { left: 21px; }
+
 .oblogger-content .child-item {
     border-radius: var(--radius-s);
     color: var(--nav-item-color);
