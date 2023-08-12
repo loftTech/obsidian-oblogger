@@ -216,8 +216,6 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .child-item-content { display: flex; }
 
 .oblogger-content .child-item-text {
-    align-items: center;
-    display: flex;
     grid-column: 2;
     overflow: hidden;
     text-overflow: ellipsis;
