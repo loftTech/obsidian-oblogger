@@ -114,14 +114,14 @@ export class TagGroupContainer extends ViewContainer {
         }
     }
 
-    protected getTitleIcon(): string {
+    protected getTextIcon(): string {
         if (this.getIsolatedTagMatch()) {
             return "tags";
         }
         return "";
     }
 
-    protected getTitleIconTooltip(): string {
+    protected getTextIconTooltip(): string {
         return this.getIsolatedTagMatch() ? "Nested within multiple tags" : "";
     }
 

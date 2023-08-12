@@ -20,8 +20,8 @@ export abstract class ViewContainer extends GroupFolder {
 
     protected abstract getTitleText(): string;
     protected abstract getTitleTooltip(): string;
-    protected abstract getTitleIcon(): string;
-    protected abstract getTitleIconTooltip(): string;
+    protected abstract getTextIcon(): string;
+    protected abstract getTextIconTooltip(): string;
     protected abstract getPillText(): string;
     protected abstract getPillTooltipText(): string;
     protected abstract getPillIcon(): string;
@@ -165,76 +165,55 @@ export abstract class ViewContainer extends GroupFolder {
     }
 
     private buildPinContainer(): HTMLElement {
-        const pinContainerDiv = document.createElement("div");
-        pinContainerDiv.addClass("pin-container");
-
         const pinDiv = document.createElement("div");
         pinDiv.addClass("pin");
         if (this.isPinned) {
             pinDiv.addClass("is-pinned");
         }
         setIcon(pinDiv, "chevrons-down");
-        pinContainerDiv.appendChild(pinDiv);
 
-        return pinContainerDiv;
+        return pinDiv;
     }
 
     private buildTitleSvgHolder(): HTMLElement {
-        const svgHolder = document.createElement("div");
-        svgHolder.addClass("svg-holder");
-
-        const titleChevronContainer = document.createElement("div");
-        titleChevronContainer.addClass("title-chevron-container")
-
         const titleChevron = document.createElement("div");
         setIcon(titleChevron, "chevron-down");
         titleChevron.addClass("title-chevron");
         if (this.isPinned) {
             titleChevron.addClass("is-pinned");
         }
-        titleChevronContainer.appendChild(titleChevron)
 
-        svgHolder.appendChild(this.buildPinContainer());
-        svgHolder.appendChild(titleChevronContainer);
+        titleChevron.appendChild(this.buildPinContainer());
 
-        return svgHolder;
+        return titleChevron;
     }
 
     private buildTitleTextDiv(): HTMLElement {
+        const textLabel = document.createElement("div");
+        textLabel.addClass("text-label");
+
+        const textIcon = document.createElement("div");
+        setIcon(textIcon, this.getTextIcon());
+        textIcon.addClass("text-icon");
+        textIcon.ariaLabel = this.getTextIconTooltip();
+
         const titleText = document.createElement("div");
         titleText.addClass("title-text");
+        titleText.appendChild(textLabel);
+        titleText.appendChild(textIcon);
 
-        const titleIcon = document.createElement("div");
-        setIcon(titleIcon, this.getTitleIcon());
-        titleIcon.addClass("title-icon");
-        titleIcon.ariaLabel = this.getTitleIconTooltip();
-
-        const titleTextContainer = document.createElement("div");
-        titleTextContainer.addClass("title-text-container");
-        titleTextContainer.appendChild(titleText);
-        titleTextContainer.appendChild(titleIcon);
-
-        titleTextContainer.addEventListener("click", () => {
+        titleText.addEventListener("click", () => {
             this.toggleCollapse();
         });
 
-        titleText.setText(this.getTitleText().toUpperCase());
-        titleText.addEventListener("contextmenu", (e) => {
+        textLabel.setText(this.getTitleText().toUpperCase());
+        textLabel.addEventListener("contextmenu", (e) => {
             const contextMenu = this.getContextMenu();
             contextMenu && contextMenu.showAtMouseEvent(e);
         });
-        titleText.ariaLabel = this.getTitleTooltip();
+        textLabel.ariaLabel = this.getTitleTooltip();
 
-        return titleTextContainer;
-    }
-
-    private buildTagTitleGroup(): HTMLElement {
-        const tagTitleGroupDiv = document.createElement("div");
-        tagTitleGroupDiv.addClass("tag-title-group")
-
-        tagTitleGroupDiv.appendChild(this.buildPill());
-
-        return tagTitleGroupDiv;
+        return titleText;
     }
 
     private buildPill(): HTMLElement {
@@ -255,16 +234,13 @@ export abstract class ViewContainer extends GroupFolder {
             }
         });
 
-        const pillIconDiv = document.createElement("div");
-        pillIconDiv.addClass("pill-icon");
         const pillIcon = this.getPillIcon();
-        pillIcon && setIcon(pillIconDiv, pillIcon);
-        titleTagDiv.appendChild(pillIconDiv);
+        pillIcon && setIcon(titleTagDiv, pillIcon);
 
-        const pillLabelDiv = document.createElement("div");
-        pillLabelDiv.addClass("pill-label");
-        pillLabelDiv.setText(this.getPillText());
-        titleTagDiv.appendChild(pillLabelDiv);
+        const tagLabelDiv = document.createElement("div");
+        tagLabelDiv.addClass("tag-label");
+        tagLabelDiv.setText(this.getPillText());
+        titleTagDiv.appendChild(tagLabelDiv);
 
         return titleTagDiv;
     }
@@ -279,7 +255,7 @@ export abstract class ViewContainer extends GroupFolder {
 
         this.titleContainer.appendChild(this.buildTitleSvgHolder());
         this.titleContainer.appendChild(this.buildTitleTextDiv());
-        this.titleContainer.appendChild(this.buildTagTitleGroup());
+        this.titleContainer.appendChild(this.buildPill());
     }
 
     rebuildFileStructure(excludedFolders: string[]) {
