@@ -1,4 +1,10 @@
-import { App, ExtraButtonComponent, getAllTags, setIcon, TFile } from "obsidian";
+import {
+    App,
+    ExtraButtonComponent,
+    getAllTags,
+    setIcon,
+    TFile
+} from "obsidian";
 import { getFileTypeIcon } from "./settings";
 
 const COLLAPSED_CLASS_IDENTIFIER = "collapsed";
@@ -9,6 +15,24 @@ export type FileAddedCallback = (
     contentItem: HTMLElement,
     titleItem: HTMLElement,
     titleContentItem: HTMLElement) => void;
+
+declare module "obsidian" {
+    interface Plugin {
+        instance: never;
+    }
+    interface App {
+        internalPlugins: {
+            plugins: { [key: string]: {
+                instance: {
+                    items: {
+                        type: string;
+                        path: string;
+                    }[]
+                }
+            } }
+        }
+    }
+}
 
 export class GroupFolder {
     app: App;
@@ -53,6 +77,10 @@ export class GroupFolder {
 
         this.rootElement = document.createElement("div");
         this.rootElement.addClass("folder-holder")
+    }
+
+    protected hasFileWithin(file: TFile): boolean {
+        return this.sortedFiles.contains(file) || this.sortedSubFolders.some(subFolder => subFolder.hasFileWithin(file));
     }
 
     public getCollapsedFolders(): string[] {
@@ -193,9 +221,7 @@ export class GroupFolder {
     }
 
     protected isBookmarked(file: TFile): boolean {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        return !!app.internalPlugins.plugins.bookmarks?.instance?.items?.find(item => {
+        return !!app.internalPlugins.plugins["bookmarks"].instance?.items?.find(item => {
             return item.type === "file" && item.path === file.path
         });
     }

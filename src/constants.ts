@@ -1,3 +1,5 @@
+import { CachedMetadata, TFile } from "obsidian";
+
 const MINIMUM_DESKTOP_RESOLUTION_WIDTH_PX = 500;
 
 // Using a minimum resolution width to determine desktop (including ipad)
@@ -5,4 +7,9 @@ const MINIMUM_DESKTOP_RESOLUTION_WIDTH_PX = 500;
 // position.
 export function isDesktopLikeResolution() {
     return window.screen.availWidth >= MINIMUM_DESKTOP_RESOLUTION_WIDTH_PX;
+}
+
+export interface FileModificationEventDetails {
+    file: TFile;
+    metadata: CachedMetadata;
 }

@@ -2,11 +2,19 @@ import { App, getAllTags, Menu, MenuItem, TFile } from "obsidian";
 import { FileClickCallback, FileAddedCallback } from "./group_folder";
 import { ViewContainer } from "./view_container";
 import { ContainerSortMethod, getSortMethodDisplayText, ObloggerSettings } from "./settings";
+import { FileModificationEventDetails } from "./constants";
 
 
 type TagFileMap = { [key: string]: TFile[] };
 
+interface FileTags {
+    file: TFile;
+    tags: string[];
+}
+
 export class TagGroupContainer extends ViewContainer {
+    renderedFileTags: FileTags[];
+
     constructor(
         app: App,
         baseTag: string,
@@ -40,6 +48,41 @@ export class TagGroupContainer extends ViewContainer {
             pinCallback,
             isPinned
         );
+    }
+
+    protected shouldRerenderOnModification(
+        modifiedFile: FileModificationEventDetails,
+        excludedFolders: string[]
+    ): boolean {
+        const currentFileTags = this.getFileTags(
+            modifiedFile.file,
+            excludedFolders,
+            this.getIsolatedTagMatch()?.at(1));
+        const shouldBeIncluded = currentFileTags !== null;
+        const isIncluded = this.hasFileWithin(modifiedFile.file);
+        if (shouldBeIncluded !== isIncluded) {
+            return true;
+        }
+
+        if (!isIncluded) {
+            // irrelevant
+            return false;
+        }
+
+        const fileTags = this.renderedFileTags.find(fileTags => fileTags.file === modifiedFile.file);
+        if (!fileTags) {
+            // something went wrong with the caching, default to re-rendering
+            console.debug("Cache invalidation error with rendered file tags.");
+            return true;
+        }
+
+        const currentTags = currentFileTags?.tags.sort();
+        if (currentTags?.length !== fileTags.tags.length) {
+            return true;
+        }
+        return fileTags.tags.sort().some((tag, index) => {
+            return tag !== currentTags.at(index);
+        });
     }
 
     protected getEmptyMessage(): string {
@@ -129,10 +172,10 @@ export class TagGroupContainer extends ViewContainer {
 
             const setupItem = (item: MenuItem, method: string) => {
                 item.onClick(() => {
-                    changeSortMethod(method);
+                    return changeSortMethod(method);
                 });
                 if (method === this.getGroupSetting()?.sortMethod) {
-
+                    // Note: iconEl is added to MenuItem at run time
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
                     item.iconEl.addClass("untagged-sort-confirmation");
@@ -161,43 +204,46 @@ export class TagGroupContainer extends ViewContainer {
         }
     }
 
-    private getAllAssociatedTags(excludedFolders: string[]): TagFileMap {
-        interface Item {
-            file: TFile;
-            tags: string[];
+    private getFileTags(
+        file: TFile,
+        excludedFolders: string[],
+        isolatedGroupName: string | undefined
+    ): FileTags | null {
+        // filter out excluded
+        if (file.parent && excludedFolders.contains(file.parent.path)) {
+            return null;
         }
+        const cache = this.app.metadataCache.getFileCache(file);
+        // filter out files missing cache
+        if (cache === null) {
+            return null;
+        }
+        const tags = getAllTags(cache)
+            ?.map(tag => tag.replace("#", ""))
+            ?.unique()
+            ?.filter((tag: string) => {
+                if (isolatedGroupName) {
+                    return tag.contains(isolatedGroupName);
+                } else {
+                    return tag.startsWith(this.groupName);
+                }
+            });
+        if (!tags?.length) {
+            return null;
+        }
+        return { file, tags };
+    }
 
+    private getAllAssociatedTags(excludedFolders: string[]): TagFileMap {
         const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
 
-        return this.app.vault
+        // This is fine, we're filtering out nulls
+        this.renderedFileTags = this.app.vault
             .getMarkdownFiles()
-            .map((file: TFile) => {
-                // filter out excluded
-                if (file.parent && excludedFolders.contains(file.parent.path)) {
-                    return null;
-                }
-                const cache = this.app.metadataCache.getFileCache(file);
-                // filter out files missing cache
-                if (cache === null) {
-                    return null;
-                }
-                const tags = getAllTags(cache)
-                    ?.map(tag => tag.replace("#", ""))
-                    ?.unique()
-                    ?.filter((tag: string) => {
-                        if (isolatedGroupName) {
-                            return tag.contains(isolatedGroupName);
-                        } else {
-                            return tag.split("/")[0] === this.groupName;
-                        }
-                    });
-                if (!tags) {
-                    return null;
-                }
-                return { file, tags };
-            })
-            .filter(item => item !== null)
-            .reduce((acc: TagFileMap, item: Item) => {
+            .map(file => this.getFileTags(file, excludedFolders, isolatedGroupName))
+            .filter(item => item !== null) as FileTags[];
+        return this.renderedFileTags
+            .reduce((acc: TagFileMap, item: FileTags) => {
                 item.tags.forEach((tag: string) => {
                     if (!Object.keys(acc).contains(tag)) {
                         acc[tag] = [];
@@ -227,6 +273,9 @@ export class TagGroupContainer extends ViewContainer {
     }
 
     protected buildFileStructure(excludedFolders: string[]) {
+        // clear the cache
+        this.renderedFileTags = [];
+
         const tagFiles = this.getAllAssociatedTags(excludedFolders);
         const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
         const ascending = this.getGroupSetting()?.sortAscending ?? true;

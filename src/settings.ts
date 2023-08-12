@@ -55,8 +55,7 @@ export const PostLogAction = {
     COPY: "copy"
 }
 
-export interface ObloggerSettings {
-    version: number;
+interface ObloggerSettings_v0 {
     loggingPath: string;
     avatarPath: string;
     tagGroups: OtcGroupSettings[];
@@ -68,18 +67,28 @@ export interface ObloggerSettings {
     dailiesTag: string;
 }
 
-const UPGRADE_FUNCTIONS: {[id: number]: (settings: any)=> void} = {
-    0: (settings: any) => {
-        settings.version = 1;
+interface ObloggerSettings_v1 extends ObloggerSettings_v0 {
+    version: number;
+}
+
+export type ObloggerSettings = ObloggerSettings_v1
+
+const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } = {
+    0: (settings: ObloggerSettings) => {
+        const newSettings = settings as ObloggerSettings_v1;
+        if (newSettings) {
+            newSettings.version = 1;
+        }
     }
 };
 
-export const upgradeSettings = (currentVersion: number, settings: any) => {
+export const upgradeSettings = (currentVersion: number, settings: ObloggerSettings) => {
     const availableUpgrades = Object.keys(UPGRADE_FUNCTIONS);
     if (!availableUpgrades.contains(currentVersion.toString())) {
         console.warn(`Unable to upgrade ${currentVersion}. No upgrade function defined.`)
         return;
     }
+
     UPGRADE_FUNCTIONS[currentVersion](settings);
 }
 

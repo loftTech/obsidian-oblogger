@@ -38,7 +38,7 @@ export default class Oblogger extends Plugin {
             }
         }
         if (needsSaving) {
-            this.saveSettings();
+            return this.saveSettings();
         }
     }
 
@@ -57,36 +57,6 @@ export default class Oblogger extends Plugin {
 
     async onload() {
         await this.loadSettings();
-
-        this.registerEvent(
-            this.app.metadataCache.on("changed", async () => {
-                await this.getObloggerView()?.requestRender();
-            })
-        );
-
-        this.registerEvent(
-            this.app.vault.on("create", async () => {
-                await this.getObloggerView()?.requestRender();
-            })
-        );
-
-        this.registerEvent(
-            this.app.vault.on("modify", async () => {
-                await this.getObloggerView()?.requestRender();
-            })
-        );
-
-        this.registerEvent(
-            this.app.vault.on("rename", async () => {
-                await this.getObloggerView()?.requestRender();
-            })
-        );
-
-        this.registerEvent(
-            this.app.vault.on("delete", async () => {
-                await this.getObloggerView()?.requestRender();
-            })
-        );
 
         this.registerView(
             VIEW_TYPE_OBLOGGER,

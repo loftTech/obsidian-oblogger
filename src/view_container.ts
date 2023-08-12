@@ -1,6 +1,7 @@
 import { App, Menu, setIcon, TFile } from "obsidian";
 import { FileClickCallback, GroupFolder, FileAddedCallback } from "./group_folder";
 import { ObloggerSettings, RxGroupSettings } from "./settings";
+import { FileModificationEventDetails } from "./constants";
 
 export abstract class ViewContainer extends GroupFolder {
     settings: ObloggerSettings;
@@ -30,6 +31,10 @@ export abstract class ViewContainer extends GroupFolder {
     protected abstract getHideText(): string;
     protected abstract getHideIcon(): string;
     protected abstract getEmptyMessage(): string;
+    protected abstract shouldRerenderOnModification(
+        modifiedFile: FileModificationEventDetails,
+        excludedFolders: string[]
+    ): boolean;
 
     protected constructor(
         app: App,
@@ -296,7 +301,17 @@ export abstract class ViewContainer extends GroupFolder {
         });
     }
 
-    public render(collapsedFolders: string[], excludedFolders: string[]) {
+    public render(
+        collapsedFolders: string[],
+        excludedFolders: string[],
+        modifiedFiles: FileModificationEventDetails[]
+    ) {
+        if (modifiedFiles.length > 0 && !modifiedFiles.some(
+            f => this.shouldRerenderOnModification(f, excludedFolders))
+        ) {
+            return;
+        }
+
         this.rebuildFileStructure(excludedFolders);
 
         if (this.isVisible()) {

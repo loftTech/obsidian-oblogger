@@ -2,8 +2,17 @@ import { FileClickCallback, FileAddedCallback } from "./group_folder";
 import { ViewContainer } from "./view_container";
 import { App, getAllTags, Menu, MenuItem, moment, TFile } from "obsidian";
 import { ObloggerSettings, ContainerSortMethod, getSortMethodDisplayText, RxGroupType } from "./settings";
+import { FileModificationEventDetails } from "./constants";
+
+interface RenderedFile {
+    file: TFile;
+    mtime: number;
+    ctime: number;
+}
 
 export class UntaggedContainer extends ViewContainer {
+    renderedFiles: RenderedFile[];
+
     constructor(
         app: App,
         fileClickCallback: FileClickCallback,
@@ -33,6 +42,45 @@ export class UntaggedContainer extends ViewContainer {
             false, // canBePinned
             undefined,
             false); // isPinned
+    }
+
+    protected shouldRerenderOnModification(
+        modifiedFile: FileModificationEventDetails
+    ): boolean {
+        const renderedFile = this.renderedFiles.find(rf => rf.file === modifiedFile.file);
+        const wasUntagged = renderedFile !== undefined;
+
+        const isUntagged = (getAllTags(modifiedFile.metadata)?.length ?? 0) === 0;
+        if (wasUntagged !== isUntagged) {
+            // it was rendered (meaning it was untagged) but now it has tags, or
+            // it was not rendered (meaning it had tags) but now is untagged...redraw
+            return true;
+
+        }
+        if (!isUntagged) {
+            // irrelevant
+            return false;
+
+        }
+        // if we're sorting by created and the created time changed, redraw
+        if (
+            renderedFile?.ctime !== modifiedFile.file.stat.ctime &&
+            this.getGroupSetting()?.sortMethod === ContainerSortMethod.CTIME
+        ) {
+            return true;
+
+        }
+        // if we're sorting by modified and the modified time changed and
+        // the file is not in the top or bottom depending on ordering, redraw
+        return renderedFile?.mtime !== modifiedFile.file.stat.mtime &&
+          this.getGroupSetting()?.sortMethod === ContainerSortMethod.MTIME &&
+          (
+            this.getGroupSetting()?.sortAscending ?
+              this.renderedFiles.first() :
+              this.renderedFiles.last()
+          )?.file !== modifiedFile.file;
+
+
     }
 
     protected getEmptyMessage(): string {
@@ -99,7 +147,7 @@ export class UntaggedContainer extends ViewContainer {
 
             const setupItem = (item: MenuItem, method: string) => {
                 item.onClick(() => {
-                    changeSortMethod(method);
+                    return changeSortMethod(method);
                 });
                 if (method === this.getGroupSetting()?.sortMethod) {
 
@@ -133,6 +181,15 @@ export class UntaggedContainer extends ViewContainer {
 
     protected getContainerClass(): string {
         return "rx-child";
+    }
+
+    protected addFileToFolder(file: TFile, remainingTag:string, pathPrefix:string) {
+        this.renderedFiles.push({
+            file: file,
+            mtime: file.stat.mtime,
+            ctime: file.stat.ctime
+        });
+        super.addFileToFolder(file, remainingTag, pathPrefix);
     }
 
     private buildAlphabeticalFileStructure(
@@ -205,6 +262,8 @@ export class UntaggedContainer extends ViewContainer {
     }
 
     protected buildFileStructure(excludedFolders: string[]): void {
+        this.renderedFiles = [];
+
         const includedFiles = this.app.vault.getFiles().filter(file => {
             if (file.extension !== "md") {
                 return false;
