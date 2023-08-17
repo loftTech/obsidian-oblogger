@@ -82,6 +82,7 @@ export class ObloggerView extends ItemView {
     lastOpenFile: TFile | undefined;
     renderTimeout: number | null = null;
     filesModifiedSinceRender: FileModificationEventDetails[];
+    fullRender: boolean;
     otcGroupsDiv: HTMLElement | undefined;
     rxGroupsDiv: HTMLElement | undefined;
     showLoggerCallbackFn: () => Promise<void>;
@@ -121,6 +122,7 @@ export class ObloggerView extends ItemView {
     ) {
         super(leaf);
 
+        this.fullRender = true;
         this.settings = settings;
         this.showLoggerCallbackFn = showLoggerCallbackFn;
         this.files = new WeakMap();
@@ -306,7 +308,7 @@ export class ObloggerView extends ItemView {
 
     requestRender(maybeFileDetails?: FileModificationEventDetails) {
         if (!maybeFileDetails) {
-            this.filesModifiedSinceRender = [];
+            this.fullRender = true;
         } else {
             const index = this.filesModifiedSinceRender.findIndex(
                 details => details.file === maybeFileDetails.file);
@@ -322,8 +324,9 @@ export class ObloggerView extends ItemView {
         }
         this.renderTimeout = window.setTimeout(
             () => {
-                const modified = this.filesModifiedSinceRender;
+                const modified = this.fullRender ? [] : this.filesModifiedSinceRender;
                 this.filesModifiedSinceRender = [];
+                this.fullRender = false;
                 return this.renderNow(modified);
             },
             RENDER_DELAY_MS
