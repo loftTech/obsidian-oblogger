@@ -46,14 +46,14 @@ export class FilesContainer extends ViewContainer {
     ): boolean {
         switch(this.getGroupSetting()?.sortMethod) {
             case ContainerSortMethod.ALPHABETICAL:
-                return oldState.basename != newState.basename;
+                return oldState.basename !== newState.basename;
             case ContainerSortMethod.CTIME:
-                return oldState.ctime != newState.ctime;
+                return oldState.ctime !== newState.ctime;
             case ContainerSortMethod.MTIME:
-                return oldState.mtime != newState.mtime;
+                return oldState.mtime !== newState.mtime;
             case ContainerSortMethod.EXTENSION:
             case ContainerSortMethod.TYPE:
-                return oldState.extension != newState.extension;
+                return oldState.extension !== newState.extension;
         }
         return false;
     }

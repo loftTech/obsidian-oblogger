@@ -51,7 +51,7 @@ export class RecentsContainer extends ViewContainer {
         oldState: FileModificationEventDetails,
         newState: FileModificationEventDetails
     ): boolean {
-        return false;
+        return oldState.mtime !== newState.mtime && this.sortedFiles.first() !== newState.file;
     }
 
     protected getEmptyMessage(): string {

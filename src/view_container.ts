@@ -358,10 +358,7 @@ export abstract class ViewContainer extends GroupFolder {
         // have the tags changed?
         const oldTags = maybeCache.state.tags;
         const newTags = state.tags;
-        console.log(oldTags);
-        console.log(newTags);
         if (!this.tagsEqual(oldTags, newTags)) {
-            console.log(`tags aren't equal, causing a rendering of ${this.groupName}`)
             return true;
         }
 
