@@ -366,18 +366,7 @@ export abstract class ViewContainer extends GroupFolder {
         }
 
         // any container-specific rendering decisions?
-        if (this.shouldRender(maybeCache.state, state)) {
-            return true;
-        }
-
-        // if (maybeCache.cache === modificationDetails.metadata) {
-        //     console.log(`file ${modificationDetails.file.name} in ${this.groupName} but metadata unchanged`);
-        //     return false;
-        // }
-
-        // todo: i left off at the point where i'm not doing any specific
-        //  filtering of events. if it's included, redraw it.
-        return true;
+        return this.shouldRender(maybeCache.state, state);
     }
 
     public render(
@@ -393,6 +382,7 @@ export abstract class ViewContainer extends GroupFolder {
                 return;
             }
         }
+        console.log(`rendering ${this.groupName}`)
         // if (modifiedFiles.length > 0 && !modifiedFiles.some(
         //     f => this.shouldRerenderOnModification(f, excludedFolders))
         // ) {

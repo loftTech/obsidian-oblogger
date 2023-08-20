@@ -54,14 +54,6 @@ export class RecentsContainer extends ViewContainer {
         return false;
     }
 
-    // protected shouldRerenderOnModification(
-    //     modifiedFile: FileModificationEventDetails
-    // ): boolean {
-    //     // if the first of the sorted files isn't the modified file, then we
-    //     // need to redraw.
-    //     return this.sortedFiles[0] !== modifiedFile.file;
-    // }
-
     protected getEmptyMessage(): string {
         return "No recents";
     }

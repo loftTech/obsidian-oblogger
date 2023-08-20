@@ -37,25 +37,26 @@ export class FilesContainer extends ViewContainer {
     }
 
     protected wouldBeRendered(state: FileModificationEventDetails): boolean {
-        return true;
+        return state.extension !== "md";
     }
 
     protected shouldRender(
         oldState: FileModificationEventDetails,
         newState: FileModificationEventDetails
     ): boolean {
-        // Since these files don't have metadata, then we never need to re-render
-        // based on a specific file change. We will re-render when more broad
-        // render events happen (like files added/deleted)
+        switch(this.getGroupSetting()?.sortMethod) {
+            case ContainerSortMethod.ALPHABETICAL:
+                return oldState.basename != newState.basename;
+            case ContainerSortMethod.CTIME:
+                return oldState.ctime != newState.ctime;
+            case ContainerSortMethod.MTIME:
+                return oldState.mtime != newState.mtime;
+            case ContainerSortMethod.EXTENSION:
+            case ContainerSortMethod.TYPE:
+                return oldState.extension != newState.extension;
+        }
         return false;
     }
-
-    // protected shouldRerenderOnModification(): boolean {
-    //     // Since these files don't have metadata, then we never need to re-render
-    //     // based on a specific file change. We will re-render when more broad
-    //     // render events happen (like files added/deleted)
-    //     return false;
-    // }
 
     protected getEmptyMessage(): string {
         return "No special files";
