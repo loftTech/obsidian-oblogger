@@ -9,6 +9,12 @@ export function isDesktopLikeResolution() {
     return window.screen.availWidth >= MINIMUM_DESKTOP_RESOLUTION_WIDTH_PX;
 }
 
+export function isBookmarked(app: App, file: TFile): boolean {
+    return !!app.internalPlugins.plugins["bookmarks"].instance?.items?.find(item => {
+        return item.type === "file" && item.path === file.path
+    });
+}
+
 // todo: this needs a better name
 export interface FileModificationEventDetails {
     file: TFile;
@@ -19,6 +25,7 @@ export interface FileModificationEventDetails {
     basename: string;
     extension: string;
     tags: string[];
+    isBookmarked: boolean;
 }
 
 // todo: this needs a better name
@@ -36,6 +43,7 @@ export const buildFromFile = (
         path: file.path,
         basename: file.basename,
         extension: file.extension,
-        tags: (stillMaybeMetadata ? getAllTags(stillMaybeMetadata) : []) ?? []
+        tags: (stillMaybeMetadata ? getAllTags(stillMaybeMetadata) : []) ?? [],
+        isBookmarked: isBookmarked(app, file)
     };
 }

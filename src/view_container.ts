@@ -361,7 +361,10 @@ export abstract class ViewContainer extends GroupFolder {
             return true;
         }
 
-        // todo: if bookmark status changed, re-render
+        // if the bookmark status changed, reload
+        if (maybeCache.state.isBookmarked !== state.isBookmarked) {
+            return true;
+        }
 
         // frontmatter changes don't always need reloads, but might as well.
         // might want to be more discerning with this in the future.
