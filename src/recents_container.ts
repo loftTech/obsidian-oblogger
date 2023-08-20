@@ -43,6 +43,7 @@ export class RecentsContainer extends ViewContainer {
     }
 
     protected wouldBeRendered(state: FileModificationEventDetails): boolean {
+        // We would always render a single file
         return true;
     }
 

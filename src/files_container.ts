@@ -44,6 +44,9 @@ export class FilesContainer extends ViewContainer {
         oldState: FileModificationEventDetails,
         newState: FileModificationEventDetails
     ): boolean {
+        // Since these files don't have metadata, then we never need to re-render
+        // based on a specific file change. We will re-render when more broad
+        // render events happen (like files added/deleted)
         return false;
     }
 

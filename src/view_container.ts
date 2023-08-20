@@ -332,7 +332,16 @@ export abstract class ViewContainer extends GroupFolder {
         return !oldTags.some(oldTag => !newTags.contains(oldTag));
     }
 
-    private shouldFileCauseRender(state: FileModificationEventDetails): boolean {
+    private shouldFileCauseRender(
+        state: FileModificationEventDetails,
+        excludedFolders: string[]
+    ): boolean {
+
+        // todo: test if it gets added or removed from a path
+        if (excludedFolders.contains(state.path)) {
+            return false;
+        }
+
         const maybeCache = this.renderedFileCaches.find(
             renderedCache => renderedCache.file === state.file);
         if (!maybeCache) {
@@ -377,8 +386,8 @@ export abstract class ViewContainer extends GroupFolder {
         modifiedFiles: FileModificationEventDetails[]
     ) {
         if (modifiedFiles.length > 0) {
-            if (!modifiedFiles.some(modificationDetails => {
-                return this.shouldFileCauseRender(modificationDetails);
+            if (!modifiedFiles.some(state => {
+                return this.shouldFileCauseRender(state, excludedFolders);
             })) {
                 console.log(`skipping rendering of ${this.groupName}`)
                 return;
