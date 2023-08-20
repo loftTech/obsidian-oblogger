@@ -41,29 +41,36 @@ export class DailiesContainer extends ViewContainer {
         this.fileEntryDates = [];
     }
 
-    protected shouldRerenderOnModification(
-        modifiedFile: FileModificationEventDetails,
-        excludedFolders: string[]
+    protected shouldRender(
+        oldState: FileModificationEventDetails,
+        newState: FileModificationEventDetails
     ): boolean {
-        const shouldBeIncluded = this.shouldIncludeFile(modifiedFile.file, excludedFolders);
-        const isIncluded = this.hasFileWithin(modifiedFile.file);
-
-        if (shouldBeIncluded != isIncluded) {
-            return true;
-        }
-
-        if (!isIncluded && !shouldBeIncluded) {
-            // file is irrelevant
-            return false;
-        }
-
-        // file is already included and should be, but check if the date changed
-        const existingDate = this.fileEntryDates.find(
-            fileDate => fileDate.file === modifiedFile.file)?.date;
-        const modifiedDate = this.getDailyDate(modifiedFile.file, true);
-
-        return existingDate != modifiedDate;
+        return false;
     }
+
+    // protected shouldRerenderOnModification(
+    //     modifiedFile: FileModificationEventDetails,
+    //     excludedFolders: string[]
+    // ): boolean {
+    //     const shouldBeIncluded = this.shouldIncludeFile(modifiedFile.file, excludedFolders);
+    //     const isIncluded = this.hasFileWithin(modifiedFile.file);
+    //
+    //     if (shouldBeIncluded != isIncluded) {
+    //         return true;
+    //     }
+    //
+    //     if (!isIncluded && !shouldBeIncluded) {
+    //         // file is irrelevant
+    //         return false;
+    //     }
+    //
+    //     // file is already included and should be, but check if the date changed
+    //     const existingDate = this.fileEntryDates.find(
+    //         fileDate => fileDate.file === modifiedFile.file)?.date;
+    //     const modifiedDate = this.getDailyDate(modifiedFile.file, true);
+    //
+    //     return existingDate != modifiedDate;
+    // }
 
     protected getEmptyMessage(): string {
         return `No documents tagged #${this.settings.dailiesTag};`

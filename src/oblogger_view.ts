@@ -20,7 +20,7 @@ import { ImageFileSuggestModal } from "./image_file_suggest_modal";
 import { ViewContainer } from "./view_container";
 import { buildSeparator } from "./misc_components";
 import { NewTagModal } from "./new_tag_modal";
-import { FileModificationEventDetails } from "./constants";
+import { buildFromFile, FileModificationEventDetails } from "./constants";
 
 export const VIEW_TYPE_OBLOGGER = "oblogger-view";
 const RENDER_DELAY_MS = 100;
@@ -147,10 +147,7 @@ export class ObloggerView extends ItemView {
                 fileContents: string,
                 fileMetadata: CachedMetadata
             ) => {
-                this.requestRender({
-                    file: fileChanged,
-                    metadata: fileMetadata
-                });
+                this.requestRender(buildFromFile(this.app, fileChanged, fileMetadata));
             })
         );
 

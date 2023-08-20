@@ -44,44 +44,51 @@ export class UntaggedContainer extends ViewContainer {
             false); // isPinned
     }
 
-    protected shouldRerenderOnModification(
-        modifiedFile: FileModificationEventDetails
+    protected shouldRender(
+      oldState: FileModificationEventDetails,
+      newState: FileModificationEventDetails
     ): boolean {
-        const renderedFile = this.renderedFiles.find(rf => rf.file === modifiedFile.file);
-        const wasUntagged = renderedFile !== undefined;
-
-        const isUntagged = (getAllTags(modifiedFile.metadata)?.length ?? 0) === 0;
-        if (wasUntagged !== isUntagged) {
-            // it was rendered (meaning it was untagged) but now it has tags, or
-            // it was not rendered (meaning it had tags) but now is untagged...redraw
-            return true;
-
-        }
-        if (!isUntagged) {
-            // irrelevant
-            return false;
-
-        }
-        // if we're sorting by created and the created time changed, redraw
-        if (
-            renderedFile?.ctime !== modifiedFile.file.stat.ctime &&
-            this.getGroupSetting()?.sortMethod === ContainerSortMethod.CTIME
-        ) {
-            return true;
-
-        }
-        // if we're sorting by modified and the modified time changed and
-        // the file is not in the top or bottom depending on ordering, redraw
-        return renderedFile?.mtime !== modifiedFile.file.stat.mtime &&
-          this.getGroupSetting()?.sortMethod === ContainerSortMethod.MTIME &&
-          (
-            this.getGroupSetting()?.sortAscending ?
-              this.renderedFiles.first() :
-              this.renderedFiles.last()
-          )?.file !== modifiedFile.file;
-
-
+        return false;
     }
+    //
+    // protected shouldRerenderOnModification(
+    //     modifiedFile: FileModificationEventDetails
+    // ): boolean {
+    //     const renderedFile = this.renderedFiles.find(rf => rf.file === modifiedFile.file);
+    //     const wasUntagged = renderedFile !== undefined;
+    //
+    //     const isUntagged = (getAllTags(modifiedFile.metadata)?.length ?? 0) === 0;
+    //     if (wasUntagged !== isUntagged) {
+    //         // it was rendered (meaning it was untagged) but now it has tags, or
+    //         // it was not rendered (meaning it had tags) but now is untagged...redraw
+    //         return true;
+    //
+    //     }
+    //     if (!isUntagged) {
+    //         // irrelevant
+    //         return false;
+    //
+    //     }
+    //     // if we're sorting by created and the created time changed, redraw
+    //     if (
+    //         renderedFile?.ctime !== modifiedFile.file.stat.ctime &&
+    //         this.getGroupSetting()?.sortMethod === ContainerSortMethod.CTIME
+    //     ) {
+    //         return true;
+    //
+    //     }
+    //     // if we're sorting by modified and the modified time changed and
+    //     // the file is not in the top or bottom depending on ordering, redraw
+    //     return renderedFile?.mtime !== modifiedFile.file.stat.mtime &&
+    //       this.getGroupSetting()?.sortMethod === ContainerSortMethod.MTIME &&
+    //       (
+    //         this.getGroupSetting()?.sortAscending ?
+    //           this.renderedFiles.first() :
+    //           this.renderedFiles.last()
+    //       )?.file !== modifiedFile.file;
+    //
+    //
+    // }
 
     protected getEmptyMessage(): string {
         return "No untagged documents";

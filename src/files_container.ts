@@ -2,6 +2,7 @@ import { ViewContainer } from "./view_container";
 import { FileAddedCallback, FileClickCallback } from "./group_folder";
 import { ObloggerSettings, ContainerSortMethod, getSortMethodDisplayText, RxGroupType, getFileType } from "./settings";
 import { App, Menu, MenuItem, moment, TFile } from "obsidian";
+import { FileModificationEventDetails } from "./constants";
 
 export class FilesContainer extends ViewContainer {
     constructor(
@@ -35,12 +36,19 @@ export class FilesContainer extends ViewContainer {
             false); // isPinned
     }
 
-    protected shouldRerenderOnModification(): boolean {
-        // Since these files don't have metadata, then we never need to re-render
-        // based on a specific file change. We will re-render when more broad
-        // render events happen (like files added/deleted)
+    protected shouldRender(
+        oldState: FileModificationEventDetails,
+        newState: FileModificationEventDetails
+    ): boolean {
         return false;
     }
+
+    // protected shouldRerenderOnModification(): boolean {
+    //     // Since these files don't have metadata, then we never need to re-render
+    //     // based on a specific file change. We will re-render when more broad
+    //     // render events happen (like files added/deleted)
+    //     return false;
+    // }
 
     protected getEmptyMessage(): string {
         return "No special files";

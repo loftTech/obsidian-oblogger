@@ -1,7 +1,13 @@
-import { App, Menu, setIcon, TFile } from "obsidian";
+import { App, FrontMatterCache, Menu, setIcon, TFile } from "obsidian";
 import { FileClickCallback, GroupFolder, FileAddedCallback } from "./group_folder";
 import { ObloggerSettings, RxGroupSettings } from "./settings";
-import { FileModificationEventDetails } from "./constants";
+import { buildFromFile, FileModificationEventDetails } from "./constants";
+import { keys } from "builtin-modules";
+
+interface RenderedFileCache {
+    file: TFile;
+    state: FileModificationEventDetails
+}
 
 export abstract class ViewContainer extends GroupFolder {
     settings: ObloggerSettings;
@@ -9,6 +15,7 @@ export abstract class ViewContainer extends GroupFolder {
     canCollapseInnerFolders: boolean;
     canBePinned: boolean;
     isPinned: boolean;
+    renderedFileCaches: RenderedFileCache[]
 
     fileClickCallback: FileClickCallback;
     fileAddedCallback: FileAddedCallback;
@@ -31,9 +38,9 @@ export abstract class ViewContainer extends GroupFolder {
     protected abstract getHideText(): string;
     protected abstract getHideIcon(): string;
     protected abstract getEmptyMessage(): string;
-    protected abstract shouldRerenderOnModification(
-        modifiedFile: FileModificationEventDetails,
-        excludedFolders: string[]
+    protected abstract shouldRender(
+        oldState: FileModificationEventDetails,
+        newState: FileModificationEventDetails
     ): boolean;
 
     protected constructor(
@@ -79,6 +86,17 @@ export abstract class ViewContainer extends GroupFolder {
         this.hideCallback = hideCallback;
         this.moveCallback = moveCallback;
         this.pinCallback = pinCallback;
+    }
+
+    protected addFileToFolder(
+      file: TFile,
+      remainingTag: string,
+      pathPrefix: string
+    ) {
+        const state = buildFromFile(this.app, file);
+        this.renderedFileCaches.push({ file, state });
+
+        super.addFileToFolder(file, remainingTag, pathPrefix);
     }
 
     protected isVisible(): boolean {
@@ -265,6 +283,7 @@ export abstract class ViewContainer extends GroupFolder {
         // Clear
         this.sortedFiles = [];
         this.sortedSubFolders = [];
+        this.renderedFileCaches = [];
 
         // Build
         this.buildFileStructure(excludedFolders);
@@ -280,16 +299,82 @@ export abstract class ViewContainer extends GroupFolder {
         });
     }
 
+    private frontmattersEqual(
+        oldFrontmatter?: FrontMatterCache,
+        newFrontmatter?: FrontMatterCache
+    ) {
+        if (oldFrontmatter === undefined && newFrontmatter === undefined) {
+            return true;
+        }
+        if (oldFrontmatter === undefined || newFrontmatter === undefined) {
+            return false;
+        }
+
+        const oldKeys = Object.keys(oldFrontmatter);
+        const newKeys = Object.keys(newFrontmatter);
+        if (oldKeys.length !== newKeys.length) {
+            return false;
+        }
+
+        return !oldKeys.some(oldKey => {
+            // skip over this key
+            if (oldKey === "position") {
+                return false;
+            }
+            return newFrontmatter[oldKey] !== oldFrontmatter[oldKey];
+
+        });
+
+
+
+    }
+
     public render(
         collapsedFolders: string[],
         excludedFolders: string[],
         modifiedFiles: FileModificationEventDetails[]
     ) {
-        if (modifiedFiles.length > 0 && !modifiedFiles.some(
-            f => this.shouldRerenderOnModification(f, excludedFolders))
-        ) {
-            return;
+        if (modifiedFiles.length > 0) {
+            if (!modifiedFiles.some(modificationDetails => {
+                const maybeCache = this.renderedFileCaches.find(
+                    renderedCache => renderedCache.file === modificationDetails.file);
+                if (!maybeCache) {
+                    console.log(`file ${modificationDetails.file.name} not in ${this.groupName}`);
+                    return false;
+                }
+
+                // did the frontmatter change?
+                const oldFrontmatter = maybeCache.state.maybeMetadata?.frontmatter;
+                const newFrontmatter = modificationDetails.maybeMetadata?.frontmatter;
+                if (!this.frontmattersEqual(oldFrontmatter, newFrontmatter)) {
+                    console.log(`file ${modificationDetails.file.name} had frontmatter change`)
+                    return true;
+                }
+
+                // any container-specific rendering decisions?
+                if (this.shouldRender(maybeCache.state, modificationDetails)) {
+                    return true;
+                }
+
+                // if (maybeCache.cache === modificationDetails.metadata) {
+                //     console.log(`file ${modificationDetails.file.name} in ${this.groupName} but metadata unchanged`);
+                //     return false;
+                // }
+
+                // todo: i left off at the point where i'm not doing any specific
+                //  filtering of events. if it's included, redraw it.
+                return true;
+            })) {
+                console.log(`skipping rendering of ${this.groupName}`)
+                return;
+            }
         }
+        // if (modifiedFiles.length > 0 && !modifiedFiles.some(
+        //     f => this.shouldRerenderOnModification(f, excludedFolders))
+        // ) {
+        //     console.log(`skipping rendering of ${this.groupName}`)
+        //     return;
+        // }
 
         this.rebuildFileStructure(excludedFolders);
 

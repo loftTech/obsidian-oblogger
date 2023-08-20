@@ -1,4 +1,4 @@
-import { CachedMetadata, TFile } from "obsidian";
+import { App, CachedMetadata, TFile } from "obsidian";
 
 const MINIMUM_DESKTOP_RESOLUTION_WIDTH_PX = 500;
 
@@ -9,7 +9,30 @@ export function isDesktopLikeResolution() {
     return window.screen.availWidth >= MINIMUM_DESKTOP_RESOLUTION_WIDTH_PX;
 }
 
+// todo: this needs a better name
 export interface FileModificationEventDetails {
     file: TFile;
-    metadata: CachedMetadata;
+    maybeMetadata?: CachedMetadata;
+    mtime: number;
+    ctime: number;
+    path: string;
+    basename: string;
+    extension: string;
+}
+
+// todo: this needs a better name
+export const buildFromFile = (
+    app: App,
+    file: TFile,
+    maybeMetadata?: CachedMetadata
+) : FileModificationEventDetails => {
+    return {
+        file,
+        maybeMetadata: (maybeMetadata ?? app.metadataCache.getFileCache(file)) ?? undefined,
+        mtime: file.stat.mtime,
+        ctime: file.stat.ctime,
+        path: file.path,
+        basename: file.basename,
+        extension: file.extension
+    };
 }

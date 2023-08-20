@@ -50,40 +50,47 @@ export class TagGroupContainer extends ViewContainer {
         );
     }
 
-    protected shouldRerenderOnModification(
-        modifiedFile: FileModificationEventDetails,
-        excludedFolders: string[]
+    protected shouldRender(
+        oldState: FileModificationEventDetails,
+        newState: FileModificationEventDetails
     ): boolean {
-        const currentFileTags = this.getFileTags(
-            modifiedFile.file,
-            excludedFolders,
-            this.getIsolatedTagMatch()?.at(1));
-        const shouldBeIncluded = currentFileTags !== null;
-        const isIncluded = this.hasFileWithin(modifiedFile.file);
-        if (shouldBeIncluded !== isIncluded) {
-            return true;
-        }
-
-        if (!isIncluded) {
-            // irrelevant
-            return false;
-        }
-
-        const fileTags = this.renderedFileTags.find(fileTags => fileTags.file === modifiedFile.file);
-        if (!fileTags) {
-            // something went wrong with the caching, default to re-rendering
-            console.debug("Cache invalidation error with rendered file tags.");
-            return true;
-        }
-
-        const currentTags = currentFileTags?.tags.sort();
-        if (currentTags?.length !== fileTags.tags.length) {
-            return true;
-        }
-        return fileTags.tags.sort().some((tag, index) => {
-            return tag !== currentTags.at(index);
-        });
+        return false;
     }
+
+    // protected shouldRerenderOnModification(
+    //     modifiedFile: FileModificationEventDetails,
+    //     excludedFolders: string[]
+    // ): boolean {
+    //     const currentFileTags = this.getFileTags(
+    //         modifiedFile.file,
+    //         excludedFolders,
+    //         this.getIsolatedTagMatch()?.at(1));
+    //     const shouldBeIncluded = currentFileTags !== null;
+    //     const isIncluded = this.hasFileWithin(modifiedFile.file);
+    //     if (shouldBeIncluded !== isIncluded) {
+    //         return true;
+    //     }
+    //
+    //     if (!isIncluded) {
+    //         // irrelevant
+    //         return false;
+    //     }
+    //
+    //     const fileTags = this.renderedFileTags.find(fileTags => fileTags.file === modifiedFile.file);
+    //     if (!fileTags) {
+    //         // something went wrong with the caching, default to re-rendering
+    //         console.debug("Cache invalidation error with rendered file tags.");
+    //         return true;
+    //     }
+    //
+    //     const currentTags = currentFileTags?.tags.sort();
+    //     if (currentTags?.length !== fileTags.tags.length) {
+    //         return true;
+    //     }
+    //     return fileTags.tags.sort().some((tag, index) => {
+    //         return tag !== currentTags.at(index);
+    //     });
+    // }
 
     protected getEmptyMessage(): string {
         return "";
