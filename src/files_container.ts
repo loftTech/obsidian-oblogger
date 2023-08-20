@@ -36,6 +36,10 @@ export class FilesContainer extends ViewContainer {
             false); // isPinned
     }
 
+    protected wouldBeRendered(state: FileModificationEventDetails): boolean {
+        return true;
+    }
+
     protected shouldRender(
         oldState: FileModificationEventDetails,
         newState: FileModificationEventDetails

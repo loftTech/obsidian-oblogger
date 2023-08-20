@@ -2,7 +2,6 @@ import { App, FrontMatterCache, Menu, setIcon, TFile } from "obsidian";
 import { FileClickCallback, GroupFolder, FileAddedCallback } from "./group_folder";
 import { ObloggerSettings, RxGroupSettings } from "./settings";
 import { buildFromFile, FileModificationEventDetails } from "./constants";
-import { keys } from "builtin-modules";
 
 interface RenderedFileCache {
     file: TFile;
@@ -38,6 +37,7 @@ export abstract class ViewContainer extends GroupFolder {
     protected abstract getHideText(): string;
     protected abstract getHideIcon(): string;
     protected abstract getEmptyMessage(): string;
+    protected abstract wouldBeRendered(state: FileModificationEventDetails): boolean;
     protected abstract shouldRender(
         oldState: FileModificationEventDetails,
         newState: FileModificationEventDetails
@@ -322,11 +322,53 @@ export abstract class ViewContainer extends GroupFolder {
                 return false;
             }
             return newFrontmatter[oldKey] !== oldFrontmatter[oldKey];
-
         });
+    }
 
+    private tagsEqual(oldTags: string[], newTags: string[]): boolean {
+        if (oldTags.length !== newTags.length) {
+            return false;
+        }
+        return !oldTags.some(oldTag => !newTags.contains(oldTag));
+    }
 
+    private shouldFileCauseRender(state: FileModificationEventDetails): boolean {
+        const maybeCache = this.renderedFileCaches.find(
+            renderedCache => renderedCache.file === state.file);
+        if (!maybeCache) {
+            return this.wouldBeRendered(state);
+        }
 
+        // has the frontmatter changed?
+        const oldFrontmatter = maybeCache.state.maybeMetadata?.frontmatter;
+        const newFrontmatter = state.maybeMetadata?.frontmatter;
+        if (!this.frontmattersEqual(oldFrontmatter, newFrontmatter)) {
+            return true;
+        }
+
+        // have the tags changed?
+        const oldTags = maybeCache.state.tags;
+        const newTags = state.tags;
+        console.log(oldTags);
+        console.log(newTags);
+        if (!this.tagsEqual(oldTags, newTags)) {
+            console.log(`tags aren't equal, causing a rendering of ${this.groupName}`)
+            return true;
+        }
+
+        // any container-specific rendering decisions?
+        if (this.shouldRender(maybeCache.state, state)) {
+            return true;
+        }
+
+        // if (maybeCache.cache === modificationDetails.metadata) {
+        //     console.log(`file ${modificationDetails.file.name} in ${this.groupName} but metadata unchanged`);
+        //     return false;
+        // }
+
+        // todo: i left off at the point where i'm not doing any specific
+        //  filtering of events. if it's included, redraw it.
+        return true;
     }
 
     public render(
@@ -336,34 +378,7 @@ export abstract class ViewContainer extends GroupFolder {
     ) {
         if (modifiedFiles.length > 0) {
             if (!modifiedFiles.some(modificationDetails => {
-                const maybeCache = this.renderedFileCaches.find(
-                    renderedCache => renderedCache.file === modificationDetails.file);
-                if (!maybeCache) {
-                    console.log(`file ${modificationDetails.file.name} not in ${this.groupName}`);
-                    return false;
-                }
-
-                // did the frontmatter change?
-                const oldFrontmatter = maybeCache.state.maybeMetadata?.frontmatter;
-                const newFrontmatter = modificationDetails.maybeMetadata?.frontmatter;
-                if (!this.frontmattersEqual(oldFrontmatter, newFrontmatter)) {
-                    console.log(`file ${modificationDetails.file.name} had frontmatter change`)
-                    return true;
-                }
-
-                // any container-specific rendering decisions?
-                if (this.shouldRender(maybeCache.state, modificationDetails)) {
-                    return true;
-                }
-
-                // if (maybeCache.cache === modificationDetails.metadata) {
-                //     console.log(`file ${modificationDetails.file.name} in ${this.groupName} but metadata unchanged`);
-                //     return false;
-                // }
-
-                // todo: i left off at the point where i'm not doing any specific
-                //  filtering of events. if it's included, redraw it.
-                return true;
+                return this.shouldFileCauseRender(modificationDetails);
             })) {
                 console.log(`skipping rendering of ${this.groupName}`)
                 return;

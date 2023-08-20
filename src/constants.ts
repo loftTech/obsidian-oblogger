@@ -1,4 +1,4 @@
-import { App, CachedMetadata, TFile } from "obsidian";
+import { App, CachedMetadata, getAllTags, TFile } from "obsidian";
 
 const MINIMUM_DESKTOP_RESOLUTION_WIDTH_PX = 500;
 
@@ -18,6 +18,7 @@ export interface FileModificationEventDetails {
     path: string;
     basename: string;
     extension: string;
+    tags: string[];
 }
 
 // todo: this needs a better name
@@ -26,13 +27,15 @@ export const buildFromFile = (
     file: TFile,
     maybeMetadata?: CachedMetadata
 ) : FileModificationEventDetails => {
+    const stillMaybeMetadata = (maybeMetadata ?? app.metadataCache.getFileCache(file)) ?? undefined;
     return {
         file,
-        maybeMetadata: (maybeMetadata ?? app.metadataCache.getFileCache(file)) ?? undefined,
+        maybeMetadata: stillMaybeMetadata,
         mtime: file.stat.mtime,
         ctime: file.stat.ctime,
         path: file.path,
         basename: file.basename,
-        extension: file.extension
+        extension: file.extension,
+        tags: (stillMaybeMetadata ? getAllTags(stillMaybeMetadata) : []) ?? []
     };
 }

@@ -42,6 +42,10 @@ export class RecentsContainer extends ViewContainer {
         this.recentsCount = settings.recentsCount;
     }
 
+    protected wouldBeRendered(state: FileModificationEventDetails): boolean {
+        return true;
+    }
+
     protected shouldRender(
         oldState: FileModificationEventDetails,
         newState: FileModificationEventDetails

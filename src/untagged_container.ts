@@ -44,6 +44,10 @@ export class UntaggedContainer extends ViewContainer {
             false); // isPinned
     }
 
+    protected wouldBeRendered(state: FileModificationEventDetails): boolean {
+        return state.tags.length === 0;
+    }
+
     protected shouldRender(
       oldState: FileModificationEventDetails,
       newState: FileModificationEventDetails

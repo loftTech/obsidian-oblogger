@@ -48,6 +48,10 @@ export class DailiesContainer extends ViewContainer {
         return false;
     }
 
+    protected wouldBeRendered(state: FileModificationEventDetails): boolean {
+        return true;
+    }
+
     // protected shouldRerenderOnModification(
     //     modifiedFile: FileModificationEventDetails,
     //     excludedFolders: string[]

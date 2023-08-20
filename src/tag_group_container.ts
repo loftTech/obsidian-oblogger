@@ -50,6 +50,10 @@ export class TagGroupContainer extends ViewContainer {
         );
     }
 
+    protected wouldBeRendered(state: FileModificationEventDetails): boolean {
+        return true;
+    }
+
     protected shouldRender(
         oldState: FileModificationEventDetails,
         newState: FileModificationEventDetails
