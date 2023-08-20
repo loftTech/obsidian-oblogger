@@ -1,9 +1,9 @@
-import { App, getAllTags, Menu, moment, Notice, TFile } from "obsidian";
+import { App, FrontMatterCache, getAllTags, Menu, moment, Notice, TFile } from "obsidian";
 import { FileClickCallback, FileAddedCallback } from "./group_folder";
 import { ViewContainer } from "./view_container";
 import { ObloggerSettings, RxGroupType } from "./settings";
 import { NewTagModal } from "./new_tag_modal";
-import { FileModificationEventDetails } from "./constants";
+import { FileState } from "./constants";
 
 export class DailiesContainer extends ViewContainer {
     fileEntryDates: { file: TFile, date: string }[]
@@ -41,28 +41,23 @@ export class DailiesContainer extends ViewContainer {
         this.fileEntryDates = [];
     }
 
-    protected shouldRerenderOnModification(
-        modifiedFile: FileModificationEventDetails,
-        excludedFolders: string[]
+    protected shouldRender(
+        oldState: FileState,
+        newState: FileState
     ): boolean {
-        const shouldBeIncluded = this.shouldIncludeFile(modifiedFile.file, excludedFolders);
-        const isIncluded = this.hasFileWithin(modifiedFile.file);
+        const oldDailyDate = this.getDailyDate(
+            oldState.ctime,
+            true,
+            oldState.maybeMetadata?.frontmatter);
+        const newDailyDate = this.getDailyDate(
+            newState.ctime,
+            true,
+            newState.maybeMetadata?.frontmatter);
+        return oldDailyDate !== newDailyDate;
+    }
 
-        if (shouldBeIncluded != isIncluded) {
-            return true;
-        }
-
-        if (!isIncluded && !shouldBeIncluded) {
-            // file is irrelevant
-            return false;
-        }
-
-        // file is already included and should be, but check if the date changed
-        const existingDate = this.fileEntryDates.find(
-            fileDate => fileDate.file === modifiedFile.file)?.date;
-        const modifiedDate = this.getDailyDate(modifiedFile.file, true);
-
-        return existingDate != modifiedDate;
+    protected wouldBeRendered(state: FileState): boolean {
+        return state.tags.contains("#" + this.settings.dailiesTag);
     }
 
     protected getEmptyMessage(): string {
@@ -146,11 +141,14 @@ export class DailiesContainer extends ViewContainer {
 
     }
 
-    private getDailyDate(daily: TFile, dayPrecision: boolean): string {
-        const cache = this.app.metadataCache.getFileCache(daily);
-        return moment(cache?.frontmatter?.day ??
-            cache?.frontmatter?.created ??
-            daily.stat.ctime).format(dayPrecision ? "YYYY-MM-DD" : "YYYY-MM");
+    private getDailyDate(
+        ctime: number,
+        dayPrecision: boolean,
+        frontmatter?: FrontMatterCache
+    ): string {
+        return moment(frontmatter?.day ??
+            frontmatter?.created ??
+            ctime).format(dayPrecision ? "YYYY-MM-DD" : "YYYY-MM");
     }
 
     protected buildFileStructure(excludedFolders: string[]) {
@@ -162,8 +160,10 @@ export class DailiesContainer extends ViewContainer {
                 return this.shouldIncludeFile(file, excludedFolders);
             })
             .sort((fileA: TFile, fileB: TFile): number => {
-                const monthA = this.getDailyDate(fileA, false);
-                const monthB = this.getDailyDate(fileB, false);
+                const cacheA = this.app.metadataCache.getFileCache(fileA);
+                const cacheB = this.app.metadataCache.getFileCache(fileB);
+                const monthA = this.getDailyDate(fileA.stat.ctime, false, cacheA?.frontmatter);
+                const monthB = this.getDailyDate(fileB.stat.ctime, false, cacheB?.frontmatter);
                 if (monthA > monthB) {
                     return -1;
                 }
@@ -176,12 +176,16 @@ export class DailiesContainer extends ViewContainer {
                     return bookmarkSorting;
                 }
 
-                const dayA = this.getDailyDate(fileA, true);
-                const dayB = this.getDailyDate(fileB, true);
+                const dayA = this.getDailyDate(fileA.stat.ctime, true, cacheA?.frontmatter);
+                const dayB = this.getDailyDate(fileB.stat.ctime, true, cacheB?.frontmatter);
                 return dayA > dayB ? -1 : dayA < dayB ? 1 : 0;
             })
             .forEach((file: TFile) => {
-                const dailyDateString = this.getDailyDate(file, true);
+                const cache = this.app.metadataCache.getFileCache(file);
+                const dailyDateString = this.getDailyDate(
+                    file.stat.ctime,
+                    true,
+                    cache?.frontmatter);
                 this.fileEntryDates.push({file, date: dailyDateString});
                 const dailyDate = moment(dailyDateString);
                 const dailyDateYear = dailyDate.format("YYYY");

@@ -1,7 +1,12 @@
-import { App, Menu, setIcon, TFile } from "obsidian";
+import { App, FrontMatterCache, Menu, setIcon, TFile } from "obsidian";
 import { FileClickCallback, GroupFolder, FileAddedCallback } from "./group_folder";
 import { ObloggerSettings, RxGroupSettings } from "./settings";
-import { FileModificationEventDetails } from "./constants";
+import { buildStateFromFile, FileState } from "./constants";
+
+interface RenderedFileCache {
+    file: TFile;
+    state: FileState
+}
 
 export abstract class ViewContainer extends GroupFolder {
     settings: ObloggerSettings;
@@ -9,6 +14,7 @@ export abstract class ViewContainer extends GroupFolder {
     canCollapseInnerFolders: boolean;
     canBePinned: boolean;
     isPinned: boolean;
+    renderedFileCaches: RenderedFileCache[]
 
     fileClickCallback: FileClickCallback;
     fileAddedCallback: FileAddedCallback;
@@ -31,9 +37,10 @@ export abstract class ViewContainer extends GroupFolder {
     protected abstract getHideText(): string;
     protected abstract getHideIcon(): string;
     protected abstract getEmptyMessage(): string;
-    protected abstract shouldRerenderOnModification(
-        modifiedFile: FileModificationEventDetails,
-        excludedFolders: string[]
+    protected abstract wouldBeRendered(state: FileState): boolean;
+    protected abstract shouldRender(
+        oldState: FileState,
+        newState: FileState
     ): boolean;
 
     protected constructor(
@@ -79,6 +86,17 @@ export abstract class ViewContainer extends GroupFolder {
         this.hideCallback = hideCallback;
         this.moveCallback = moveCallback;
         this.pinCallback = pinCallback;
+    }
+
+    protected addFileToFolder(
+      file: TFile,
+      remainingTag: string,
+      pathPrefix: string
+    ) {
+        const state = buildStateFromFile(this.app, file);
+        this.renderedFileCaches.push({ file, state });
+
+        super.addFileToFolder(file, remainingTag, pathPrefix);
     }
 
     protected isVisible(): boolean {
@@ -265,6 +283,7 @@ export abstract class ViewContainer extends GroupFolder {
         // Clear
         this.sortedFiles = [];
         this.sortedSubFolders = [];
+        this.renderedFileCaches = [];
 
         // Build
         this.buildFileStructure(excludedFolders);
@@ -280,16 +299,107 @@ export abstract class ViewContainer extends GroupFolder {
         });
     }
 
+    private frontmattersEqual(
+        oldFrontmatter?: FrontMatterCache,
+        newFrontmatter?: FrontMatterCache
+    ) {
+        if (oldFrontmatter === undefined && newFrontmatter === undefined) {
+            return true;
+        }
+        if (oldFrontmatter === undefined || newFrontmatter === undefined) {
+            return false;
+        }
+
+        const oldKeys = Object.keys(oldFrontmatter);
+        const newKeys = Object.keys(newFrontmatter);
+        if (oldKeys.length !== newKeys.length) {
+            return false;
+        }
+
+        return !oldKeys.some(oldKey => {
+            // skip over this key
+            if (oldKey === "position") {
+                return false;
+            }
+            return newFrontmatter[oldKey] !== oldFrontmatter[oldKey];
+        });
+    }
+
+    private tagsEqual(oldTags: string[], newTags: string[]): boolean {
+        if (oldTags.length !== newTags.length) {
+            return false;
+        }
+        return !oldTags.some(oldTag => !newTags.contains(oldTag));
+    }
+
+    private shouldFileCauseRender(
+        state: FileState,
+        excludedFolders: string[]
+    ): boolean {
+        const isExcluded = excludedFolders.contains(state.path);
+        const maybeCache = this.renderedFileCaches.find(
+            renderedCache => renderedCache.file === state.file);
+
+        // not excluded but no cache, only re-render if the file would be rendered
+        if (!maybeCache && !isExcluded) {
+            return this.wouldBeRendered(state);
+        }
+
+        // file is now excluded, and it either wasn't excluded or we have a cache
+        const wasExcluded = excludedFolders.contains(maybeCache?.file.path ?? "");
+        if (isExcluded && (!wasExcluded || !!maybeCache)) {
+            return true;
+        }
+
+        // no cache or it's excluded, shouldn't need to re-render
+        if (!maybeCache || isExcluded) {
+            return false;
+        }
+
+        // name changes should always be reloaded
+        if (maybeCache.state.basename !== state.basename) {
+            return true;
+        }
+
+        // if the bookmark status changed, reload
+        if (maybeCache.state.isBookmarked !== state.isBookmarked) {
+            return true;
+        }
+
+        // frontmatter changes don't always need reloads, but might as well.
+        // might want to be more discerning with this in the future.
+        const oldFrontmatter = maybeCache.state.maybeMetadata?.frontmatter;
+        const newFrontmatter = state.maybeMetadata?.frontmatter;
+        if (!this.frontmattersEqual(oldFrontmatter, newFrontmatter)) {
+            return true;
+        }
+
+        // tag changes don't always need reloads, but might as well.
+        // might want to be more discerning with this in the future.
+        const oldTags = maybeCache.state.tags;
+        const newTags = state.tags;
+        if (!this.tagsEqual(oldTags, newTags)) {
+            return true;
+        }
+
+        // no generic decision to be made. ask the container if we should re-render
+        return this.shouldRender(maybeCache.state, state);
+    }
+
     public render(
         collapsedFolders: string[],
         excludedFolders: string[],
-        modifiedFiles: FileModificationEventDetails[]
+        modifiedFiles: FileState[]
     ) {
-        if (modifiedFiles.length > 0 && !modifiedFiles.some(
-            f => this.shouldRerenderOnModification(f, excludedFolders))
-        ) {
-            return;
+        if (modifiedFiles.length > 0) {
+            if (!modifiedFiles.some(state => {
+                return this.shouldFileCauseRender(state, excludedFolders);
+            })) {
+                console.log(`skipping rendering of ${this.groupName}`)
+                return;
+            }
         }
+        console.log(`rendering ${this.groupName}`)
 
         this.rebuildFileStructure(excludedFolders);
 

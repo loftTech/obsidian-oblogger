@@ -2,7 +2,7 @@ import { FileClickCallback, FileAddedCallback } from "./group_folder";
 import { ViewContainer } from "./view_container";
 import { App, Menu } from "obsidian";
 import { ObloggerSettings, RxGroupType } from "./settings";
-import { FileModificationEventDetails } from "./constants";
+import { FileState } from "./constants";
 
 const RECENT_COUNT_OPTIONS = [5, 10, 15];
 
@@ -42,12 +42,16 @@ export class RecentsContainer extends ViewContainer {
         this.recentsCount = settings.recentsCount;
     }
 
-    protected shouldRerenderOnModification(
-        modifiedFile: FileModificationEventDetails
+    protected wouldBeRendered(): boolean {
+        // We would always render a single file
+        return true;
+    }
+
+    protected shouldRender(
+        oldState: FileState,
+        newState: FileState
     ): boolean {
-        // if the first of the sorted files isn't the modified file, then we
-        // need to redraw.
-        return this.sortedFiles[0] !== modifiedFile.file;
+        return oldState.mtime !== newState.mtime && this.sortedFiles.first() !== newState.file;
     }
 
     protected getEmptyMessage(): string {

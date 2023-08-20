@@ -6,6 +6,7 @@ import {
     TFile
 } from "obsidian";
 import { getFileTypeIcon } from "./settings";
+import { isBookmarked } from "./constants";
 
 const COLLAPSED_CLASS_IDENTIFIER = "collapsed";
 
@@ -212,18 +213,12 @@ export class GroupFolder {
     }
 
     protected sortFilesByBookmark(fileA: TFile, fileB: TFile): number {
-        const isABookmarked = this.isBookmarked(fileA);
-        const isBBookmarked = this.isBookmarked(fileB);
+        const isABookmarked = isBookmarked(this.app, fileA);
+        const isBBookmarked = isBookmarked(this.app, fileB);
         return (
             isABookmarked && !isBBookmarked ? -1 :
             !isABookmarked && isBBookmarked ? 1 : 0
         );
-    }
-
-    protected isBookmarked(file: TFile): boolean {
-        return !!app.internalPlugins.plugins["bookmarks"].instance?.items?.find(item => {
-            return item.type === "file" && item.path === file.path
-        });
     }
 
     private buildFileElement(
@@ -273,7 +268,7 @@ Created at ${window.moment(file.stat.ctime).format("YYYY-MM-DD HH:mm")}`;
 
         const bookmarkIcon = document.createElement("div");
         bookmarkIcon.addClass("bookmark-icon");
-        if (this.isBookmarked(file)) {
+        if (isBookmarked(this.app, file)) {
             setIcon(bookmarkIcon, "bookmark");
             bookmarkIcon.ariaLabel = "Bookmarked";
         }

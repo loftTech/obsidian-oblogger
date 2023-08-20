@@ -2,7 +2,7 @@ import { App, getAllTags, Menu, MenuItem, TFile } from "obsidian";
 import { FileClickCallback, FileAddedCallback } from "./group_folder";
 import { ViewContainer } from "./view_container";
 import { ContainerSortMethod, getSortMethodDisplayText, ObloggerSettings } from "./settings";
-import { FileModificationEventDetails } from "./constants";
+import { FileState } from "./constants";
 
 
 type TagFileMap = { [key: string]: TFile[] };
@@ -50,39 +50,51 @@ export class TagGroupContainer extends ViewContainer {
         );
     }
 
-    protected shouldRerenderOnModification(
-        modifiedFile: FileModificationEventDetails,
-        excludedFolders: string[]
-    ): boolean {
-        const currentFileTags = this.getFileTags(
-            modifiedFile.file,
-            excludedFolders,
-            this.getIsolatedTagMatch()?.at(1));
-        const shouldBeIncluded = currentFileTags !== null;
-        const isIncluded = this.hasFileWithin(modifiedFile.file);
-        if (shouldBeIncluded !== isIncluded) {
-            return true;
-        }
-
-        if (!isIncluded) {
-            // irrelevant
+    protected wouldBeRendered(state: FileState): boolean {
+        // if we don't have metadata, then it's not going to be rendered
+        if (!state.maybeMetadata) {
             return false;
         }
+        // this code is duplicated below. it checks if the group name (tag) is
+        // included somewhere in the tags
+        const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
+        return (getAllTags(state.maybeMetadata)
+            ?.map(tag => tag.replace("#", ""))
+            ?.unique()
+            ?.filter((tag: string) => {
+                if (isolatedGroupName) {
+                    return tag.contains(isolatedGroupName);
+                } else {
+                    return tag.startsWith(this.groupName);
+                }
+            }).length ?? 0) > 0;
+    }
 
-        const fileTags = this.renderedFileTags.find(fileTags => fileTags.file === modifiedFile.file);
-        if (!fileTags) {
-            // something went wrong with the caching, default to re-rendering
-            console.debug("Cache invalidation error with rendered file tags.");
-            return true;
+    protected shouldRender(
+        oldState: FileState,
+        newState: FileState
+    ): boolean {
+        const groupSettings = this.getGroupSetting();
+        switch(groupSettings?.sortMethod) {
+            case ContainerSortMethod.ALPHABETICAL:
+                // shouldn't actually happen because we should be deciding
+                // to render before we hit this point. But just in case...
+                return oldState.basename !== newState.basename;
+            case ContainerSortMethod.CTIME:
+                return oldState.ctime !== newState.ctime;
+            case ContainerSortMethod.MTIME: {
+                // if the doc should be at the top/bottom of the list and it's
+                // not, then re-render
+                const oldMostRecentFile =
+                    groupSettings?.sortAscending ?
+                        this.sortedFiles.last() :
+                        this.sortedFiles.first();
+                return (
+                    oldState.mtime !== newState.mtime &&
+                    oldMostRecentFile !== newState.file);
+            }
         }
-
-        const currentTags = currentFileTags?.tags.sort();
-        if (currentTags?.length !== fileTags.tags.length) {
-            return true;
-        }
-        return fileTags.tags.sort().some((tag, index) => {
-            return tag !== currentTags.at(index);
-        });
+        return false;
     }
 
     protected getEmptyMessage(): string {
@@ -237,7 +249,10 @@ export class TagGroupContainer extends ViewContainer {
     private getAllAssociatedTags(excludedFolders: string[]): TagFileMap {
         const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
 
-        // This is fine, we're filtering out nulls
+        // This is pretty confusing bit of code. we're first getting all files
+        // and their tags (wrapped in special objects and saved to `renderedFileTags`,
+        // and then inverted to be a map of tag to list of files associated with
+        // that tag.
         this.renderedFileTags = this.app.vault
             .getMarkdownFiles()
             .map(file => this.getFileTags(file, excludedFolders, isolatedGroupName))

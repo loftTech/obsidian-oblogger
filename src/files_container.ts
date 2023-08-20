@@ -2,6 +2,7 @@ import { ViewContainer } from "./view_container";
 import { FileAddedCallback, FileClickCallback } from "./group_folder";
 import { ObloggerSettings, ContainerSortMethod, getSortMethodDisplayText, RxGroupType, getFileType } from "./settings";
 import { App, Menu, MenuItem, moment, TFile } from "obsidian";
+import { FileState } from "./constants";
 
 export class FilesContainer extends ViewContainer {
     constructor(
@@ -35,10 +36,25 @@ export class FilesContainer extends ViewContainer {
             false); // isPinned
     }
 
-    protected shouldRerenderOnModification(): boolean {
-        // Since these files don't have metadata, then we never need to re-render
-        // based on a specific file change. We will re-render when more broad
-        // render events happen (like files added/deleted)
+    protected wouldBeRendered(state: FileState): boolean {
+        return state.extension !== "md";
+    }
+
+    protected shouldRender(
+        oldState: FileState,
+        newState: FileState
+    ): boolean {
+        switch(this.getGroupSetting()?.sortMethod) {
+            case ContainerSortMethod.ALPHABETICAL:
+                return oldState.basename !== newState.basename;
+            case ContainerSortMethod.CTIME:
+                return oldState.ctime !== newState.ctime;
+            case ContainerSortMethod.MTIME:
+                return oldState.mtime !== newState.mtime;
+            case ContainerSortMethod.EXTENSION:
+            case ContainerSortMethod.TYPE:
+                return oldState.extension !== newState.extension;
+        }
         return false;
     }
 
