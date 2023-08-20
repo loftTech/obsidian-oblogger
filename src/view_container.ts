@@ -336,33 +336,50 @@ export abstract class ViewContainer extends GroupFolder {
         state: FileModificationEventDetails,
         excludedFolders: string[]
     ): boolean {
-
-        // todo: test if it gets added or removed from a path
-        if (excludedFolders.contains(state.path)) {
-            return false;
-        }
-
+        const isExcluded = excludedFolders.contains(state.path);
         const maybeCache = this.renderedFileCaches.find(
             renderedCache => renderedCache.file === state.file);
-        if (!maybeCache) {
+
+        // not excluded but no cache, only re-render if the file would be rendered
+        if (!maybeCache && !isExcluded) {
             return this.wouldBeRendered(state);
         }
 
-        // has the frontmatter changed?
+        // file is now excluded, and it either wasn't excluded or we have a cache
+        const wasExcluded = excludedFolders.contains(maybeCache?.file.path ?? "");
+        if (isExcluded && (!wasExcluded || !!maybeCache)) {
+            return true;
+        }
+
+        // no cache or it's excluded, shouldn't need to re-render
+        if (!maybeCache || isExcluded) {
+            return false;
+        }
+
+        // name changes should always be reloaded
+        if (maybeCache.state.basename !== state.basename) {
+            return true;
+        }
+
+        // todo: if bookmark status changed, re-render
+
+        // frontmatter changes don't always need reloads, but might as well.
+        // might want to be more discerning with this in the future.
         const oldFrontmatter = maybeCache.state.maybeMetadata?.frontmatter;
         const newFrontmatter = state.maybeMetadata?.frontmatter;
         if (!this.frontmattersEqual(oldFrontmatter, newFrontmatter)) {
             return true;
         }
 
-        // have the tags changed?
+        // tag changes don't always need reloads, but might as well.
+        // might want to be more discerning with this in the future.
         const oldTags = maybeCache.state.tags;
         const newTags = state.tags;
         if (!this.tagsEqual(oldTags, newTags)) {
             return true;
         }
 
-        // any container-specific rendering decisions?
+        // no generic decision to be made. ask the container if we should re-render
         return this.shouldRender(maybeCache.state, state);
     }
 
@@ -380,12 +397,6 @@ export abstract class ViewContainer extends GroupFolder {
             }
         }
         console.log(`rendering ${this.groupName}`)
-        // if (modifiedFiles.length > 0 && !modifiedFiles.some(
-        //     f => this.shouldRerenderOnModification(f, excludedFolders))
-        // ) {
-        //     console.log(`skipping rendering of ${this.groupName}`)
-        //     return;
-        // }
 
         this.rebuildFileStructure(excludedFolders);
 

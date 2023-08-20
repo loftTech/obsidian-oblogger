@@ -52,47 +52,28 @@ export class UntaggedContainer extends ViewContainer {
       oldState: FileModificationEventDetails,
       newState: FileModificationEventDetails
     ): boolean {
+        const groupSettings = this.getGroupSetting();
+        switch(groupSettings?.sortMethod) {
+            case ContainerSortMethod.ALPHABETICAL:
+                // shouldn't actually happen because we should be deciding
+                // to render before we hit this point. But just in case...
+                return oldState.basename !== newState.basename;
+            case ContainerSortMethod.CTIME:
+                return oldState.ctime !== newState.ctime;
+            case ContainerSortMethod.MTIME: {
+                // if the doc should be at the top/bottom of the list and it's
+                // not, then re-render
+                const oldMostRecentFile =
+                    groupSettings?.sortAscending ?
+                        this.sortedFiles.last() :
+                        this.sortedFiles.first();
+                return (
+                    oldState.mtime !== newState.mtime &&
+                    oldMostRecentFile !== newState.file);
+            }
+        }
         return false;
     }
-    //
-    // protected shouldRerenderOnModification(
-    //     modifiedFile: FileModificationEventDetails
-    // ): boolean {
-    //     const renderedFile = this.renderedFiles.find(rf => rf.file === modifiedFile.file);
-    //     const wasUntagged = renderedFile !== undefined;
-    //
-    //     const isUntagged = (getAllTags(modifiedFile.metadata)?.length ?? 0) === 0;
-    //     if (wasUntagged !== isUntagged) {
-    //         // it was rendered (meaning it was untagged) but now it has tags, or
-    //         // it was not rendered (meaning it had tags) but now is untagged...redraw
-    //         return true;
-    //
-    //     }
-    //     if (!isUntagged) {
-    //         // irrelevant
-    //         return false;
-    //
-    //     }
-    //     // if we're sorting by created and the created time changed, redraw
-    //     if (
-    //         renderedFile?.ctime !== modifiedFile.file.stat.ctime &&
-    //         this.getGroupSetting()?.sortMethod === ContainerSortMethod.CTIME
-    //     ) {
-    //         return true;
-    //
-    //     }
-    //     // if we're sorting by modified and the modified time changed and
-    //     // the file is not in the top or bottom depending on ordering, redraw
-    //     return renderedFile?.mtime !== modifiedFile.file.stat.mtime &&
-    //       this.getGroupSetting()?.sortMethod === ContainerSortMethod.MTIME &&
-    //       (
-    //         this.getGroupSetting()?.sortAscending ?
-    //           this.renderedFiles.first() :
-    //           this.renderedFiles.last()
-    //       )?.file !== modifiedFile.file;
-    //
-    //
-    // }
 
     protected getEmptyMessage(): string {
         return "No untagged documents";
