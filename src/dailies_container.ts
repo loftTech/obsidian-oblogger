@@ -3,7 +3,7 @@ import { FileClickCallback, FileAddedCallback } from "./group_folder";
 import { ViewContainer } from "./view_container";
 import { ObloggerSettings, RxGroupType } from "./settings";
 import { NewTagModal } from "./new_tag_modal";
-import { FileModificationEventDetails } from "./constants";
+import { FileState } from "./constants";
 
 export class DailiesContainer extends ViewContainer {
     fileEntryDates: { file: TFile, date: string }[]
@@ -42,8 +42,8 @@ export class DailiesContainer extends ViewContainer {
     }
 
     protected shouldRender(
-        oldState: FileModificationEventDetails,
-        newState: FileModificationEventDetails
+        oldState: FileState,
+        newState: FileState
     ): boolean {
         const oldDailyDate = this.getDailyDate(
             oldState.ctime,
@@ -56,7 +56,7 @@ export class DailiesContainer extends ViewContainer {
         return oldDailyDate !== newDailyDate;
     }
 
-    protected wouldBeRendered(state: FileModificationEventDetails): boolean {
+    protected wouldBeRendered(state: FileState): boolean {
         return state.tags.contains("#" + this.settings.dailiesTag);
     }
 

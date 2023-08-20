@@ -2,7 +2,7 @@ import { App, getAllTags, Menu, MenuItem, TFile } from "obsidian";
 import { FileClickCallback, FileAddedCallback } from "./group_folder";
 import { ViewContainer } from "./view_container";
 import { ContainerSortMethod, getSortMethodDisplayText, ObloggerSettings } from "./settings";
-import { FileModificationEventDetails } from "./constants";
+import { FileState } from "./constants";
 
 
 type TagFileMap = { [key: string]: TFile[] };
@@ -50,7 +50,7 @@ export class TagGroupContainer extends ViewContainer {
         );
     }
 
-    protected wouldBeRendered(state: FileModificationEventDetails): boolean {
+    protected wouldBeRendered(state: FileState): boolean {
         // if we don't have metadata, then it's not going to be rendered
         if (!state.maybeMetadata) {
             return false;
@@ -71,8 +71,8 @@ export class TagGroupContainer extends ViewContainer {
     }
 
     protected shouldRender(
-        oldState: FileModificationEventDetails,
-        newState: FileModificationEventDetails
+        oldState: FileState,
+        newState: FileState
     ): boolean {
         const groupSettings = this.getGroupSetting();
         switch(groupSettings?.sortMethod) {

@@ -2,7 +2,7 @@ import { FileClickCallback, FileAddedCallback } from "./group_folder";
 import { ViewContainer } from "./view_container";
 import { App, Menu } from "obsidian";
 import { ObloggerSettings, RxGroupType } from "./settings";
-import { FileModificationEventDetails } from "./constants";
+import { FileState } from "./constants";
 
 const RECENT_COUNT_OPTIONS = [5, 10, 15];
 
@@ -48,8 +48,8 @@ export class RecentsContainer extends ViewContainer {
     }
 
     protected shouldRender(
-        oldState: FileModificationEventDetails,
-        newState: FileModificationEventDetails
+        oldState: FileState,
+        newState: FileState
     ): boolean {
         return oldState.mtime !== newState.mtime && this.sortedFiles.first() !== newState.file;
     }

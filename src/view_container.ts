@@ -1,11 +1,11 @@
 import { App, FrontMatterCache, Menu, setIcon, TFile } from "obsidian";
 import { FileClickCallback, GroupFolder, FileAddedCallback } from "./group_folder";
 import { ObloggerSettings, RxGroupSettings } from "./settings";
-import { buildFromFile, FileModificationEventDetails } from "./constants";
+import { buildStateFromFile, FileState } from "./constants";
 
 interface RenderedFileCache {
     file: TFile;
-    state: FileModificationEventDetails
+    state: FileState
 }
 
 export abstract class ViewContainer extends GroupFolder {
@@ -37,10 +37,10 @@ export abstract class ViewContainer extends GroupFolder {
     protected abstract getHideText(): string;
     protected abstract getHideIcon(): string;
     protected abstract getEmptyMessage(): string;
-    protected abstract wouldBeRendered(state: FileModificationEventDetails): boolean;
+    protected abstract wouldBeRendered(state: FileState): boolean;
     protected abstract shouldRender(
-        oldState: FileModificationEventDetails,
-        newState: FileModificationEventDetails
+        oldState: FileState,
+        newState: FileState
     ): boolean;
 
     protected constructor(
@@ -93,7 +93,7 @@ export abstract class ViewContainer extends GroupFolder {
       remainingTag: string,
       pathPrefix: string
     ) {
-        const state = buildFromFile(this.app, file);
+        const state = buildStateFromFile(this.app, file);
         this.renderedFileCaches.push({ file, state });
 
         super.addFileToFolder(file, remainingTag, pathPrefix);
@@ -333,7 +333,7 @@ export abstract class ViewContainer extends GroupFolder {
     }
 
     private shouldFileCauseRender(
-        state: FileModificationEventDetails,
+        state: FileState,
         excludedFolders: string[]
     ): boolean {
         const isExcluded = excludedFolders.contains(state.path);
@@ -389,7 +389,7 @@ export abstract class ViewContainer extends GroupFolder {
     public render(
         collapsedFolders: string[],
         excludedFolders: string[],
-        modifiedFiles: FileModificationEventDetails[]
+        modifiedFiles: FileState[]
     ) {
         if (modifiedFiles.length > 0) {
             if (!modifiedFiles.some(state => {

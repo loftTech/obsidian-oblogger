@@ -15,8 +15,7 @@ export function isBookmarked(app: App, file: TFile): boolean {
     });
 }
 
-// todo: this needs a better name
-export interface FileModificationEventDetails {
+export interface FileState {
     file: TFile;
     maybeMetadata?: CachedMetadata;
     mtime: number;
@@ -28,12 +27,11 @@ export interface FileModificationEventDetails {
     isBookmarked: boolean;
 }
 
-// todo: this needs a better name
-export const buildFromFile = (
+export const buildStateFromFile = (
     app: App,
     file: TFile,
     maybeMetadata?: CachedMetadata
-) : FileModificationEventDetails => {
+) : FileState => {
     const stillMaybeMetadata = (maybeMetadata ?? app.metadataCache.getFileCache(file)) ?? undefined;
     return {
         file,

@@ -2,7 +2,7 @@ import { ViewContainer } from "./view_container";
 import { FileAddedCallback, FileClickCallback } from "./group_folder";
 import { ObloggerSettings, ContainerSortMethod, getSortMethodDisplayText, RxGroupType, getFileType } from "./settings";
 import { App, Menu, MenuItem, moment, TFile } from "obsidian";
-import { FileModificationEventDetails } from "./constants";
+import { FileState } from "./constants";
 
 export class FilesContainer extends ViewContainer {
     constructor(
@@ -36,13 +36,13 @@ export class FilesContainer extends ViewContainer {
             false); // isPinned
     }
 
-    protected wouldBeRendered(state: FileModificationEventDetails): boolean {
+    protected wouldBeRendered(state: FileState): boolean {
         return state.extension !== "md";
     }
 
     protected shouldRender(
-        oldState: FileModificationEventDetails,
-        newState: FileModificationEventDetails
+        oldState: FileState,
+        newState: FileState
     ): boolean {
         switch(this.getGroupSetting()?.sortMethod) {
             case ContainerSortMethod.ALPHABETICAL:
