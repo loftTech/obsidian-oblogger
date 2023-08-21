@@ -74,6 +74,7 @@ interface ObloggerSettings_v1 extends ObloggerSettings_v0 {
 interface ObloggerSettings_v2 extends ObloggerSettings_v1 {
     vaultVisible: boolean;
     clockVisible: boolean;
+    rxSeparatorVisible: boolean;
 }
 
 export type ObloggerSettings = ObloggerSettings_v2
@@ -90,6 +91,7 @@ const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } =
         if (newSettings) {
             newSettings.vaultVisible = true;
             newSettings.clockVisible = true;
+            newSettings.rxSeparatorVisible = true;
             newSettings.version = 2;
         }
     }
@@ -112,6 +114,7 @@ export const DEFAULT_SETTINGS: Partial<ObloggerSettings> = {
     avatarVisible: true,
     vaultVisible: true,
     clockVisible: true,
+    rxSeparatorVisible: true,
     recentsCount: 10,
     postLogAction: PostLogAction.QUIETLY,
     rxGroups: [
