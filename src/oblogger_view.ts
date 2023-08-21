@@ -80,6 +80,7 @@ export class ObloggerView extends ItemView {
     vaultNameDiv: HTMLElement;
     clockDiv: HTMLElement;
     rxSeparatorDiv: HTMLElement;
+    otcSeparatorDiv: HTMLElement;
     otcGroups: TagGroup[]
     rxContainers: ViewContainer[]
     lastOpenFile: TFile | undefined;
@@ -395,6 +396,7 @@ export class ObloggerView extends ItemView {
         await this.renderVault();
         this.renderClock(this.clockDiv);
         this.renderRXSeparator();
+        this.renderOTCSeparator();
 
         this.renderRecents(modifiedFiles);
         this.renderDailies(modifiedFiles);
@@ -466,6 +468,14 @@ export class ObloggerView extends ItemView {
             this.rxSeparatorDiv?.removeClass("hidden");
         } else {
             this.rxSeparatorDiv?.addClass("hidden");
+        }
+    }
+
+    private renderOTCSeparator() {
+        if (this.settings?.otcSeparatorVisible) {
+            this.otcSeparatorDiv?.removeClass("hidden");
+        } else {
+            this.otcSeparatorDiv?.addClass("hidden");
         }
     }
 
@@ -622,6 +632,15 @@ export class ObloggerView extends ItemView {
                             item.setIcon(this.settings.rxSeparatorVisible ? "eye-off" : "eye");
                             item.onClick(async () => {
                                 this.settings.rxSeparatorVisible = !this.settings.rxSeparatorVisible;
+                                await this.saveSettingsCallback();
+                                this.requestRender();
+                            })
+                        });
+                        menu.addItem(item => {
+                            item.setTitle(`${this.settings.otcSeparatorVisible ? "Hide" : "Show"} user group separator`);
+                            item.setIcon(this.settings.otcSeparatorVisible ? "eye-off" : "eye");
+                            item.onClick(async () => {
+                                this.settings.otcSeparatorVisible = !this.settings.otcSeparatorVisible;
                                 await this.saveSettingsCallback();
                                 this.requestRender();
                             })
@@ -883,11 +902,12 @@ export class ObloggerView extends ItemView {
 
         body.appendChild(this.rxGroupsDiv);
 
-        body.appendChild(buildSeparator(
+        this.otcSeparatorDiv = buildSeparator(
             "otc-separator",
             "user-groups",
             "User created tag groups"
-        ));
+        );
+        body.appendChild(this.otcSeparatorDiv);
 
         this.otcGroupsDiv = document.createElement("div");
         this.otcGroupsDiv.addClass("otc-groups");
