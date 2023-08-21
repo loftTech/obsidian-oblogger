@@ -71,13 +71,26 @@ interface ObloggerSettings_v1 extends ObloggerSettings_v0 {
     version: number;
 }
 
-export type ObloggerSettings = ObloggerSettings_v1
+interface ObloggerSettings_v2 extends ObloggerSettings_v1 {
+    vaultVisible: boolean;
+    clockVisible: boolean;
+}
+
+export type ObloggerSettings = ObloggerSettings_v2
 
 const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } = {
     0: (settings: ObloggerSettings) => {
         const newSettings = settings as ObloggerSettings_v1;
         if (newSettings) {
             newSettings.version = 1;
+        }
+    },
+    1: (settings: ObloggerSettings) => {
+        const newSettings = settings as ObloggerSettings_v2;
+        if (newSettings) {
+            newSettings.vaultVisible = true;
+            newSettings.clockVisible = true;
+            newSettings.version = 2;
         }
     }
 };
@@ -92,10 +105,13 @@ export const upgradeSettings = (currentVersion: number, settings: ObloggerSettin
     UPGRADE_FUNCTIONS[currentVersion](settings);
 }
 
-export const CURRENT_VERSION = 1;
+export const CURRENT_VERSION = 2;
 
 export const DEFAULT_SETTINGS: Partial<ObloggerSettings> = {
-    version: 1,
+    version: 2,
+    avatarVisible: true,
+    vaultVisible: true,
+    clockVisible: true,
     recentsCount: 10,
     postLogAction: PostLogAction.QUIETLY,
     rxGroups: [

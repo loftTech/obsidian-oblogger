@@ -77,6 +77,8 @@ export class ObloggerView extends ItemView {
     avatarDiv: HTMLElement;
     greeterDiv: HTMLElement;
     greeterContainerDiv: HTMLElement;
+    vaultNameDiv: HTMLElement;
+    clockDiv: HTMLElement;
     otcGroups: TagGroup[]
     rxContainers: ViewContainer[]
     lastOpenFile: TFile | undefined;
@@ -389,6 +391,8 @@ export class ObloggerView extends ItemView {
         this.fileItems = {};
 
         await this.renderAvatar();
+        await this.renderVault();
+        this.renderClock(this.clockDiv);
 
         this.renderRecents(modifiedFiles);
         this.renderDailies(modifiedFiles);
@@ -427,7 +431,20 @@ export class ObloggerView extends ItemView {
         this.avatarDiv.appendChild(myImage);
     }
 
+    private async renderVault() {
+        if (this.settings?.vaultVisible) {
+            this.vaultNameDiv?.removeClass("hidden");
+        } else {
+            this.vaultNameDiv?.addClass("hidden");
+        }
+}
+
     private renderClock(clockDiv: HTMLElement) {
+        if (this.settings?.clockVisible) {
+            this.clockDiv?.removeClass("hidden");
+        } else {
+            this.clockDiv?.addClass("hidden");
+        }
         clockDiv.empty();
         const timestamp = moment();
         const dayDiv = document.createElement("div");
@@ -489,18 +506,19 @@ export class ObloggerView extends ItemView {
         greeterContentDiv.classList.add("greeter-content");
         this.greeterDiv.appendChild(greeterContentDiv);
 
-        const vaultNameDiv = document.createElement("div");
-        vaultNameDiv.addClass("greeter-vault-name");
-        greeterContentDiv.appendChild(vaultNameDiv);
-        vaultNameDiv.setText(this.app.vault.getName());
+        this.vaultNameDiv = document.createElement("div");
+        this.vaultNameDiv.addClass("greeter-vault-name");
+        await this.renderVault();
+        greeterContentDiv.appendChild(this.vaultNameDiv);
+        this.vaultNameDiv.setText(this.app.vault.getName());
 
-        const clockDiv = document.createElement("div");
-        clockDiv.addClass("greeter-clock");
-        greeterContentDiv.appendChild(clockDiv);
-        this.renderClock(clockDiv);
+        this.clockDiv = document.createElement("div");
+        this.clockDiv.addClass("greeter-clock");
+        greeterContentDiv.appendChild(this.clockDiv);
+        this.renderClock(this.clockDiv);
         this.registerInterval(window.setInterval(
             () => {
-                this.renderClock(clockDiv);
+                this.renderClock(this.clockDiv);
             },
             1000))
 
@@ -570,6 +588,24 @@ export class ObloggerView extends ItemView {
                             await this.saveSettingsCallback();
                             this.requestRender();
                         })
+                        menu.addItem(item => {
+                            item.setTitle(`${this.settings.vaultVisible ? "Hide" : "Show"} vault name`);
+                            item.setIcon(this.settings.vaultVisible ? "eye-off" : "eye");
+                            item.onClick(async () => {
+                                this.settings.vaultVisible = !this.settings.vaultVisible;
+                                await this.saveSettingsCallback();
+                                this.requestRender();
+                            })
+                        });
+                        menu.addItem(item => {
+                            item.setTitle(`${this.settings.clockVisible ? "Hide" : "Show"} clock`);
+                            item.setIcon(this.settings.clockVisible ? "eye-off" : "eye");
+                            item.onClick(async () => {
+                                this.settings.clockVisible = !this.settings.clockVisible;
+                                await this.saveSettingsCallback();
+                                this.requestRender();
+                            })
+                        });
                     });
 
                     menu.addSeparator();
