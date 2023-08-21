@@ -25,7 +25,7 @@ body.styled-scrollbars .oblogger-content {
     padding: 0 4px 70px;
 }
 
-.oblogger-content .hidden { display:none; }
+.oblogger-content .hidden { display:none !important; }
 
 .oblogger-content .empty-rx-message {
     align-content: center;

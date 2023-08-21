@@ -79,6 +79,8 @@ export class ObloggerView extends ItemView {
     greeterContainerDiv: HTMLElement;
     vaultNameDiv: HTMLElement;
     clockDiv: HTMLElement;
+    rxSeparatorDiv: HTMLElement;
+    otcSeparatorDiv: HTMLElement;
     otcGroups: TagGroup[]
     rxContainers: ViewContainer[]
     lastOpenFile: TFile | undefined;
@@ -393,6 +395,8 @@ export class ObloggerView extends ItemView {
         await this.renderAvatar();
         await this.renderVault();
         this.renderClock(this.clockDiv);
+        this.renderRXSeparator();
+        this.renderOTCSeparator();
 
         this.renderRecents(modifiedFiles);
         this.renderDailies(modifiedFiles);
@@ -437,6 +441,8 @@ export class ObloggerView extends ItemView {
         } else {
             this.vaultNameDiv?.addClass("hidden");
         }
+        this.vaultNameDiv.setText(this.app.vault.getName());
+        this.vaultNameDiv.addClass("greeter-vault-name");
 }
 
     private renderClock(clockDiv: HTMLElement) {
@@ -455,6 +461,22 @@ export class ObloggerView extends ItemView {
         timeDiv.setText(timestamp.format("HH:mm:ss"));
         timeDiv.addClass("time");
         clockDiv.appendChild(timeDiv);
+    }
+    
+    private renderRXSeparator() {
+        if (this.settings?.rxSeparatorVisible) {
+            this.rxSeparatorDiv?.removeClass("hidden");
+        } else {
+            this.rxSeparatorDiv?.addClass("hidden");
+        }
+    }
+
+    private renderOTCSeparator() {
+        if (this.settings?.otcSeparatorVisible) {
+            this.otcSeparatorDiv?.removeClass("hidden");
+        } else {
+            this.otcSeparatorDiv?.addClass("hidden");
+        }
     }
 
     private async buildGreeter() {
@@ -507,10 +529,8 @@ export class ObloggerView extends ItemView {
         this.greeterDiv.appendChild(greeterContentDiv);
 
         this.vaultNameDiv = document.createElement("div");
-        this.vaultNameDiv.addClass("greeter-vault-name");
         await this.renderVault();
         greeterContentDiv.appendChild(this.vaultNameDiv);
-        this.vaultNameDiv.setText(this.app.vault.getName());
 
         this.clockDiv = document.createElement("div");
         this.clockDiv.addClass("greeter-clock");
@@ -602,6 +622,24 @@ export class ObloggerView extends ItemView {
                             item.setIcon(this.settings.clockVisible ? "eye-off" : "eye");
                             item.onClick(async () => {
                                 this.settings.clockVisible = !this.settings.clockVisible;
+                                await this.saveSettingsCallback();
+                                this.requestRender();
+                            })
+                        });
+                        menu.addItem(item => {
+                            item.setTitle(`${this.settings.rxSeparatorVisible ? "Hide" : "Show"} oblogger group separator`);
+                            item.setIcon(this.settings.rxSeparatorVisible ? "eye-off" : "eye");
+                            item.onClick(async () => {
+                                this.settings.rxSeparatorVisible = !this.settings.rxSeparatorVisible;
+                                await this.saveSettingsCallback();
+                                this.requestRender();
+                            })
+                        });
+                        menu.addItem(item => {
+                            item.setTitle(`${this.settings.otcSeparatorVisible ? "Hide" : "Show"} user group separator`);
+                            item.setIcon(this.settings.otcSeparatorVisible ? "eye-off" : "eye");
+                            item.onClick(async () => {
+                                this.settings.otcSeparatorVisible = !this.settings.otcSeparatorVisible;
                                 await this.saveSettingsCallback();
                                 this.requestRender();
                             })
@@ -849,11 +887,12 @@ export class ObloggerView extends ItemView {
 
         body.appendChild(greeter);
 
-        body.appendChild(buildSeparator(
+        this.rxSeparatorDiv = buildSeparator(
             "rx-separator",
             "oblogger-groups",
             "Built in groups"
-        ));
+        );
+        body.appendChild(this.rxSeparatorDiv); 
 
         this.rxGroupsDiv = document.createElement("div");
         this.rxGroupsDiv.addClass("rx-groups");
@@ -862,11 +901,12 @@ export class ObloggerView extends ItemView {
 
         body.appendChild(this.rxGroupsDiv);
 
-        body.appendChild(buildSeparator(
+        this.otcSeparatorDiv = buildSeparator(
             "otc-separator",
             "user-groups",
             "User created tag groups"
-        ));
+        );
+        body.appendChild(this.otcSeparatorDiv);
 
         this.otcGroupsDiv = document.createElement("div");
         this.otcGroupsDiv.addClass("otc-groups");
