@@ -394,7 +394,6 @@ export class ObloggerView extends ItemView {
 
         await this.renderAvatar();
         await this.renderVault();
-        this.renderClock(this.clockDiv);
         this.renderRXSeparator();
         this.renderOTCSeparator();
 
