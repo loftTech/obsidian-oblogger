@@ -391,7 +391,8 @@ export class ObloggerView extends ItemView {
         this.fileItems = {};
 
         await this.renderAvatar();
-        await this.renderVault()
+        await this.renderVault();
+        this.renderClock(this.clockDiv);
 
         this.renderRecents(modifiedFiles);
         this.renderDailies(modifiedFiles);
