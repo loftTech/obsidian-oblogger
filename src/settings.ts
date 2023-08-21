@@ -90,7 +90,7 @@ const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } =
         const newSettings = settings as ObloggerSettings_v2;
         if (newSettings) {
             newSettings.vaultVisible = true;
-            newSettings.clockVisible = true;
+            newSettings.clockVisible = false;
             newSettings.rxSeparatorVisible = true;
             newSettings.version = 2;
         }
@@ -113,7 +113,7 @@ export const DEFAULT_SETTINGS: Partial<ObloggerSettings> = {
     version: 2,
     avatarVisible: true,
     vaultVisible: true,
-    clockVisible: true,
+    clockVisible: false,
     rxSeparatorVisible: true,
     recentsCount: 10,
     postLogAction: PostLogAction.QUIETLY,
