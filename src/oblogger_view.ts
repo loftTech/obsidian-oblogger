@@ -77,6 +77,7 @@ export class ObloggerView extends ItemView {
     avatarDiv: HTMLElement;
     greeterDiv: HTMLElement;
     greeterContainerDiv: HTMLElement;
+    vaultNameDiv: HTMLElement;
     otcGroups: TagGroup[]
     rxContainers: ViewContainer[]
     lastOpenFile: TFile | undefined;
@@ -389,6 +390,7 @@ export class ObloggerView extends ItemView {
         this.fileItems = {};
 
         await this.renderAvatar();
+        await this.renderVault()
 
         this.renderRecents(modifiedFiles);
         this.renderDailies(modifiedFiles);
@@ -426,6 +428,14 @@ export class ObloggerView extends ItemView {
         this.avatarDiv.empty();
         this.avatarDiv.appendChild(myImage);
     }
+
+    private async renderVault() {
+        if (this.settings?.vaultVisible) {
+            this.vaultNameDiv?.removeClass("hidden");
+        } else {
+            this.vaultNameDiv?.addClass("hidden");
+        }
+}
 
     private renderClock(clockDiv: HTMLElement) {
         clockDiv.empty();
@@ -489,10 +499,11 @@ export class ObloggerView extends ItemView {
         greeterContentDiv.classList.add("greeter-content");
         this.greeterDiv.appendChild(greeterContentDiv);
 
-        const vaultNameDiv = document.createElement("div");
-        vaultNameDiv.addClass("greeter-vault-name");
-        greeterContentDiv.appendChild(vaultNameDiv);
-        vaultNameDiv.setText(this.app.vault.getName());
+        this.vaultNameDiv = document.createElement("div");
+        this.vaultNameDiv.addClass("greeter-vault-name");
+        await this.renderVault();
+        greeterContentDiv.appendChild(this.vaultNameDiv);
+        this.vaultNameDiv.setText(this.app.vault.getName());
 
         const clockDiv = document.createElement("div");
         clockDiv.addClass("greeter-clock");
@@ -570,6 +581,15 @@ export class ObloggerView extends ItemView {
                             await this.saveSettingsCallback();
                             this.requestRender();
                         })
+                        menu.addItem(item => {
+                            item.setTitle(`${this.settings.vaultVisible ? "Hide" : "Show"} vault name`);
+                            item.setIcon(this.settings.vaultVisible ? "eye-off" : "eye");
+                            item.onClick(async () => {
+                                this.settings.vaultVisible = !this.settings.vaultVisible;
+                                await this.saveSettingsCallback();
+                                this.requestRender();
+                            })
+                        });
                     });
 
                     menu.addSeparator();

@@ -62,6 +62,7 @@ interface ObloggerSettings_v0 {
     excludedFolders: string[];
     recentsCount: number;
     avatarVisible: boolean;
+    vaultVisible: boolean;
     postLogAction: string;
     rxGroups: RxGroupSettings[];
     dailiesTag: string;
