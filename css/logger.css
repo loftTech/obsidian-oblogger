@@ -148,8 +148,11 @@
     background: none;
     border: none;
     color: var(--nav-item-color);
+    text-overflow: ellipsis;
     width: 100%;
 }
+
+.logger .field-div input[type='text'] { padding-right: 50px; }
 
 .logger .content-div textarea {
     background: none;
