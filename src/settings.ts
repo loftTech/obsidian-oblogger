@@ -63,6 +63,7 @@ interface ObloggerSettings_v0 {
     recentsCount: number;
     avatarVisible: boolean;
     vaultVisible: boolean;
+    clockVisible: boolean;
     postLogAction: string;
     rxGroups: RxGroupSettings[];
     dailiesTag: string;

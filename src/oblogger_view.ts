@@ -78,6 +78,7 @@ export class ObloggerView extends ItemView {
     greeterDiv: HTMLElement;
     greeterContainerDiv: HTMLElement;
     vaultNameDiv: HTMLElement;
+    clockDiv: HTMLElement;
     otcGroups: TagGroup[]
     rxContainers: ViewContainer[]
     lastOpenFile: TFile | undefined;
@@ -438,6 +439,11 @@ export class ObloggerView extends ItemView {
 }
 
     private renderClock(clockDiv: HTMLElement) {
+        if (this.settings?.clockVisible) {
+            this.clockDiv?.removeClass("hidden");
+        } else {
+            this.clockDiv?.addClass("hidden");
+        }
         clockDiv.empty();
         const timestamp = moment();
         const dayDiv = document.createElement("div");
@@ -505,13 +511,13 @@ export class ObloggerView extends ItemView {
         greeterContentDiv.appendChild(this.vaultNameDiv);
         this.vaultNameDiv.setText(this.app.vault.getName());
 
-        const clockDiv = document.createElement("div");
-        clockDiv.addClass("greeter-clock");
-        greeterContentDiv.appendChild(clockDiv);
-        this.renderClock(clockDiv);
+        this.clockDiv = document.createElement("div");
+        this.clockDiv.addClass("greeter-clock");
+        greeterContentDiv.appendChild(this.clockDiv);
+        this.renderClock(this.clockDiv);
         this.registerInterval(window.setInterval(
             () => {
-                this.renderClock(clockDiv);
+                this.renderClock(this.clockDiv);
             },
             1000))
 
@@ -586,6 +592,15 @@ export class ObloggerView extends ItemView {
                             item.setIcon(this.settings.vaultVisible ? "eye-off" : "eye");
                             item.onClick(async () => {
                                 this.settings.vaultVisible = !this.settings.vaultVisible;
+                                await this.saveSettingsCallback();
+                                this.requestRender();
+                            })
+                        });
+                        menu.addItem(item => {
+                            item.setTitle(`${this.settings.clockVisible ? "Hide" : "Show"} clock`);
+                            item.setIcon(this.settings.clockVisible ? "eye-off" : "eye");
+                            item.onClick(async () => {
+                                this.settings.clockVisible = !this.settings.clockVisible;
                                 await this.saveSettingsCallback();
                                 this.requestRender();
                             })
