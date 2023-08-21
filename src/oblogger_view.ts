@@ -531,7 +531,6 @@ export class ObloggerView extends ItemView {
         await this.renderVault();
         greeterContentDiv.appendChild(this.vaultNameDiv);
 
-
         this.clockDiv = document.createElement("div");
         this.clockDiv.addClass("greeter-clock");
         greeterContentDiv.appendChild(this.clockDiv);
