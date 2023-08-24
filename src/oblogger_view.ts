@@ -97,6 +97,7 @@ export class ObloggerView extends ItemView {
         contentItem: HTMLElement,
         titleItem: HTMLDivElement,
         titleContentItem: HTMLElement) => void;
+    fileRetainedCallback: (file: TFile) => void;
     rxGroupCollapseChangeCallback: (
         groupName: string,
         collapsedFolders: string[],
@@ -107,6 +108,9 @@ export class ObloggerView extends ItemView {
         collapsedFolders: string[],
         save: boolean
     ) => void;
+
+    // Needed so we can pull old data to retain during a render cycle
+    oldFileItems: {[id: string]: FileItem};
 
     // These are needed for the context menu to work
     files: WeakMap<HTMLElement, TFile>;
@@ -132,6 +136,7 @@ export class ObloggerView extends ItemView {
         this.files = new WeakMap();
         this.selectedDoms = [];
         this.fileItems = {};
+        this.oldFileItems = {};
         this.otcGroups = [];
         this.saveSettingsCallback = saveSettingsCallback;
 
@@ -188,6 +193,7 @@ export class ObloggerView extends ItemView {
             const { workspace } = this.app;
             return workspace.getLeaf(false).openFile(file);
         }
+
         this.fileAddedCallback = (
             file: TFile,
             contentItem: HTMLElement,
@@ -197,8 +203,17 @@ export class ObloggerView extends ItemView {
             this.files.set(contentItem, file);
             this.fileItems[file.path] = new FileItem(file, contentItem, titleItem, titleContentItem);
             contentItem.addEventListener("contextmenu", (e) => {
+                // todo(#91): something in the openFileContextMenu is blocking the context menu in some vaults
                 this.openFileContextMenu(e, titleItem);
             });
+        }
+
+        this.fileRetainedCallback = (file: TFile) => {
+            const fileItem = this.oldFileItems[file.path];
+            const contentItem = fileItem.el;
+            const titleItem = fileItem.titleEl as HTMLDivElement;
+            const titleContentItem = fileItem.titleInnerEl;
+            this.fileAddedCallback(file, contentItem, titleItem, titleContentItem);
         }
 
         this.rxGroupCollapseChangeCallback = (
@@ -341,14 +356,15 @@ export class ObloggerView extends ItemView {
             settingsGroup => settingsGroup.tag === group.groupName
         )?.collapsedFolders ?? [];
         if (group instanceof TagGroupContainer) {
-            group.render(collapsedFolders, excludedFolders, modifiedFiles);
+            group.render(collapsedFolders, excludedFolders, modifiedFiles, false);
         }
     }
 
     private renderRxGroup(
         groupName: string,
         excludedFolders: string[],
-        modifiedFiles: FileState[]
+        modifiedFiles: FileState[],
+        forced: boolean
     ) {
         const groupSetting = this.settings?.rxGroups.find(group => group.groupName === groupName);
         if (!groupSetting) {
@@ -363,33 +379,37 @@ export class ObloggerView extends ItemView {
         container.render(
             groupSetting.collapsedFolders ?? [],
             excludedFolders,
-            modifiedFiles);
+            modifiedFiles,
+            forced);
     }
 
     private renderDailies(modifiedFiles: FileState[]) {
         this.renderRxGroup(
             RxGroupType.DAILIES,
             this.settings?.excludedFolders ?? [],
-            modifiedFiles);
+            modifiedFiles,
+            false);
     }
 
     private renderFiles(modifiedFiles: FileState[]) {
-        this.renderRxGroup(RxGroupType.FILES, [], modifiedFiles);
+        this.renderRxGroup(RxGroupType.FILES, [], modifiedFiles, false);
     }
 
     private renderUntagged(modifiedFiles: FileState[]) {
         this.renderRxGroup(
             RxGroupType.UNTAGGED,
             [this.settings?.loggingPath].concat(this.settings?.excludedFolders ?? []),
-            modifiedFiles);
+            modifiedFiles,
+            false);
     }
 
     private renderRecents(modifiedFiles: FileState[]) {
-        this.renderRxGroup(RxGroupType.RECENTS, [], modifiedFiles);
+        this.renderRxGroup(RxGroupType.RECENTS, [], modifiedFiles, true);
     }
 
     private async renderNow(modifiedFiles: FileState[]) {
         this.files = new WeakMap();
+        this.oldFileItems = this.fileItems;
         this.fileItems = {};
 
         await this.renderAvatar();
@@ -772,6 +792,7 @@ export class ObloggerView extends ItemView {
             moveCallback,
             this.fileClickCallback,
             this.fileAddedCallback,
+            this.fileRetainedCallback,
             this.tagGroupCollapseChangedCallback,
             () => { this.requestRender() },
             this.settings,
@@ -864,6 +885,7 @@ export class ObloggerView extends ItemView {
                 this.app,
                 this.fileClickCallback,
                 this.fileAddedCallback,
+                this.fileRetainedCallback,
                 this.rxGroupCollapseChangeCallback,
                 () => { this.requestRender() },
                 this.settings,

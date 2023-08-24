@@ -16,6 +16,7 @@ export type FileAddedCallback = (
     contentItem: HTMLElement,
     titleItem: HTMLElement,
     titleContentItem: HTMLElement) => void;
+export type FileRetainedCallback =  (file: TFile) => void;
 
 declare module "obsidian" {
     interface Plugin {
@@ -92,7 +93,7 @@ export class GroupFolder {
     protected rebuild(
         collapsedFolders: string[],
         fileClickCallback: FileClickCallback,
-        fileAddedCallback: FileAddedCallback
+        fileAddedCallback: FileAddedCallback,
     ) {
         // Clear
         this.rootElement.empty();

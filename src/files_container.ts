@@ -1,5 +1,5 @@
 import { ViewContainer } from "./view_container";
-import { FileAddedCallback, FileClickCallback } from "./group_folder";
+import { FileAddedCallback, FileClickCallback, FileRetainedCallback } from "./group_folder";
 import { ObloggerSettings, ContainerSortMethod, getSortMethodDisplayText, RxGroupType, getFileType } from "./settings";
 import { App, Menu, MenuItem, moment, TFile } from "obsidian";
 import { FileState } from "./constants";
@@ -9,6 +9,7 @@ export class FilesContainer extends ViewContainer {
         app: App,
         fileClickCallback: FileClickCallback,
         fileAddedCallback: FileAddedCallback,
+        fileRetainedCallback: FileRetainedCallback,
         collapseChangedCallback: (groupName: string, collapsedFolders: string[], save: boolean) => void,
         requestRenderCallback: () => void,
         settings: ObloggerSettings,
@@ -21,6 +22,7 @@ export class FilesContainer extends ViewContainer {
             RxGroupType.FILES,
             fileClickCallback,
             fileAddedCallback,
+            fileRetainedCallback,
             collapseChangedCallback,
             false,
             requestRenderCallback,
