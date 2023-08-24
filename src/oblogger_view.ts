@@ -203,8 +203,46 @@ export class ObloggerView extends ItemView {
             this.files.set(contentItem, file);
             this.fileItems[file.path] = new FileItem(file, contentItem, titleItem, titleContentItem);
             contentItem.addEventListener("contextmenu", (e) => {
-                // todo(#91): something in the openFileContextMenu is blocking the context menu in some vaults
-                this.openFileContextMenu(e, titleItem);
+                // // todo(#91): something in the openFileContextMenu is blocking the context menu in some vaults
+                // this.openFileContextMenu(e, titleItem);
+                const menu = new Menu();
+                this.app.workspace.trigger(
+                    "file-menu",
+                    menu,
+                    file,
+                    "file-explorer"
+                );
+
+                menu.addSeparator();
+                menu.addItem((item) =>
+                    item
+                        .setTitle(`Open in new tab`)
+                        .setIcon("lucide-file-plus")
+                        .onClick(async () => {
+                            app.workspace.openLinkText(file.path, file.path, "tab");
+                        })
+                );
+                menu.addItem((item) =>
+                    item
+                        .setTitle(`Open to the right`)
+                        .setIcon("lucide-separator-vertical")
+                        .onClick(async () => {
+                            app.workspace.openLinkText(file.path, file.path, "split");
+                        })
+                );
+
+                if ("screenX" in e) {
+                    menu.showAtPosition({ x: e.pageX, y: e.pageY });
+                } else {
+                    menu.showAtPosition({
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
+                        x: e.nativeEvent.locationX,
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
+                        y: e.nativeEvent.locationY,
+                    });
+                }
             });
         }
 
