@@ -210,10 +210,12 @@ export class ObloggerView extends ItemView {
 
         this.fileRetainedCallback = (file: TFile) => {
             const fileItem = this.oldFileItems[file.path];
+
             const contentItem = fileItem.el;
             const titleItem = fileItem.titleEl as HTMLDivElement;
             const titleContentItem = fileItem.titleInnerEl;
-            this.fileAddedCallback(file, contentItem, titleItem, titleContentItem);
+            this.files.set(contentItem, file);
+            this.fileItems[file.path] = new FileItem(file, contentItem, titleItem, titleContentItem);
         }
 
         this.rxGroupCollapseChangeCallback = (
