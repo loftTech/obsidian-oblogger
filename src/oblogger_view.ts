@@ -203,8 +203,6 @@ export class ObloggerView extends ItemView {
             this.files.set(contentItem, file);
             this.fileItems[file.path] = new FileItem(file, contentItem, titleItem, titleContentItem);
             contentItem.addEventListener("contextmenu", (e) => {
-                // // todo(#91): something in the openFileContextMenu is blocking the context menu in some vaults
-                // this.openFileContextMenu(e, titleItem);
                 const menu = new Menu();
                 this.app.workspace.trigger(
                     "file-menu",
@@ -219,7 +217,7 @@ export class ObloggerView extends ItemView {
                         .setTitle(`Open in new tab`)
                         .setIcon("lucide-file-plus")
                         .onClick(async () => {
-                            app.workspace.openLinkText(file.path, file.path, "tab");
+                            return app.workspace.openLinkText(file.path, file.path, "tab");
                         })
                 );
                 menu.addItem((item) =>
@@ -227,7 +225,7 @@ export class ObloggerView extends ItemView {
                         .setTitle(`Open to the right`)
                         .setIcon("lucide-separator-vertical")
                         .onClick(async () => {
-                            app.workspace.openLinkText(file.path, file.path, "split");
+                            return app.workspace.openLinkText(file.path, file.path, "split");
                         })
                 );
 
