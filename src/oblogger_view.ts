@@ -394,7 +394,11 @@ export class ObloggerView extends ItemView {
     }
 
     private renderFiles(modifiedFiles: FileState[]) {
-        this.renderRxGroup(RxGroupType.FILES, [], modifiedFiles, false);
+        this.renderRxGroup(
+            RxGroupType.FILES,
+            [],
+            modifiedFiles,
+            false);
     }
 
     private renderUntagged(modifiedFiles: FileState[]) {
@@ -406,7 +410,11 @@ export class ObloggerView extends ItemView {
     }
 
     private renderRecents(modifiedFiles: FileState[]) {
-        this.renderRxGroup(RxGroupType.RECENTS, [], modifiedFiles, true);
+        this.renderRxGroup(
+            RxGroupType.RECENTS,
+            [],
+            modifiedFiles,
+            false);
     }
 
     private async renderNow(modifiedFiles: FileState[]) {
