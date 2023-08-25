@@ -182,10 +182,11 @@ export abstract class ViewContainer extends GroupFolder {
                     .setTitle(`${groupSetting?.templatesFolderVisible ? "Hide" : "Show"} templates`)
                     .setIcon(groupSetting?.templatesFolderVisible ? "eye-off" : "eye")
                     .setSection("hide")
-                    .onClick(() => {
+                    .onClick(async () => {
                         if (groupSetting) {
                             groupSetting.templatesFolderVisible = !groupSetting.templatesFolderVisible;
-                            this.saveSettingsCallback();
+                            await this.saveSettingsCallback();
+                            this.requestRender();
                         } else {
                             console.warn(`Unable to get group setting for ${this.groupName}`)
                         }
@@ -196,10 +197,11 @@ export abstract class ViewContainer extends GroupFolder {
                     .setTitle(`${groupSetting?.logsFolderVisible ? "Hide" : "Show"} logs`)
                     .setIcon(groupSetting?.logsFolderVisible ? "eye-off" : "eye")
                     .setSection("hide")
-                    .onClick(() => {
+                    .onClick(async () => {
                         if (groupSetting) {
                             groupSetting.logsFolderVisible = !groupSetting.logsFolderVisible;
-                            this.saveSettingsCallback();
+                            await this.saveSettingsCallback();
+                            this.requestRender();
                         } else {
                             console.warn(`Unable to get group setting for ${this.groupName}`)
                         }
@@ -211,10 +213,11 @@ export abstract class ViewContainer extends GroupFolder {
                         .setTitle(`Include ${folderPath}`)
                         .setIcon("folder-plus")
                         .setSection("include")
-                        .onClick(() => {
+                        .onClick(async () => {
                             if (groupSetting) {
                                 groupSetting.excludedFolders.remove(folderPath);
-                                this.saveSettingsCallback();
+                                await this.saveSettingsCallback();
+                                this.requestRender();
                             } else {
                                 console.warn(`Unable to get group setting for ${this.groupName}`)
                             }
