@@ -288,19 +288,9 @@ export class ObloggerView extends ItemView {
             if (!maybeSettingsGroup.templatesFolderVisible) {
                 const templatesFolderPath = ""; // todo: figure out how to get this
                 excludedFolders.push(templatesFolderPath);
-
-                // todo: validate that pushing new things to excluded folders doesn't modify the settings object
-                if (excludedFolders === maybeSettingsGroup.excludedFolders) {
-                    console.error("this isn't supposed to happen. program it differently!")
-                }
             }
             if (!maybeSettingsGroup.logsFolderVisible && this.settings) {
                 excludedFolders.push(this.settings.loggingPath);
-
-                // todo: validate that pushing new things to excluded folders doesn't modify the settings object
-                if (excludedFolders === maybeSettingsGroup.excludedFolders) {
-                    console.error("this isn't supposed to happen. program it differently!")
-                }
             }
         }
 
@@ -323,19 +313,9 @@ export class ObloggerView extends ItemView {
         if (!groupSetting.templatesFolderVisible) {
             const templatesFolderPath = ""; // todo: figure out how to get this
             excludedFolders.push(templatesFolderPath);
-
-            // todo: validate that pushing new things to excluded folders doesn't modify the settings object
-            if (excludedFolders === groupSetting.excludedFolders) {
-                console.error("this isn't supposed to happen. program it differently!")
-            }
         }
         if (!groupSetting.logsFolderVisible && this.settings) {
             excludedFolders.push(this.settings.loggingPath);
-
-            // todo: validate that pushing new things to excluded folders doesn't modify the settings object
-            if (excludedFolders === groupSetting.excludedFolders) {
-                console.error("this isn't supposed to happen. program it differently!")
-            }
         }
         const container = this.rxContainers.find(container => container.groupName === groupName);
         if (!container) {
