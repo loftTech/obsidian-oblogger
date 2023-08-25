@@ -165,6 +165,8 @@ export abstract class ViewContainer extends GroupFolder {
             );
         }
 
+        const groupSetting = this.getGroupSetting();
+
         menu.addItem(item => {
             item
                 .setTitle("Folder exclusions")
@@ -176,27 +178,32 @@ export abstract class ViewContainer extends GroupFolder {
             const subMenu = item.setSubmenu() as Menu;
             subMenu.addItem(subItem => {
                 subItem
-                    .setTitle("Hide templates")
-                    .setIcon("eye-off")
+                    .setTitle(`${groupSetting?.templatesFolderVisible ? "Hide" : "Show"} templates`)
+                    .setIcon(groupSetting?.templatesFolderVisible ? "eye-off" : "eye")
                     .setSection("hide");
             });
             subMenu.addItem(subItem => {
                 subItem
-                    .setTitle("Show logs")
-                    .setIcon("eye")
+                    .setTitle(`${groupSetting?.logsFolderVisible ? "Hide" : "Show"} logs`)
+                    .setIcon(groupSetting?.logsFolderVisible ? "eye-off" : "eye")
                     .setSection("hide");
             });
-            subMenu.addItem(subItem => {
-                subItem
-                    .setTitle("Include asdf")
-                    .setIcon("folder-plus")
-                    .setSection("include");
+            groupSetting?.excludedFolders.forEach(folderPath => {
+                subMenu.addItem(subItem => {
+                    subItem
+                        .setTitle(`Include ${folderPath}`)
+                        .setIcon("folder-plus")
+                        .setSection("include");
+                });
             });
             subMenu.addItem(subItem => {
                 subItem
                     .setTitle("Exclude folder")
                     .setIcon("folder-x")
-                    .setSection("exclude");
+                    .setSection("exclude")
+                    .onClick(() => {
+                        console.log("todo: show folder selection")
+                    });
             });
         });
 
