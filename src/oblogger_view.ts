@@ -504,7 +504,10 @@ export class ObloggerView extends ItemView {
             this.settings.tagGroups.push({
                 tag: result,
                 collapsedFolders: [],
-                isPinned: false
+                isPinned: false,
+                excludedFolders: [],
+                logsFolderVisible: false,
+                templatesFolderVisible: false
             });
             await this.saveSettingsCallback();
             this.reloadOtcGroups();

@@ -1,12 +1,20 @@
 import { TFile } from "obsidian";
 
-export interface OtcGroupSettings {
+interface OtcGroupSettings_v0 {
     tag: string;
     collapsedFolders: string[];
     isPinned: boolean;
     sortMethod?: string;
     sortAscending?: boolean;
 }
+
+interface OtcGroupSettings_v1 extends OtcGroupSettings_v0 {
+    excludedFolders: string[];
+    templatesFolderVisible: boolean;
+    logsFolderVisible: boolean;
+}
+
+export type OtcGroupSettings = OtcGroupSettings_v1;
 
 export const ContainerSortMethod = {
     ALPHABETICAL: "alphabetical",
@@ -41,13 +49,21 @@ export const RxGroupType = {
 }
 
 // TODO(#64): combine this with OtcGroupSettings
-export interface RxGroupSettings {
+interface RxGroupSettings_v0 {
     groupName: string;
     collapsedFolders: string[];
     isVisible: boolean;
     sortMethod: string;
     sortAscending: boolean;
 }
+
+interface RxGroupSettings_v1 extends RxGroupSettings_v0 {
+    excludedFolders: string[];
+    templatesFolderVisible: boolean;
+    logsFolderVisible: boolean;
+}
+
+export type RxGroupSettings = RxGroupSettings_v1;
 
 export const PostLogAction = {
     QUIETLY: "quietly",
@@ -58,12 +74,16 @@ export const PostLogAction = {
 interface ObloggerSettings_v0 {
     loggingPath: string;
     avatarPath: string;
-    tagGroups: OtcGroupSettings[];
-    excludedFolders: string[];
+    tagGroups: OtcGroupSettings_v0[];
+    /**
+     * @deprecated Use {@link OtcGroupSettings_v1.excludedFolders} and
+     * {@link RxGroupSettings_v1.excludedFolders} instead
+     */
+    excludedFolders?: string[];
     recentsCount: number;
     avatarVisible: boolean;
     postLogAction: string;
-    rxGroups: RxGroupSettings[];
+    rxGroups: RxGroupSettings_v0[];
     dailiesTag: string;
 }
 
@@ -78,7 +98,12 @@ interface ObloggerSettings_v2 extends ObloggerSettings_v1 {
     otcSeparatorVisible: boolean;
 }
 
-export type ObloggerSettings = ObloggerSettings_v2
+interface ObloggerSettings_v3 extends ObloggerSettings_v2 {
+    tagGroups: OtcGroupSettings_v1[];
+    rxGroups: RxGroupSettings_v1[];
+}
+
+export type ObloggerSettings = ObloggerSettings_v3
 
 const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } = {
     0: (settings: ObloggerSettings) => {
@@ -96,6 +121,20 @@ const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } =
             newSettings.otcSeparatorVisible = true;
             newSettings.version = 2;
         }
+    },
+    2: (settings: ObloggerSettings) => {
+        const newSettings = settings as ObloggerSettings_v3;
+        if (newSettings) {
+            newSettings.rxGroups.forEach(group => {
+                group.logsFolderVisible = false;
+                group.templatesFolderVisible = false;
+            });
+            newSettings.tagGroups.forEach(group => {
+                group.logsFolderVisible = false;
+                group.templatesFolderVisible = false;
+            });
+            newSettings.version = 3;
+        }
     }
 };
 
@@ -109,10 +148,10 @@ export const upgradeSettings = (currentVersion: number, settings: ObloggerSettin
     UPGRADE_FUNCTIONS[currentVersion](settings);
 }
 
-export const CURRENT_VERSION = 2;
+export const CURRENT_VERSION = 3;
 
-export const DEFAULT_SETTINGS: Partial<ObloggerSettings> = {
-    version: 2,
+export const DEFAULT_SETTINGS: ObloggerSettings = {
+    version: 3,
     avatarVisible: true,
     vaultVisible: true,
     clockVisible: false,
@@ -120,34 +159,49 @@ export const DEFAULT_SETTINGS: Partial<ObloggerSettings> = {
     otcSeparatorVisible: true,
     recentsCount: 10,
     postLogAction: PostLogAction.QUIETLY,
+    tagGroups: [],
+    loggingPath: "",
+    avatarPath: "",
     rxGroups: [
         {
             groupName: RxGroupType.DAILIES,
             collapsedFolders: [],
             isVisible: true,
             sortMethod: ContainerSortMethod.ALPHABETICAL,
-            sortAscending: true
+            sortAscending: true,
+            logsFolderVisible: false,
+            templatesFolderVisible: false,
+            excludedFolders: []
         },
         {
             groupName: RxGroupType.FILES,
             collapsedFolders: [],
             isVisible: true,
             sortMethod: ContainerSortMethod.TYPE,
-            sortAscending: true
+            sortAscending: true,
+            logsFolderVisible: false,
+            templatesFolderVisible: false,
+            excludedFolders: []
         },
         {
             groupName: RxGroupType.RECENTS,
             collapsedFolders: [],
             isVisible: true,
             sortMethod: ContainerSortMethod.ALPHABETICAL,
-            sortAscending: true
+            sortAscending: true,
+            logsFolderVisible: false,
+            templatesFolderVisible: false,
+            excludedFolders: []
         },
         {
             groupName: RxGroupType.UNTAGGED,
             collapsedFolders: [],
             isVisible: true,
             sortMethod: ContainerSortMethod.ALPHABETICAL,
-            sortAscending: true
+            sortAscending: true,
+            logsFolderVisible: false,
+            templatesFolderVisible: false,
+            excludedFolders: []
         }
     ],
     dailiesTag: "daily"
