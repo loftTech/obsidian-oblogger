@@ -126,8 +126,16 @@ const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } =
         const newSettings = settings as ObloggerSettings_v3;
         if (newSettings) {
             newSettings.rxGroups.forEach(group => {
-                group.logsFolderVisible = false;
-                group.templatesFolderVisible = false;
+                group.logsFolderVisible = [
+                    RxGroupType.DAILIES,
+                    RxGroupType.FILES,
+                    RxGroupType.RECENTS
+                ].contains(group.groupName);
+
+                group.templatesFolderVisible = [
+                    RxGroupType.FILES,
+                    RxGroupType.RECENTS
+                ].contains(group.groupName);
             });
             newSettings.tagGroups.forEach(group => {
                 group.logsFolderVisible = false;
@@ -169,7 +177,7 @@ export const DEFAULT_SETTINGS: ObloggerSettings = {
             isVisible: true,
             sortMethod: ContainerSortMethod.ALPHABETICAL,
             sortAscending: true,
-            logsFolderVisible: false,
+            logsFolderVisible: true,
             templatesFolderVisible: false,
             excludedFolders: []
         },
@@ -179,8 +187,8 @@ export const DEFAULT_SETTINGS: ObloggerSettings = {
             isVisible: true,
             sortMethod: ContainerSortMethod.TYPE,
             sortAscending: true,
-            logsFolderVisible: false,
-            templatesFolderVisible: false,
+            logsFolderVisible: true,
+            templatesFolderVisible: true,
             excludedFolders: []
         },
         {
@@ -189,8 +197,8 @@ export const DEFAULT_SETTINGS: ObloggerSettings = {
             isVisible: true,
             sortMethod: ContainerSortMethod.ALPHABETICAL,
             sortAscending: true,
-            logsFolderVisible: false,
-            templatesFolderVisible: false,
+            logsFolderVisible: true,
+            templatesFolderVisible: true,
             excludedFolders: []
         },
         {
