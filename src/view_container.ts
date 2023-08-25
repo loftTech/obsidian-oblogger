@@ -1,5 +1,5 @@
 import { App, FrontMatterCache, Menu, setIcon, TFile } from "obsidian";
-import {FileClickCallback, GroupFolder, FileAddedCallback, FileRetainedCallback} from "./group_folder";
+import {FileClickCallback, GroupFolder, FileAddedCallback} from "./group_folder";
 import { ObloggerSettings, RxGroupSettings } from "./settings";
 import { buildStateFromFile, FileState } from "./constants";
 
@@ -18,7 +18,6 @@ export abstract class ViewContainer extends GroupFolder {
 
     fileClickCallback: FileClickCallback;
     fileAddedCallback: FileAddedCallback;
-    fileRetainedCallback: FileRetainedCallback;
     requestRenderCallback: () => void;
     saveSettingsCallback: () => void;
     hideCallback: () => void;
@@ -49,7 +48,6 @@ export abstract class ViewContainer extends GroupFolder {
         viewName: string,
         fileClickCallback: FileClickCallback,
         fileAddedCallback: FileAddedCallback,
-        fileRetainedCallback: FileRetainedCallback,
         collapseChangedCallback: (groupName: string, collapsedFolders: string[], save: boolean) => void,
         showStatusIcon: boolean,
         requestRenderCallback: () => void,
@@ -83,7 +81,6 @@ export abstract class ViewContainer extends GroupFolder {
 
         this.fileClickCallback = fileClickCallback;
         this.fileAddedCallback = fileAddedCallback;
-        this.fileRetainedCallback = fileRetainedCallback;
         this.requestRenderCallback = requestRenderCallback;
         this.saveSettingsCallback = saveSettingsCallback;
         this.hideCallback = hideCallback;
@@ -400,10 +397,6 @@ export abstract class ViewContainer extends GroupFolder {
                 return this.shouldFileCauseRender(state, excludedFolders);
             })) {
                 console.log(`skipping rendering of ${this.groupName}`)
-
-                // before returning, we want to make sure the files are still handled by the view (for context menu interactions)
-                this.renderedFileCaches.forEach(cache => this.fileRetainedCallback(cache.file));
-
                 return;
             }
         }

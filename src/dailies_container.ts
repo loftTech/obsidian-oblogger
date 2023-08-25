@@ -1,5 +1,5 @@
 import { App, FrontMatterCache, getAllTags, Menu, moment, Notice, TFile } from "obsidian";
-import { FileClickCallback, FileAddedCallback, FileRetainedCallback } from "./group_folder";
+import { FileClickCallback, FileAddedCallback } from "./group_folder";
 import { ViewContainer } from "./view_container";
 import { ObloggerSettings, RxGroupType } from "./settings";
 import { NewTagModal } from "./new_tag_modal";
@@ -12,7 +12,6 @@ export class DailiesContainer extends ViewContainer {
         app: App,
         fileClickCallback: FileClickCallback,
         fileAddedCallback: FileAddedCallback,
-        fileRetainedCallback: FileRetainedCallback,
         collapseChangedCallback: (groupName: string, collapsedFolders: string[], save: boolean) => void,
         requestRenderCallback: () => void,
         settings: ObloggerSettings,
@@ -25,7 +24,6 @@ export class DailiesContainer extends ViewContainer {
             RxGroupType.DAILIES,
             fileClickCallback,
             fileAddedCallback,
-            fileRetainedCallback,
             collapseChangedCallback,
             false, // showStatusIcon
             requestRenderCallback,

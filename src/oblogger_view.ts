@@ -5,7 +5,6 @@ import {
     ButtonComponent,
     moment,
     Menu,
-    View,
     Notice,
     CachedMetadata
 } from "obsidian";
@@ -30,41 +29,6 @@ declare module "obsidian" {
         loadLocalStorage(key: string): string | null;
         saveLocalStorage(key: string, value: string | undefined): void;
     }
-}
-
-// Needed for using built-in context menu
-class FileItem {
-    titleEl: HTMLElement;
-    el: HTMLElement;
-    titleInnerEl: HTMLElement;
-    file: TFile;
-    selfEl: HTMLElement;
-
-    constructor(
-        file: TFile,
-        el: HTMLElement,
-        titleEl: HTMLElement,
-        titleInnerEl: HTMLElement
-    ) {
-        this.el = el;
-        this.file = file;
-        this.titleEl = titleEl;
-        this.titleInnerEl = titleInnerEl;
-
-        // not sure if this is the right thing to set it to
-        this.selfEl = el;
-    }
-}
-
-// Needed for using built-in context menu
-class UnknownInfinityScrollObject {
-    computeSync: () => void;
-    scrollIntoView: () => void;
-}
-
-// Needed for using built-in context menu
-class UnknownDomObject {
-    infinityScroll: UnknownInfinityScrollObject;
 }
 
 interface TagGroup {
@@ -94,10 +58,7 @@ export class ObloggerView extends ItemView {
     fileClickCallback: (file: TFile) => void;
     fileAddedCallback: (
         file: TFile,
-        contentItem: HTMLElement,
-        titleItem: HTMLDivElement,
-        titleContentItem: HTMLElement) => void;
-    fileRetainedCallback: (file: TFile) => void;
+        contentItem: HTMLElement) => void;
     rxGroupCollapseChangeCallback: (
         groupName: string,
         collapsedFolders: string[],
@@ -108,19 +69,6 @@ export class ObloggerView extends ItemView {
         collapsedFolders: string[],
         save: boolean
     ) => void;
-
-    // Needed so we can pull old data to retain during a render cycle
-    oldFileItems: {[id: string]: FileItem};
-
-    // These are needed for the context menu to work
-    files: WeakMap<HTMLElement, TFile>;
-    fileItems: {[id: string]: FileItem};
-    selectedDoms: [];
-    dom: UnknownDomObject;
-    openFileContextMenu: (e: MouseEvent, container: HTMLDivElement) => void;
-    setFocusedItem: (fileItem: FileItem) => void;
-    afterCreate: (file: TFile, unknownBool: boolean) => void;
-    isItem: (file: TFile) => boolean;
 
     constructor(
         leaf: WorkspaceLeaf,
@@ -133,19 +81,8 @@ export class ObloggerView extends ItemView {
         this.fullRender = true;
         this.settings = settings;
         this.showLoggerCallbackFn = showLoggerCallbackFn;
-        this.files = new WeakMap();
-        this.selectedDoms = [];
-        this.fileItems = {};
-        this.oldFileItems = {};
         this.otcGroups = [];
         this.saveSettingsCallback = saveSettingsCallback;
-
-        class FileExplorerLeaf extends WorkspaceLeaf {}
-        interface FileExplorerView extends View {
-            openFileContextMenu: (e: MouseEvent, container: HTMLDivElement) => void;
-            setFocusedItem: (fileItem: FileItem) => void;
-            afterCreate: (file: TFile, unknownBool: boolean) => void;
-        }
 
         this.lastOpenFile = this.app.workspace.getActiveFile() ?? undefined;
 
@@ -196,22 +133,14 @@ export class ObloggerView extends ItemView {
 
         this.fileAddedCallback = (
             file: TFile,
-            contentItem: HTMLElement,
-            titleItem: HTMLDivElement,
-            titleContentItem: HTMLElement
+            contentItem: HTMLElement
         ) => {
-            this.files.set(contentItem, file);
-            this.fileItems[file.path] = new FileItem(file, contentItem, titleItem, titleContentItem);
             contentItem.addEventListener("contextmenu", (e) => {
                 const menu = new Menu();
-                this.app.workspace.trigger(
-                    "file-menu",
-                    menu,
-                    file,
-                    "file-explorer"
-                );
 
                 menu.addSeparator();
+
+                // todo: set proper category so this shows up in the right place
                 menu.addItem((item) =>
                     item
                         .setTitle(`Open in new tab`)
@@ -220,6 +149,8 @@ export class ObloggerView extends ItemView {
                             return app.workspace.openLinkText(file.path, file.path, "tab");
                         })
                 );
+
+                // todo: set proper category so this shows up in the right place
                 menu.addItem((item) =>
                     item
                         .setTitle(`Open to the right`)
@@ -228,6 +159,13 @@ export class ObloggerView extends ItemView {
                             return app.workspace.openLinkText(file.path, file.path, "split");
                         })
                 );
+
+                // This adds all the normal file-explorer stuff
+                this.app.workspace.trigger(
+                    "file-menu",
+                    menu,
+                    file,
+                    "file-explorer");
 
                 if ("screenX" in e) {
                     menu.showAtPosition({ x: e.pageX, y: e.pageY });
@@ -242,16 +180,6 @@ export class ObloggerView extends ItemView {
                     });
                 }
             });
-        }
-
-        this.fileRetainedCallback = (file: TFile) => {
-            const fileItem = this.oldFileItems[file.path];
-
-            const contentItem = fileItem.el;
-            const titleItem = fileItem.titleEl as HTMLDivElement;
-            const titleContentItem = fileItem.titleInnerEl;
-            this.files.set(contentItem, file);
-            this.fileItems[file.path] = new FileItem(file, contentItem, titleItem, titleContentItem);
         }
 
         this.rxGroupCollapseChangeCallback = (
@@ -288,46 +216,7 @@ export class ObloggerView extends ItemView {
             return this.saveSettingsCallback();
         }
 
-        this.dom = {
-            infinityScroll: {
-                computeSync: () => { console.debug("computeSync does nothing"); },
-                scrollIntoView: () => { console.debug("scrollIntoView does nothing"); }
-            }
-        }
-
         this.app.workspace.onLayoutReady(() => {
-            // Hook up to the file-explorer plugin
-            const fileExplorerLeaf = this.app.workspace.getLeavesOfType("file-explorer")[0] as FileExplorerLeaf;
-            const fileExplorer = fileExplorerLeaf?.view as FileExplorerView;
-            this.openFileContextMenu = fileExplorer.openFileContextMenu;
-            this.setFocusedItem = fileExplorer.setFocusedItem;
-            this.afterCreate = fileExplorer.afterCreate;
-            this.isItem = () => false;
-
-            this.registerEvent(
-                // todo(#172): right now, we're disabling rename because it's broken
-                //  however, we should fix it with either custom rename or by getting
-                //  the in-line rename to work right
-                this.app.workspace.on("file-menu", (menu) => {
-                    // Don't hide it for other views (like file-explorer)
-                    if(!this.app.workspace.getActiveViewOfType(ObloggerView)?.getState()) {
-                        return;
-                    }
-                    // These types are added at run-time on top of Menu? Or Menu is
-                    // the wrong type to be using and these are already defined
-                    // somewhere.
-                    class FileMenuAction {
-                        titleEl: HTMLElement;
-                    }
-                    class FileMenu extends Menu {
-                        items: FileMenuAction[]
-                    }
-                    const fileMenu = menu as FileMenu;
-                    const renameAction = fileMenu.items.find(i => i?.titleEl?.innerHTML === "Rename");
-                    renameAction && fileMenu.items.remove(renameAction);
-                })
-            );
-
             // Hook up to the bookmarks plugin
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
@@ -454,10 +343,6 @@ export class ObloggerView extends ItemView {
     }
 
     private async renderNow(modifiedFiles: FileState[]) {
-        this.files = new WeakMap();
-        this.oldFileItems = this.fileItems;
-        this.fileItems = {};
-
         await this.renderAvatar();
         await this.renderVault();
         this.renderClock(this.clockDiv);
@@ -838,7 +723,6 @@ export class ObloggerView extends ItemView {
             moveCallback,
             this.fileClickCallback,
             this.fileAddedCallback,
-            this.fileRetainedCallback,
             this.tagGroupCollapseChangedCallback,
             () => { this.requestRender() },
             this.settings,
@@ -858,8 +742,6 @@ export class ObloggerView extends ItemView {
         this.otcGroupsDiv?.empty();
 
         this.otcGroups = [];
-        this.files = new WeakMap();
-        this.fileItems = {};
 
         const groupSorter = (a: SettingsTagGroup, b: SettingsTagGroup): number => {
             const pattern = "\\.\\.\\./(.*)/\\.\\.\\.";
@@ -931,7 +813,6 @@ export class ObloggerView extends ItemView {
                 this.app,
                 this.fileClickCallback,
                 this.fileAddedCallback,
-                this.fileRetainedCallback,
                 this.rxGroupCollapseChangeCallback,
                 () => { this.requestRender() },
                 this.settings,

@@ -1,5 +1,5 @@
 import { App, getAllTags, Menu, MenuItem, TFile } from "obsidian";
-import { FileClickCallback, FileAddedCallback, FileRetainedCallback } from "./group_folder";
+import { FileClickCallback, FileAddedCallback } from "./group_folder";
 import { ViewContainer } from "./view_container";
 import { ContainerSortMethod, getSortMethodDisplayText, ObloggerSettings } from "./settings";
 import { FileState } from "./constants";
@@ -22,7 +22,6 @@ export class TagGroupContainer extends ViewContainer {
         moveCallback: (up: boolean) => void,
         fileClickCallback: FileClickCallback,
         fileAddedCallback: FileAddedCallback,
-        fileRetainedCallback: FileRetainedCallback,
         collapseChangedCallback: (baseTag: string, collapsedFolders: string[], save: boolean) => void,
         requestRenderCallback: () => void,
         settings: ObloggerSettings,
@@ -35,7 +34,6 @@ export class TagGroupContainer extends ViewContainer {
             baseTag,
             fileClickCallback,
             fileAddedCallback,
-            fileRetainedCallback,
             collapseChangedCallback,
             false,
             requestRenderCallback,
