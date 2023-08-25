@@ -1,4 +1,4 @@
-import {FileClickCallback, FileAddedCallback, FileRetainedCallback} from "./group_folder";
+import {FileClickCallback, FileAddedCallback } from "./group_folder";
 import { ViewContainer } from "./view_container";
 import { App, Menu } from "obsidian";
 import { ObloggerSettings, RxGroupType } from "./settings";
@@ -13,7 +13,6 @@ export class RecentsContainer extends ViewContainer {
         app: App,
         fileClickCallback: FileClickCallback,
         fileAddedCallback: FileAddedCallback,
-        fileRetainedCallback: FileRetainedCallback,
         collapseChangedCallback: (groupName: string, collapsedFolders: string[], save: boolean) => void,
         requestRenderCallback: () => void,
         settings: ObloggerSettings,
@@ -26,7 +25,6 @@ export class RecentsContainer extends ViewContainer {
             RxGroupType.RECENTS,
             fileClickCallback,
             fileAddedCallback,
-            fileRetainedCallback,
             collapseChangedCallback,
             true,
             requestRenderCallback,

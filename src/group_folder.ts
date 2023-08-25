@@ -13,10 +13,7 @@ const COLLAPSED_CLASS_IDENTIFIER = "collapsed";
 export type FileClickCallback = (file: TFile) => void;
 export type FileAddedCallback = (
     file: TFile,
-    contentItem: HTMLElement,
-    titleItem: HTMLElement,
-    titleContentItem: HTMLElement) => void;
-export type FileRetainedCallback =  (file: TFile) => void;
+    contentItem: HTMLElement) => void;
 
 declare module "obsidian" {
     interface Plugin {
@@ -284,9 +281,8 @@ Created at ${window.moment(file.stat.ctime).format("YYYY-MM-DD HH:mm")}`;
 
         root_childItem.setAttribute("data-path", file.path);
 
-        // This callback is because we're leveraging the build in FileExplorer's
-        // context menu. It needs to know all files that might be clicked.
-        fileAddedCallback(file, root_childItem, childItemText, bookmarkIcon);
+        // This callback is here to handle context menu building at the view level
+        fileAddedCallback(file, root_childItem);
 
         return root_childItem;
     }
