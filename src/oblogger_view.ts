@@ -278,10 +278,32 @@ export class ObloggerView extends ItemView {
     }
 
     private renderTagGroup(group: GroupFolder, modifiedFiles: FileState[]) {
-        const excludedFolders = this.settings?.excludedFolders ?? [];
-        const collapsedFolders = this.settings?.tagGroups.find(
+        const maybeSettingsGroup = this.settings?.tagGroups.find(
             settingsGroup => settingsGroup.tag === group.groupName
-        )?.collapsedFolders ?? [];
+        );
+
+        const collapsedFolders = maybeSettingsGroup?.collapsedFolders ?? [];
+        const excludedFolders = [...maybeSettingsGroup?.excludedFolders ?? []];
+        if (maybeSettingsGroup) {
+            if (!maybeSettingsGroup.templatesFolderVisible) {
+                const templatesFolderPath = ""; // todo: figure out how to get this
+                excludedFolders.push(templatesFolderPath);
+
+                // todo: validate that pushing new things to excluded folders doesn't modify the settings object
+                if (excludedFolders === maybeSettingsGroup.excludedFolders) {
+                    console.error("this isn't supposed to happen. program it differently!")
+                }
+            }
+            if (!maybeSettingsGroup.logsFolderVisible && this.settings) {
+                excludedFolders.push(this.settings.loggingPath);
+
+                // todo: validate that pushing new things to excluded folders doesn't modify the settings object
+                if (excludedFolders === maybeSettingsGroup.excludedFolders) {
+                    console.error("this isn't supposed to happen. program it differently!")
+                }
+            }
+        }
+
         if (group instanceof TagGroupContainer) {
             group.render(collapsedFolders, excludedFolders, modifiedFiles, false);
         }
@@ -289,7 +311,6 @@ export class ObloggerView extends ItemView {
 
     private renderRxGroup(
         groupName: string,
-        excludedFolders: string[],
         modifiedFiles: FileState[],
         forced: boolean
     ) {
@@ -297,6 +318,24 @@ export class ObloggerView extends ItemView {
         if (!groupSetting) {
             console.warn(`unable to find settings for rx group ${groupName}`);
             return;
+        }
+        const excludedFolders = [...groupSetting.excludedFolders];
+        if (!groupSetting.templatesFolderVisible) {
+            const templatesFolderPath = ""; // todo: figure out how to get this
+            excludedFolders.push(templatesFolderPath);
+
+            // todo: validate that pushing new things to excluded folders doesn't modify the settings object
+            if (excludedFolders === groupSetting.excludedFolders) {
+                console.error("this isn't supposed to happen. program it differently!")
+            }
+        }
+        if (!groupSetting.logsFolderVisible && this.settings) {
+            excludedFolders.push(this.settings.loggingPath);
+
+            // todo: validate that pushing new things to excluded folders doesn't modify the settings object
+            if (excludedFolders === groupSetting.excludedFolders) {
+                console.error("this isn't supposed to happen. program it differently!")
+            }
         }
         const container = this.rxContainers.find(container => container.groupName === groupName);
         if (!container) {
@@ -313,7 +352,6 @@ export class ObloggerView extends ItemView {
     private renderDailies(modifiedFiles: FileState[]) {
         this.renderRxGroup(
             RxGroupType.DAILIES,
-            this.settings?.excludedFolders ?? [],
             modifiedFiles,
             false);
     }
@@ -321,7 +359,6 @@ export class ObloggerView extends ItemView {
     private renderFiles(modifiedFiles: FileState[]) {
         this.renderRxGroup(
             RxGroupType.FILES,
-            [],
             modifiedFiles,
             false);
     }
@@ -329,7 +366,6 @@ export class ObloggerView extends ItemView {
     private renderUntagged(modifiedFiles: FileState[]) {
         this.renderRxGroup(
             RxGroupType.UNTAGGED,
-            [this.settings?.loggingPath].concat(this.settings?.excludedFolders ?? []),
             modifiedFiles,
             false);
     }
@@ -337,7 +373,6 @@ export class ObloggerView extends ItemView {
     private renderRecents(modifiedFiles: FileState[]) {
         this.renderRxGroup(
             RxGroupType.RECENTS,
-            [],
             modifiedFiles,
             false);
     }
