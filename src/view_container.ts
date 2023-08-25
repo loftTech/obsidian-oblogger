@@ -2,6 +2,7 @@ import { App, FrontMatterCache, Menu, setIcon, TFile } from "obsidian";
 import {FileClickCallback, GroupFolder, FileAddedCallback} from "./group_folder";
 import { ObloggerSettings, RxGroupSettings } from "./settings";
 import { buildStateFromFile, FileState } from "./constants";
+import { FolderSuggestModal } from "./folder_suggest_modal";
 
 interface RenderedFileCache {
     file: TFile;
@@ -226,7 +227,17 @@ export abstract class ViewContainer extends GroupFolder {
                     .setIcon("folder-x")
                     .setSection("exclude")
                     .onClick(() => {
-                        console.log("todo: show folder selection")
+                        new FolderSuggestModal(
+                            this.app,
+                            ["/"].concat(groupSetting?.excludedFolders ?? []),
+                            async (selectedPath: string) => {
+                                if (!groupSetting?.excludedFolders.contains(selectedPath)) {
+                                    groupSetting?.excludedFolders.push(selectedPath);
+                                    await this.saveSettingsCallback();
+                                    this.requestRender();
+                                }
+                            }
+                        ).open();
                     });
             });
         });
