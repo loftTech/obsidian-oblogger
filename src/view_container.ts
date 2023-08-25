@@ -19,7 +19,7 @@ export abstract class ViewContainer extends GroupFolder {
     fileClickCallback: FileClickCallback;
     fileAddedCallback: FileAddedCallback;
     requestRenderCallback: () => void;
-    saveSettingsCallback: () => void;
+    saveSettingsCallback: () => Promise<void>;
     hideCallback: () => void;
     moveCallback: (up: boolean) => void;
     pinCallback: ((pin: boolean) => void) | undefined;
@@ -52,7 +52,7 @@ export abstract class ViewContainer extends GroupFolder {
         showStatusIcon: boolean,
         requestRenderCallback: () => void,
         settings: ObloggerSettings,
-        saveSettingsCallback: () => void,
+        saveSettingsCallback: () => Promise<void>,
         getGroupIconCallback: (isCollapsed: boolean) => string,
         moveCallback: (up: boolean) => void,
         hideCallback: () => void,
