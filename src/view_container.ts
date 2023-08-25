@@ -180,20 +180,44 @@ export abstract class ViewContainer extends GroupFolder {
                 subItem
                     .setTitle(`${groupSetting?.templatesFolderVisible ? "Hide" : "Show"} templates`)
                     .setIcon(groupSetting?.templatesFolderVisible ? "eye-off" : "eye")
-                    .setSection("hide");
+                    .setSection("hide")
+                    .onClick(() => {
+                        if (groupSetting) {
+                            groupSetting.templatesFolderVisible = !groupSetting.templatesFolderVisible;
+                            this.saveSettingsCallback();
+                        } else {
+                            console.warn(`Unable to get group setting for ${this.groupName}`)
+                        }
+                    });
             });
             subMenu.addItem(subItem => {
                 subItem
                     .setTitle(`${groupSetting?.logsFolderVisible ? "Hide" : "Show"} logs`)
                     .setIcon(groupSetting?.logsFolderVisible ? "eye-off" : "eye")
-                    .setSection("hide");
+                    .setSection("hide")
+                    .onClick(() => {
+                        if (groupSetting) {
+                            groupSetting.logsFolderVisible = !groupSetting.logsFolderVisible;
+                            this.saveSettingsCallback();
+                        } else {
+                            console.warn(`Unable to get group setting for ${this.groupName}`)
+                        }
+                    });
             });
             groupSetting?.excludedFolders.forEach(folderPath => {
                 subMenu.addItem(subItem => {
                     subItem
                         .setTitle(`Include ${folderPath}`)
                         .setIcon("folder-plus")
-                        .setSection("include");
+                        .setSection("include")
+                        .onClick(() => {
+                            if (groupSetting) {
+                                groupSetting.excludedFolders.remove(folderPath);
+                                this.saveSettingsCallback();
+                            } else {
+                                console.warn(`Unable to get group setting for ${this.groupName}`)
+                            }
+                        });
                 });
             });
             subMenu.addItem(subItem => {
