@@ -136,10 +136,13 @@ const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } =
                     RxGroupType.FILES,
                     RxGroupType.RECENTS
                 ].contains(group.groupName);
+
+                group.excludedFolders = [];
             });
             newSettings.tagGroups.forEach(group => {
                 group.logsFolderVisible = false;
                 group.templatesFolderVisible = false;
+                group.excludedFolders = [];
             });
             newSettings.version = 3;
         }
