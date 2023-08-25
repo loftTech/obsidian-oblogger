@@ -140,20 +140,20 @@ export class ObloggerView extends ItemView {
 
                 menu.addSeparator();
 
-                // todo(#96): set proper category so this shows up in the right place
                 menu.addItem((item) =>
                     item
                         .setTitle(`Open in new tab`)
+                        .setSection("open")
                         .setIcon("lucide-file-plus")
                         .onClick(async () => {
                             return app.workspace.openLinkText(file.path, file.path, "tab");
                         })
                 );
 
-                // todo(#96): set proper category so this shows up in the right place
                 menu.addItem((item) =>
                     item
                         .setTitle(`Open to the right`)
+                        .setSection("open")
                         .setIcon("lucide-separator-vertical")
                         .onClick(async () => {
                             return app.workspace.openLinkText(file.path, file.path, "split");
