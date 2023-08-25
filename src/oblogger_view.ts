@@ -140,7 +140,7 @@ export class ObloggerView extends ItemView {
 
                 menu.addSeparator();
 
-                // todo: set proper category so this shows up in the right place
+                // todo(#96): set proper category so this shows up in the right place
                 menu.addItem((item) =>
                     item
                         .setTitle(`Open in new tab`)
@@ -150,7 +150,7 @@ export class ObloggerView extends ItemView {
                         })
                 );
 
-                // todo: set proper category so this shows up in the right place
+                // todo(#96): set proper category so this shows up in the right place
                 menu.addItem((item) =>
                     item
                         .setTitle(`Open to the right`)
