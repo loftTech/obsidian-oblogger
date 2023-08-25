@@ -163,6 +163,41 @@ export abstract class ViewContainer extends GroupFolder {
             );
         }
 
+        menu.addItem(item => {
+            item
+                .setTitle("Folder exclusions")
+                .setSection("exclusions")
+                .setIcon("folder-x");
+
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            const subMenu = item.setSubmenu() as Menu;
+            subMenu.addItem(subItem => {
+                subItem
+                    .setTitle("Hide templates")
+                    .setIcon("eye-off")
+                    .setSection("hide");
+            });
+            subMenu.addItem(subItem => {
+                subItem
+                    .setTitle("Show logs")
+                    .setIcon("eye")
+                    .setSection("hide");
+            });
+            subMenu.addItem(subItem => {
+                subItem
+                    .setTitle("Include asdf")
+                    .setIcon("folder-plus")
+                    .setSection("include");
+            });
+            subMenu.addItem(subItem => {
+                subItem
+                    .setTitle("Exclude folder")
+                    .setIcon("folder-x")
+                    .setSection("exclude");
+            });
+        });
+
         menu.addItem(item =>
             item
                 .setTitle(this.getHideText())
