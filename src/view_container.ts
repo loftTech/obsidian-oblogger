@@ -104,6 +104,8 @@ export abstract class ViewContainer extends GroupFolder {
     }
 
     protected getGroupSetting() {
+        // todo: this is a little dangerous because someone could have a tag that
+        //  conflicts with an rx group name and this would return the wrong thing
         return (
             (this.settings.rxGroups.find(group => group.groupName === this.groupName)) ??
             (this.settings.tagGroups.find(group => group.tag === this.groupName))
