@@ -302,7 +302,6 @@ export class LoggerModal extends Modal {
                     return;
                 }
                 
-                console.log(`adding ${value}`)
                 acc.set(fmKey, (acc.get(fmKey) ?? new Set()).add(value));
             })
             return acc;
