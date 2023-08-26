@@ -284,19 +284,14 @@ export class ObloggerView extends ItemView {
         // @ts-ignore
         const coreTemplatesFolder = this.app.internalPlugins.plugins["templates"]?.instance?.options?.folder ?? "";
         if (coreTemplatesFolder !== "") {
-            console.log(coreTemplatesFolder);
             templatesFolders.push(coreTemplatesFolder);
         }
-
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const templaterFolder = this.app.plugins.plugins["templater-obsidian"]?.settings?.templates_folder ?? "";
         if (templaterFolder !== "") {
-            console.log(templaterFolder);
             templatesFolders.push(templaterFolder);
         }
-
-        console.log(templatesFolders);
         return templatesFolders;
     }
 
