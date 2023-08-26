@@ -294,10 +294,15 @@ export class LoggerModal extends Modal {
                 if (EXCLUDED_FIELDS.has(fmKey)) {
                     return;
                 }
-                const value = String(fm[fmKey]).trim();
-                if (value) {
-                    acc.set(fmKey, (acc.get(fmKey) ?? new Set()).add(value));
+                if (!fm[fmKey]) {
+                    return;
                 }
+                const value = String(fm[fmKey]).trim();
+                if (!value) {
+                    return;
+                }
+                
+                acc.set(fmKey, (acc.get(fmKey) ?? new Set()).add(value));
             })
             return acc;
         }, new Map<string, Set<string>>());
