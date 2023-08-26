@@ -2,6 +2,7 @@ import { App, FrontMatterCache, Menu, setIcon, TFile } from "obsidian";
 import {FileClickCallback, GroupFolder, FileAddedCallback} from "./group_folder";
 import { ObloggerSettings, RxGroupSettings } from "./settings";
 import { buildStateFromFile, FileState } from "./constants";
+import { FolderSuggestModal } from "./folder_suggest_modal";
 
 interface RenderedFileCache {
     file: TFile;
@@ -19,7 +20,7 @@ export abstract class ViewContainer extends GroupFolder {
     fileClickCallback: FileClickCallback;
     fileAddedCallback: FileAddedCallback;
     requestRenderCallback: () => void;
-    saveSettingsCallback: () => void;
+    saveSettingsCallback: () => Promise<void>;
     hideCallback: () => void;
     moveCallback: (up: boolean) => void;
     pinCallback: ((pin: boolean) => void) | undefined;
@@ -52,7 +53,7 @@ export abstract class ViewContainer extends GroupFolder {
         showStatusIcon: boolean,
         requestRenderCallback: () => void,
         settings: ObloggerSettings,
-        saveSettingsCallback: () => void,
+        saveSettingsCallback: () => Promise<void>,
         getGroupIconCallback: (isCollapsed: boolean) => string,
         moveCallback: (up: boolean) => void,
         hideCallback: () => void,
@@ -104,6 +105,8 @@ export abstract class ViewContainer extends GroupFolder {
     }
 
     protected getGroupSetting() {
+        // todo(#64): this is a little dangerous because someone could have a tag that
+        //  conflicts with an rx group name and this would return the wrong thing
         return (
             (this.settings.rxGroups.find(group => group.groupName === this.groupName)) ??
             (this.settings.tagGroups.find(group => group.tag === this.groupName))
@@ -162,6 +165,85 @@ export abstract class ViewContainer extends GroupFolder {
                     })
             );
         }
+
+        const groupSetting = this.getGroupSetting();
+
+        menu.addItem(item => {
+            item
+                .setTitle("Folder exclusions")
+                .setSection("exclusions")
+                .setIcon("folder-x");
+
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            const subMenu = item.setSubmenu() as Menu;
+            subMenu.addItem(subItem => {
+                subItem
+                    .setTitle(`${groupSetting?.templatesFolderVisible ? "Hide" : "Show"} templates`)
+                    .setIcon(groupSetting?.templatesFolderVisible ? "eye-off" : "eye")
+                    .setSection("hide")
+                    .onClick(async () => {
+                        if (groupSetting) {
+                            groupSetting.templatesFolderVisible = !groupSetting.templatesFolderVisible;
+                            await this.saveSettingsCallback();
+                            this.requestRender();
+                        } else {
+                            console.warn(`Unable to get group setting for ${this.groupName}`)
+                        }
+                    });
+            });
+            subMenu.addItem(subItem => {
+                subItem
+                    .setTitle(`${groupSetting?.logsFolderVisible ? "Hide" : "Show"} logs`)
+                    .setIcon(groupSetting?.logsFolderVisible ? "eye-off" : "eye")
+                    .setSection("hide")
+                    .onClick(async () => {
+                        if (groupSetting) {
+                            groupSetting.logsFolderVisible = !groupSetting.logsFolderVisible;
+                            await this.saveSettingsCallback();
+                            this.requestRender();
+                        } else {
+                            console.warn(`Unable to get group setting for ${this.groupName}`)
+                        }
+                    });
+            });
+            groupSetting?.excludedFolders.forEach(folderPath => {
+                subMenu.addItem(subItem => {
+                    subItem
+                        .setTitle(`Include ${folderPath}`)
+                        .setIcon("folder-plus")
+                        .setSection("include")
+                        .onClick(async () => {
+                            if (groupSetting) {
+                                groupSetting.excludedFolders.remove(folderPath);
+                                await this.saveSettingsCallback();
+                                this.requestRender();
+                            } else {
+                                console.warn(`Unable to get group setting for ${this.groupName}`)
+                            }
+                        });
+                });
+            });
+            subMenu.addItem(subItem => {
+                subItem
+                    .setTitle("Exclude folder")
+                    .setIcon("folder-x")
+                    .setSection("exclude")
+                    .onClick(() => {
+                        new FolderSuggestModal(
+                            this.app,
+                            ["/"].concat(groupSetting?.excludedFolders ?? []),
+                            async (selectedPath: string) => {
+                                if (!groupSetting?.excludedFolders.contains(selectedPath)) {
+                                    groupSetting?.excludedFolders.push(selectedPath);
+                                    await this.saveSettingsCallback();
+                                    this.requestRender();
+                                }
+                            }
+                        ).open();
+                    });
+            });
+        });
 
         menu.addItem(item =>
             item

@@ -25,7 +25,7 @@ export class TagGroupContainer extends ViewContainer {
         collapseChangedCallback: (baseTag: string, collapsedFolders: string[], save: boolean) => void,
         requestRenderCallback: () => void,
         settings: ObloggerSettings,
-        saveSettingsCallback: () => void,
+        saveSettingsCallback: () => Promise<void>,
         pinCallback: (pin: boolean) => void,
         isPinned: boolean
     ) {

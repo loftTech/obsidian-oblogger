@@ -277,11 +277,40 @@ export class ObloggerView extends ItemView {
         this.registerInterval(this.renderTimeout);
     }
 
+    private getTemplatesFolders(): string[] {
+        const templatesFolders: string[] = []
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const coreTemplatesFolder = this.app.internalPlugins.plugins["templates"]?.instance?.options?.folder ?? "";
+        if (coreTemplatesFolder !== "") {
+            templatesFolders.push(coreTemplatesFolder);
+        }
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const templaterFolder = this.app.plugins.plugins["templater-obsidian"]?.settings?.templates_folder ?? "";
+        if (templaterFolder !== "") {
+            templatesFolders.push(templaterFolder);
+        }
+        return templatesFolders;
+    }
+
     private renderTagGroup(group: GroupFolder, modifiedFiles: FileState[]) {
-        const excludedFolders = this.settings?.excludedFolders ?? [];
-        const collapsedFolders = this.settings?.tagGroups.find(
+        const maybeSettingsGroup = this.settings?.tagGroups.find(
             settingsGroup => settingsGroup.tag === group.groupName
-        )?.collapsedFolders ?? [];
+        );
+
+        const collapsedFolders = maybeSettingsGroup?.collapsedFolders ?? [];
+        const excludedFolders = [...maybeSettingsGroup?.excludedFolders ?? []];
+        if (maybeSettingsGroup) {
+            if (!maybeSettingsGroup.templatesFolderVisible) {
+                excludedFolders.push(...this.getTemplatesFolders());
+            }
+            if (!maybeSettingsGroup.logsFolderVisible && this.settings) {
+                excludedFolders.push(this.settings.loggingPath);
+            }
+        }
+
         if (group instanceof TagGroupContainer) {
             group.render(collapsedFolders, excludedFolders, modifiedFiles, false);
         }
@@ -289,7 +318,6 @@ export class ObloggerView extends ItemView {
 
     private renderRxGroup(
         groupName: string,
-        excludedFolders: string[],
         modifiedFiles: FileState[],
         forced: boolean
     ) {
@@ -297,6 +325,13 @@ export class ObloggerView extends ItemView {
         if (!groupSetting) {
             console.warn(`unable to find settings for rx group ${groupName}`);
             return;
+        }
+        const excludedFolders = [...groupSetting.excludedFolders];
+        if (!groupSetting.templatesFolderVisible) {
+            excludedFolders.push(...this.getTemplatesFolders());
+        }
+        if (!groupSetting.logsFolderVisible && this.settings) {
+            excludedFolders.push(this.settings.loggingPath);
         }
         const container = this.rxContainers.find(container => container.groupName === groupName);
         if (!container) {
@@ -313,7 +348,6 @@ export class ObloggerView extends ItemView {
     private renderDailies(modifiedFiles: FileState[]) {
         this.renderRxGroup(
             RxGroupType.DAILIES,
-            this.settings?.excludedFolders ?? [],
             modifiedFiles,
             false);
     }
@@ -321,7 +355,6 @@ export class ObloggerView extends ItemView {
     private renderFiles(modifiedFiles: FileState[]) {
         this.renderRxGroup(
             RxGroupType.FILES,
-            [],
             modifiedFiles,
             false);
     }
@@ -329,7 +362,6 @@ export class ObloggerView extends ItemView {
     private renderUntagged(modifiedFiles: FileState[]) {
         this.renderRxGroup(
             RxGroupType.UNTAGGED,
-            [this.settings?.loggingPath].concat(this.settings?.excludedFolders ?? []),
             modifiedFiles,
             false);
     }
@@ -337,7 +369,6 @@ export class ObloggerView extends ItemView {
     private renderRecents(modifiedFiles: FileState[]) {
         this.renderRxGroup(
             RxGroupType.RECENTS,
-            [],
             modifiedFiles,
             false);
     }
@@ -504,7 +535,10 @@ export class ObloggerView extends ItemView {
             this.settings.tagGroups.push({
                 tag: result,
                 collapsedFolders: [],
-                isPinned: false
+                isPinned: false,
+                excludedFolders: [],
+                logsFolderVisible: false,
+                templatesFolderVisible: false
             });
             await this.saveSettingsCallback();
             this.reloadOtcGroups();

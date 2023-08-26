@@ -16,7 +16,7 @@ export class RecentsContainer extends ViewContainer {
         collapseChangedCallback: (groupName: string, collapsedFolders: string[], save: boolean) => void,
         requestRenderCallback: () => void,
         settings: ObloggerSettings,
-        saveSettingsCallback: () => void,
+        saveSettingsCallback: () => Promise<void>,
         moveCallback: (up: boolean) => void,
         hideCallback: () => void
     ) {
