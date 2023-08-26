@@ -135,35 +135,8 @@ export class RecentsContainer extends ViewContainer {
                 if (foundFilesCount >= this.recentsCount) {
                     return;
                 }
-                if (file.parent) {
-                    let excluded = false;
-                    file.parent.path.split("/").reduce(
-                        (previousValue, currentValue) => {
-                            // early bail out if we've already determined it's excluded
-                            if (excluded) {
-                                return "";
-                            }
-
-                            // build the new value, concatenating the next path part
-                            const newValue =
-                                previousValue.length === 0 ?
-                                currentValue :
-                                (previousValue + "/" + currentValue);
-
-                            // check if it's excluded
-                            if (excludedFolders.contains(newValue)) {
-                                excluded = true;
-                                return "";
-                            }
-
-                            // not excluded, keep building
-                            return newValue;
-                        }, "");
-
-                    // check exclusion status
-                    if (excluded) {
-                        return;
-                    }
+                if (this.isFileExcluded(file, excludedFolders)) {
+                    return;
                 }
                 this.addFileToFolder(
                     file,
