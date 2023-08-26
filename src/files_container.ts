@@ -260,12 +260,8 @@ export class FilesContainer extends ViewContainer {
 
     protected buildFileStructure(excludedFolders: string[]): void {
         const includedFiles = this.app.vault.getFiles().filter(file => {
-            if (
-                file.parent &&
-                excludedFolders.some(
-                    excludedFolder =>
-                        file.parent?.path.startsWith(excludedFolder))
-            ) {
+
+            if (this.isFileExcluded(file, excludedFolders)) {
                 return false;
             }
 

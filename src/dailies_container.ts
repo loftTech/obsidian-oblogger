@@ -128,7 +128,7 @@ export class DailiesContainer extends ViewContainer {
     }
 
     private shouldIncludeFile(file: TFile, excludedFolders: string[]): boolean {
-        if (file.parent && excludedFolders.contains(file.parent.path)) {
+        if (this.isFileExcluded(file, excludedFolders)) {
             return false;
         }
 
