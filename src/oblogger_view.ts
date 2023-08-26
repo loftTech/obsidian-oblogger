@@ -277,6 +277,29 @@ export class ObloggerView extends ItemView {
         this.registerInterval(this.renderTimeout);
     }
 
+    private getTemplatesFolders(): string[] {
+        const templatesFolders: string[] = []
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const coreTemplatesFolder = this.app.internalPlugins.plugins["templates"]?.instance?.options?.folder ?? "";
+        if (coreTemplatesFolder !== "") {
+            console.log(coreTemplatesFolder);
+            templatesFolders.push(coreTemplatesFolder);
+        }
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const templaterFolder = this.app.plugins.plugins["templater-obsidian"]?.settings?.templates_folder ?? "";
+        if (templaterFolder !== "") {
+            console.log(templaterFolder);
+            templatesFolders.push(templaterFolder);
+        }
+
+        console.log(templatesFolders);
+        return templatesFolders;
+    }
+
     private renderTagGroup(group: GroupFolder, modifiedFiles: FileState[]) {
         const maybeSettingsGroup = this.settings?.tagGroups.find(
             settingsGroup => settingsGroup.tag === group.groupName
@@ -286,8 +309,7 @@ export class ObloggerView extends ItemView {
         const excludedFolders = [...maybeSettingsGroup?.excludedFolders ?? []];
         if (maybeSettingsGroup) {
             if (!maybeSettingsGroup.templatesFolderVisible) {
-                const templatesFolderPath = ""; // todo: figure out how to get this
-                excludedFolders.push(templatesFolderPath);
+                excludedFolders.push(...this.getTemplatesFolders());
             }
             if (!maybeSettingsGroup.logsFolderVisible && this.settings) {
                 excludedFolders.push(this.settings.loggingPath);
@@ -311,8 +333,7 @@ export class ObloggerView extends ItemView {
         }
         const excludedFolders = [...groupSetting.excludedFolders];
         if (!groupSetting.templatesFolderVisible) {
-            const templatesFolderPath = ""; // todo: figure out how to get this
-            excludedFolders.push(templatesFolderPath);
+            excludedFolders.push(...this.getTemplatesFolders());
         }
         if (!groupSetting.logsFolderVisible && this.settings) {
             excludedFolders.push(this.settings.loggingPath);
