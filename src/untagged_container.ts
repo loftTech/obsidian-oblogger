@@ -261,12 +261,7 @@ export class UntaggedContainer extends ViewContainer {
                 return false;
             }
 
-            if (
-                file.parent &&
-                excludedFolders.some(
-                    (excludedFolder: string) =>
-                        file.parent?.path.startsWith(excludedFolder))
-            ) {
+            if (this.isFileExcluded(file, excludedFolders)) {
                 return false;
             }
 

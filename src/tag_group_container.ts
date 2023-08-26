@@ -223,7 +223,7 @@ export class TagGroupContainer extends ViewContainer {
         isolatedGroupName: string | undefined
     ): FileTags | null {
         // filter out excluded
-        if (file.parent && excludedFolders.contains(file.parent.path)) {
+        if (this.isFileExcluded(file, excludedFolders)) {
             return null;
         }
         const cache = this.app.metadataCache.getFileCache(file);

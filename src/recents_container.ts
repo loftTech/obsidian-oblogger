@@ -125,12 +125,17 @@ export class RecentsContainer extends ViewContainer {
     }
 
     protected buildFileStructure(excludedFolders: string[]): void {
+        console.log(excludedFolders)
+        let foundFilesCount = 0;
         this.app.vault
             .getFiles()
             .sort((a, b) => b.stat.mtime - a.stat.mtime)
-            .slice(0, this.recentsCount)
             .forEach(file => {
-                if (file.parent && excludedFolders.contains(file.parent.path)) {
+                // early bail out if we've found enough files
+                if (foundFilesCount >= this.recentsCount) {
+                    return;
+                }
+                if (this.isFileExcluded(file, excludedFolders)) {
                     return;
                 }
                 this.addFileToFolder(
@@ -138,6 +143,7 @@ export class RecentsContainer extends ViewContainer {
                     "",
                     "/"
                 );
+                foundFilesCount += 1;
             });
     }
 }

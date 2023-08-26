@@ -1,6 +1,6 @@
 import { App, FrontMatterCache, Menu, setIcon, TFile } from "obsidian";
 import {FileClickCallback, GroupFolder, FileAddedCallback} from "./group_folder";
-import { ObloggerSettings, RxGroupSettings } from "./settings";
+import { ObloggerSettings, OtcGroupSettings, RxGroupSettings } from "./settings";
 import { buildStateFromFile, FileState } from "./constants";
 import { FolderSuggestModal } from "./folder_suggest_modal";
 
@@ -414,6 +414,39 @@ export abstract class ViewContainer extends GroupFolder {
         return !oldTags.some(oldTag => !newTags.contains(oldTag));
     }
 
+    protected isFileExcluded(file: TFile, excludedFolders: string[]) {
+        if (!file.parent) {
+            // Unable to determine exclusion status. include it just in case
+            return false;
+        }
+
+        let excluded = false;
+        file.parent.path.split("/").reduce(
+            (previousValue, currentValue) => {
+                // early bail out if we've already determined it's excluded
+                if (excluded) {
+                    return "";
+                }
+
+                // build the new value, concatenating the next path part
+                const newValue =
+                    previousValue.length === 0 ?
+                        currentValue :
+                        (previousValue + "/" + currentValue);
+
+                // check if it's excluded
+                if (excludedFolders.contains(newValue)) {
+                    excluded = true;
+                    return "";
+                }
+
+                // not excluded, keep building
+                return newValue;
+            }, "");
+
+        return excluded;
+    }
+
     private shouldFileCauseRender(
         state: FileState,
         excludedFolders: string[]
@@ -468,21 +501,45 @@ export abstract class ViewContainer extends GroupFolder {
         return this.shouldRender(maybeCache.state, state);
     }
 
+    private getTemplatesFolders(): string[] {
+        const templatesFolders: string[] = []
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const coreTemplatesFolder = this.app.internalPlugins.plugins["templates"]?.instance?.options?.folder ?? "";
+        if (coreTemplatesFolder !== "") {
+            templatesFolders.push(coreTemplatesFolder);
+        }
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const templaterFolder = this.app.plugins.plugins["templater-obsidian"]?.settings?.templates_folder ?? "";
+        if (templaterFolder !== "") {
+            templatesFolders.push(templaterFolder);
+        }
+        return templatesFolders;
+    }
+
     public render(
-        collapsedFolders: string[],
-        excludedFolders: string[],
         modifiedFiles: FileState[],
-        forced: boolean
+        forced: boolean,
+        groupSetting: OtcGroupSettings | RxGroupSettings
     ) {
+        const collapsedFolders = groupSetting.collapsedFolders ?? [];
+        const excludedFolders = [...groupSetting.excludedFolders ?? []];
+        if (!groupSetting.templatesFolderVisible) {
+            excludedFolders.push(...this.getTemplatesFolders());
+        }
+        if (!groupSetting.logsFolderVisible && this.settings) {
+            excludedFolders.push(this.settings.loggingPath);
+        }
+
         if (!forced && modifiedFiles.length > 0) {
             if (!modifiedFiles.some(state => {
                 return this.shouldFileCauseRender(state, excludedFolders);
             })) {
-                console.log(`skipping rendering of ${this.groupName}`)
                 return;
             }
         }
-        console.log(`rendering ${this.groupName}`)
 
         this.rebuildFileStructure(excludedFolders);
 
