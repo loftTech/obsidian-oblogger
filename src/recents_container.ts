@@ -125,19 +125,52 @@ export class RecentsContainer extends ViewContainer {
     }
 
     protected buildFileStructure(excludedFolders: string[]): void {
+        console.log(excludedFolders)
+        let foundFilesCount = 0;
         this.app.vault
             .getFiles()
             .sort((a, b) => b.stat.mtime - a.stat.mtime)
-            .slice(0, this.recentsCount)
             .forEach(file => {
-                if (file.parent && excludedFolders.contains(file.parent.path)) {
+                // early bail out if we've found enough files
+                if (foundFilesCount >= this.recentsCount) {
                     return;
+                }
+                if (file.parent) {
+                    let excluded = false;
+                    file.parent.path.split("/").reduce(
+                        (previousValue, currentValue) => {
+                            // early bail out if we've already determined it's excluded
+                            if (excluded) {
+                                return "";
+                            }
+
+                            // build the new value, concatenating the next path part
+                            const newValue =
+                                previousValue.length === 0 ?
+                                currentValue :
+                                (previousValue + "/" + currentValue);
+
+                            // check if it's excluded
+                            if (excludedFolders.contains(newValue)) {
+                                excluded = true;
+                                return "";
+                            }
+
+                            // not excluded, keep building
+                            return newValue;
+                        }, "");
+
+                    // check exclusion status
+                    if (excluded) {
+                        return;
+                    }
                 }
                 this.addFileToFolder(
                     file,
                     "",
                     "/"
                 );
+                foundFilesCount += 1;
             });
     }
 }
