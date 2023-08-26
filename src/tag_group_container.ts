@@ -65,7 +65,8 @@ export class TagGroupContainer extends ViewContainer {
                 if (isolatedGroupName) {
                     return tag.contains(isolatedGroupName);
                 } else {
-                    return tag.startsWith(this.groupName);
+                    const nestDepth = this.groupName.split("/").length;
+                    return tag.split("/").slice(0, nestDepth).join("/") === this.groupName;
                 }
             }).length ?? 0) > 0;
     }
@@ -237,7 +238,8 @@ export class TagGroupContainer extends ViewContainer {
                 if (isolatedGroupName) {
                     return tag.contains(isolatedGroupName);
                 } else {
-                    return tag.startsWith(this.groupName);
+                    const nestDepth = this.groupName.split("/").length;
+                    return tag.split("/").slice(0, nestDepth).join("/") === this.groupName;
                 }
             });
         if (!tags?.length) {
