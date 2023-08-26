@@ -10,7 +10,7 @@ import { isBookmarked } from "./constants";
 
 const COLLAPSED_CLASS_IDENTIFIER = "collapsed";
 
-export type FileClickCallback = (file: TFile) => void;
+export type FileClickCallback = (file: TFile, isCtrlCmdKeyDown: boolean) => void;
 export type FileAddedCallback = (
     file: TFile,
     contentItem: HTMLElement) => void;
@@ -237,7 +237,9 @@ Created at ${window.moment(file.stat.ctime).format("YYYY-MM-DD HH:mm")}`;
         root_childItem.addClass("child-item");
         root_childItem.style.marginLeft = `-${12+17*recursionDepth}px`
         root_childItem.style.paddingLeft = `${16+17*recursionDepth}px`
-        root_childItem.addEventListener("click", () => fileClickCallback(file));
+        root_childItem.addEventListener("click", (e) => {
+            fileClickCallback(file, e.metaKey || e.ctrlKey);
+        });
 
         const statusIconDiv = document.createElement("div");
         statusIconDiv.addClass("status-icon");
