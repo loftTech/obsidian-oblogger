@@ -11,7 +11,7 @@ import {
 import { ObloggerSettings, RxGroupType, OtcGroupSettings as SettingsTagGroup } from "./settings";
 import { TagGroupContainer } from "./tag_group_container";
 import { DailiesContainer } from "./dailies_container";
-import { GroupFolder } from "./group_folder";
+import { FileClickCallback, GroupFolder } from "./group_folder";
 import { RecentsContainer } from "./recents_container";
 import { UntaggedContainer } from "./untagged_container";
 import { FilesContainer } from "./files_container";
@@ -55,7 +55,7 @@ export class ObloggerView extends ItemView {
     rxGroupsDiv: HTMLElement | undefined;
     showLoggerCallbackFn: () => Promise<void>;
     saveSettingsCallback: () => Promise<void>;
-    fileClickCallback: (file: TFile) => void;
+    fileClickCallback: FileClickCallback;
     fileAddedCallback: (
         file: TFile,
         contentItem: HTMLElement) => void;
@@ -126,9 +126,8 @@ export class ObloggerView extends ItemView {
             })
         );
 
-        this.fileClickCallback = (file: TFile) => {
-            const { workspace } = this.app;
-            return workspace.getLeaf(false).openFile(file);
+        this.fileClickCallback = (file: TFile, isCtrlCmdKeyDown: boolean) => {
+            return this.app.workspace.getLeaf(isCtrlCmdKeyDown).openFile(file);
         }
 
         this.fileAddedCallback = (
