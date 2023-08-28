@@ -20,6 +20,7 @@ import { ViewContainer } from "./view_container";
 import { buildSeparator } from "./misc_components";
 import { NewTagModal } from "./new_tag_modal";
 import { buildStateFromFile, FileState } from "./constants";
+import {showContextMenu} from "./context_menu";
 
 export const VIEW_TYPE_OBLOGGER = "oblogger-view";
 const RENDER_DELAY_MS = 100;
@@ -134,50 +135,9 @@ export class ObloggerView extends ItemView {
             file: TFile,
             contentItem: HTMLElement
         ) => {
-            contentItem.addEventListener("contextmenu", (e) => {
-                const menu = new Menu();
+            contentItem.addEventListener("contextmenu", (e: MouseEvent) => {
 
-                menu.addSeparator();
-
-                menu.addItem((item) =>
-                    item
-                        .setTitle(`Open in new tab`)
-                        .setSection("open")
-                        .setIcon("lucide-file-plus")
-                        .onClick(async () => {
-                            return app.workspace.openLinkText(file.path, file.path, "tab");
-                        })
-                );
-
-                menu.addItem((item) =>
-                    item
-                        .setTitle(`Open to the right`)
-                        .setSection("open")
-                        .setIcon("lucide-separator-vertical")
-                        .onClick(async () => {
-                            return app.workspace.openLinkText(file.path, file.path, "split");
-                        })
-                );
-
-                // This adds all the normal file-explorer stuff
-                this.app.workspace.trigger(
-                    "file-menu",
-                    menu,
-                    file,
-                    "file-explorer");
-
-                if ("screenX" in e) {
-                    menu.showAtPosition({ x: e.pageX, y: e.pageY });
-                } else {
-                    menu.showAtPosition({
-                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                        // @ts-ignore
-                        x: e.nativeEvent.locationX,
-                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                        // @ts-ignore
-                        y: e.nativeEvent.locationY,
-                    });
-                }
+                showContextMenu(e, file);
             });
         }
 
