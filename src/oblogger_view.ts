@@ -137,7 +137,7 @@ export class ObloggerView extends ItemView {
         ) => {
             contentItem.addEventListener("contextmenu", (e: MouseEvent) => {
 
-                showContextMenu(e, file);
+                showContextMenu(this.app, e, file);
             });
         }
 
