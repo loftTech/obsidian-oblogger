@@ -83,6 +83,16 @@ export const showContextMenu = (app: App, e: MouseEvent, file: TFile) => {
                 }).open();
             })
     );
+    //todo: delete should have confirmation if selected in system
+    menu.addItem((item) =>
+        item
+            .setTitle(`Delete`)
+            .setIcon("trash")
+            .setSection("delete")
+            .onClick( async () => {
+                await app.vault.trash(file, true);
+            })
+    );
 
     menu.showAtMouseEvent(e);
 }
