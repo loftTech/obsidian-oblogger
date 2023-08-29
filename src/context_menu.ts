@@ -1,4 +1,4 @@
-import {App, Menu, Modal, TFile, Setting} from "obsidian"
+import { App, Menu, Modal, TFile, Setting } from "obsidian"
 
 class RenameModal extends Modal {
     result: string;
@@ -83,6 +83,31 @@ export const showContextMenu = (app: App, e: MouseEvent, file: TFile) => {
                 }).open();
             })
     );
+
+    menu.addItem((item) =>
+        item
+            .setTitle(`Make a copy`)
+            .setIcon("files")
+            .setSection("edit")
+            .onClick( async () => {
+                const copyName = file.basename.split(" ");
+                let copyNumber = 1
+                let newBaseName = file.basename
+                if (/^\d+$/.test(copyName.last() ?? "")) {
+                    copyNumber = Number(copyName.last()) ?? 1
+                    newBaseName = copyName
+                        .slice(0, -1)
+                        .join(" ");
+                }
+                let copyPath = newBaseName + " " + copyNumber + "." + file.extension
+                while (app.vault.getAbstractFileByPath(copyPath) !== null) {
+                    copyNumber += 1
+                    copyPath = newBaseName + " " + copyNumber + "." + file.extension
+                }
+                await app.vault.copy(file, copyPath)
+            })
+    );
+
     //todo: delete should have confirmation if selected in system
     menu.addItem((item) =>
         item
