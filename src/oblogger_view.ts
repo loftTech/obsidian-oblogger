@@ -245,7 +245,7 @@ export class ObloggerView extends ItemView {
     }
 
     getIcon(): string {
-        return "tags";
+        return "orbit";
     }
 
     requestRender(maybeFileDetails?: FileState) {
