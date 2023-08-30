@@ -73,7 +73,7 @@ export const showContextMenu = (app: App, e: MouseEvent, file: TFile) => {
 
     menu.addItem((item) =>
         item
-            .setTitle(`Rename`)
+            .setTitle(`Rename...`)
             .setIcon("pencil")
             .setSection("edit")
             .onClick(async () => {
