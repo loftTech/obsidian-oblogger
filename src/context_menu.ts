@@ -108,6 +108,16 @@ export const showContextMenu = (app: App, e: MouseEvent, file: TFile) => {
             })
     );
 
+    menu.addItem((item) =>
+        item
+            .setTitle(`Bookmark...`)
+            .setIcon("bookmark")
+            .setSection("edit")
+            .onClick(async () => {
+
+            })
+    );
+
     //todo: delete should have confirmation if selected in system
     menu.addItem((item) =>
         item
