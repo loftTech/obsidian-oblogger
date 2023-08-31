@@ -141,7 +141,7 @@ export class ObloggerView extends ItemView {
 
                 menu.addItem((item) =>
                     item
-                        .setTitle(`Open in new tab`)
+                        .setTitle("Open in new tab")
                         .setSection("open")
                         .setIcon("lucide-file-plus")
                         .onClick(async () => {
@@ -151,7 +151,7 @@ export class ObloggerView extends ItemView {
 
                 menu.addItem((item) =>
                     item
-                        .setTitle(`Open to the right`)
+                        .setTitle("Open to the right")
                         .setSection("open")
                         .setIcon("lucide-separator-vertical")
                         .onClick(async () => {
@@ -165,6 +165,33 @@ export class ObloggerView extends ItemView {
                     menu,
                     file,
                     "file-explorer");
+
+                menu.addItem((item) => {
+                    item
+                        .setTitle("Delete")
+                        .setSection("danger")
+                        .setIcon("trash")
+                        .onClick(async () => {
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                            // @ts-ignore
+                            this.app.fileManager.promptForDeletion(file);
+                        });
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    item.dom.addClass("is-warning")
+                });
+
+                menu.addItem((item) =>
+                    item
+                        .setTitle("Rename...")
+                        .setSection("action")
+                        .setIcon("pencil")
+                        .onClick(async () => {
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                            // @ts-ignore
+                            this.app.fileManager.promptForFileRename(file);
+                        })
+                );
 
                 if ("screenX" in e) {
                     menu.showAtPosition({ x: e.pageX, y: e.pageY });
