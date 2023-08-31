@@ -141,7 +141,7 @@ export class ObloggerView extends ItemView {
 
                 menu.addItem((item) =>
                     item
-                        .setTitle(`Open in new tab`)
+                        .setTitle("Open in new tab")
                         .setSection("open")
                         .setIcon("lucide-file-plus")
                         .onClick(async () => {
@@ -151,7 +151,7 @@ export class ObloggerView extends ItemView {
 
                 menu.addItem((item) =>
                     item
-                        .setTitle(`Open to the right`)
+                        .setTitle("Open to the right")
                         .setSection("open")
                         .setIcon("lucide-separator-vertical")
                         .onClick(async () => {
