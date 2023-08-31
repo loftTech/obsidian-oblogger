@@ -166,6 +166,18 @@ export class ObloggerView extends ItemView {
                     file,
                     "file-explorer");
 
+                menu.addItem((item) =>
+                    item
+                        .setTitle(`Delete`)
+                        .setSection("danger")
+                        .setIcon("trash")
+                        .onClick(async () => {
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                            // @ts-ignore
+                            this.app.fileManager.promptForDeletion(file);
+                        })
+                );
+
                 if ("screenX" in e) {
                     menu.showAtPosition({ x: e.pageX, y: e.pageY });
                 } else {
