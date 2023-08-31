@@ -166,15 +166,30 @@ export class ObloggerView extends ItemView {
                     file,
                     "file-explorer");
 
-                menu.addItem((item) =>
+                menu.addItem((item) => {
                     item
-                        .setTitle(`Delete`)
+                        .setTitle("Delete")
                         .setSection("danger")
                         .setIcon("trash")
                         .onClick(async () => {
                             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                             // @ts-ignore
                             this.app.fileManager.promptForDeletion(file);
+                        });
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    item.dom.addClass("is-warning")
+                });
+
+                menu.addItem((item) =>
+                    item
+                        .setTitle("Rename...")
+                        .setSection("action")
+                        .setIcon("pencil")
+                        .onClick(async () => {
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                            // @ts-ignore
+                            this.app.fileManager.promptForFileRename(file);
                         })
                 );
 
