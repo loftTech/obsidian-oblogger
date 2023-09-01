@@ -27,7 +27,7 @@ export const ContainerSortMethod = {
 export const getSortMethodDisplayText = (sortMethod: string) => {
     switch(sortMethod) {
         case ContainerSortMethod.ALPHABETICAL:
-            return "Alphabetical";
+            return "Abc";
         case ContainerSortMethod.CTIME:
             return "Created";
         case ContainerSortMethod.MTIME:
@@ -35,7 +35,7 @@ export const getSortMethodDisplayText = (sortMethod: string) => {
         case ContainerSortMethod.TYPE:
             return "Type";
         case ContainerSortMethod.EXTENSION:
-            return "Extension";
+            return "Ext";
         default:
             return "";
     }
