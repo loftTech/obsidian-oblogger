@@ -58,6 +58,7 @@ export class StringPopoverSuggest extends PopoverSuggest<string> {
     renderSuggestion(value: string, el: HTMLElement) {
         if (value === CLOSE_OPTION) {
             el.setText("Close...");
+            el.addClass("hidden-close-choice");
         } else {
             el.setText(value);
         }
