@@ -27,6 +27,8 @@
 
 .logger .hidden { display: none; }
 
+.hidden-close-choice { display: none; }
+
 .logger .modal-close-button { display: none; }
 
 .logger .modal {
@@ -464,6 +466,8 @@
    MOBILE
    ==========================================================================
 */
+
+.is-phone .hidden-close-choice { display: block; }
 
 .is-phone .logger .modal {
     border: none;
