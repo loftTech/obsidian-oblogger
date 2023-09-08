@@ -47,6 +47,9 @@ interface RxGroupSettings_v1 extends RxGroupSettings_v0 {
     logsFolderVisible: boolean;
 }
 
+/**
+ * @deprecated Use {@link GroupSettings} instead
+ */
 export type RxGroupSettings = RxGroupSettings_v1;
 
 interface OtcGroupSettings_v0 {
@@ -63,6 +66,9 @@ interface OtcGroupSettings_v1 extends OtcGroupSettings_v0 {
     logsFolderVisible: boolean;
 }
 
+/**
+ * @deprecated Use {@link GroupSettings} instead
+ */
 export type OtcGroupSettings = OtcGroupSettings_v1;
 
 export interface GroupSettings {
@@ -111,6 +117,9 @@ interface ObloggerSettings_v2 extends ObloggerSettings_v1 {
 }
 
 interface ObloggerSettings_v3 extends ObloggerSettings_v2 {
+    /**
+     * @deprecated Use {@link ObloggerSettings_v4.otcGroups} instead
+     */
     tagGroups: OtcGroupSettings_v1[];
     rxGroups: RxGroupSettings_v1[];
 }
