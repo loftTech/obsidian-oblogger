@@ -32,7 +32,6 @@ export const RxGroupType = {
     DAILIES: "dailies"
 }
 
-// TODO(#64): combine this with OtcGroupSettings
 interface RxGroupSettings_v0 {
     groupName: string;
     collapsedFolders: string[];
@@ -165,6 +164,8 @@ const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } =
 
                 group.excludedFolders = [];
             });
+            // This is deprecated in a later version. It's okay that we're using
+            // it here because it will be upgraded shortly...
             newSettings.tagGroups.forEach(group => {
                 group.logsFolderVisible = false;
                 group.templatesFolderVisible = false;
@@ -223,6 +224,7 @@ export const DEFAULT_SETTINGS: ObloggerSettings = {
     otcSeparatorVisible: true,
     recentsCount: 10,
     postLogAction: PostLogAction.QUIETLY,
+    // this is deprecated, but it's expected here in v3, it'll be removed in v4
     tagGroups: [],
     loggingPath: "",
     avatarPath: "",
