@@ -8,7 +8,7 @@ import {
     Notice,
     CachedMetadata
 } from "obsidian";
-import { ObloggerSettings, RxGroupType, OtcGroupSettings as SettingsTagGroup } from "./settings";
+import { ObloggerSettings, RxGroupType, GroupSettings, ContainerSortMethod } from "./settings";
 import { TagGroupContainer } from "./tag_group_container";
 import { DailiesContainer } from "./dailies_container";
 import { FileClickCallback, GroupFolder } from "./group_folder";
@@ -231,8 +231,8 @@ export class ObloggerView extends ItemView {
             if (!save) {
                 return;
             }
-            const group = this.settings?.tagGroups.find(
-                group => group.tag === groupName
+            const group = this.settings?.otcGroups.find(
+                group => group.groupName === groupName
             );
             if (!group) {
                 new Notice(`Unable to find tag ${groupName} to update the collapse for.`);
@@ -304,8 +304,8 @@ export class ObloggerView extends ItemView {
     }
 
     private renderTagGroup(group: GroupFolder, modifiedFiles: FileState[]) {
-        const maybeSettingsGroup = this.settings?.tagGroups.find(
-            settingsGroup => settingsGroup.tag === group.groupName
+        const maybeSettingsGroup = this.settings?.otcGroups.find(
+            settingsGroup => settingsGroup.groupName === group.groupName
         );
 
         if (!maybeSettingsGroup) {
@@ -523,13 +523,16 @@ export class ObloggerView extends ItemView {
 
     private showNewTagModal() {
         const modal = new NewTagModal(this.app, async (result: string)=> {
-            if (!this.settings.tagGroups) {
-                this.settings.tagGroups = [];
+            if (!this.settings.otcGroups) {
+                this.settings.otcGroups = [];
             }
-            this.settings.tagGroups.push({
-                tag: result,
+            this.settings.otcGroups.push({
+                groupName: result,
                 collapsedFolders: [],
+                isVisible: true,
                 isPinned: false,
+                sortMethod: ContainerSortMethod.ALPHABETICAL,
+                sortAscending: true,
                 excludedFolders: [],
                 logsFolderVisible: false,
                 templatesFolderVisible: false
@@ -656,7 +659,7 @@ export class ObloggerView extends ItemView {
         }
         this.otcGroups.remove(tagGroup);
         tagGroup.container.rootElement.remove();
-        this.settings.tagGroups = this.settings?.tagGroups.filter(group => group.tag !== tag);
+        this.settings.otcGroups = this.settings?.otcGroups.filter(group => group.groupName !== tag);
         await this.saveSettingsCallback();
         this.requestRender();
         new Notice(`"${tag}" removed`);
@@ -700,7 +703,7 @@ export class ObloggerView extends ItemView {
     }
 
     private async moveOtcGroup(tag: string, up: boolean): Promise<void> {
-        const currentIndex = this.settings.tagGroups.findIndex(group => group.tag === tag);
+        const currentIndex = this.settings.otcGroups.findIndex(group => group.groupName === tag);
         if (currentIndex === -1) {
             console.warn(`Tag ${tag} doesn't exist.`);
             return;
@@ -708,15 +711,15 @@ export class ObloggerView extends ItemView {
 
         const newIndex = currentIndex + (up ? -1 : 1);
 
-        if (newIndex < 0 || newIndex >= this.settings.tagGroups.length) {
+        if (newIndex < 0 || newIndex >= this.settings.otcGroups.length) {
             console.log(`Already at ${up ? "top" : "bottom"}`);
             return;
         }
 
         // todo(#215): try to get this to one operation using splice to swap in place
-        const group = this.settings.tagGroups[currentIndex];
-        this.settings.tagGroups.remove(group);
-        this.settings.tagGroups.splice(newIndex, 0, group);
+        const group = this.settings.otcGroups[currentIndex];
+        this.settings.otcGroups.remove(group);
+        this.settings.otcGroups.splice(newIndex, 0, group);
 
         await this.saveSettingsCallback();
         this.reloadOtcGroups();
@@ -724,7 +727,7 @@ export class ObloggerView extends ItemView {
     }
 
     private async pinOtcGroup(tag: string, pin: boolean): Promise<void> {
-        const otcGroup = this.settings.tagGroups.find((tagGroup) => tagGroup.tag === tag);
+        const otcGroup = this.settings.otcGroups.find((otcGroup) => otcGroup.groupName === tag);
         if (otcGroup === undefined) {
             new Notice(`Unable to find tag ${tag} to ${pin ? "pin" : "unpin"}`);
             return;
@@ -736,17 +739,17 @@ export class ObloggerView extends ItemView {
     }
 
     private addOtcGroup(
-        tag: string,
+        groupName: string,
         isPinned: boolean,
         parent: HTMLElement
     ) {
-        const removeCallback = async () => { return await this.removeOtcGroup(tag); }
-        const moveCallback = (up: boolean) => { return this.moveOtcGroup(tag, up); }
-        const pinCallback = (pin: boolean) => { return this.pinOtcGroup(tag, pin); }
+        const removeCallback = async () => { return await this.removeOtcGroup(groupName); }
+        const moveCallback = (up: boolean) => { return this.moveOtcGroup(groupName, up); }
+        const pinCallback = (pin: boolean) => { return this.pinOtcGroup(groupName, pin); }
 
         const container = new TagGroupContainer(
             this.app,
-            tag,
+            groupName,
             removeCallback,
             moveCallback,
             this.fileClickCallback,
@@ -758,7 +761,7 @@ export class ObloggerView extends ItemView {
             pinCallback,
             isPinned);
         this.otcGroups.push({
-            tag: tag,
+            tag: groupName,
             container: container
         })
         parent.appendChild(container.rootElement);
@@ -771,33 +774,33 @@ export class ObloggerView extends ItemView {
 
         this.otcGroups = [];
 
-        const groupSorter = (a: SettingsTagGroup, b: SettingsTagGroup): number => {
+        const groupSorter = (a: GroupSettings, b: GroupSettings): number => {
             const pattern = "\\.\\.\\./(.*)/\\.\\.\\.";
-            const aTag = a.tag.match(pattern)?.at(1) ?? a.tag;
-            const bTag = b.tag.match(pattern)?.at(1) ?? b.tag;
+            const aTag = a.groupName.match(pattern)?.at(1) ?? a.groupName;
+            const bTag = b.groupName.match(pattern)?.at(1) ?? b.groupName;
             const aChildTag = aTag.split("/").last() ?? "";
             const bChildTag = bTag.split("/").last() ?? "";
             return aChildTag < bChildTag ? -1 : aChildTag > bChildTag ? 1 : 0
         }
 
         // Add pinned groups
-        this.settings?.tagGroups
+        this.settings?.otcGroups
             ?.filter(otcGroup => otcGroup.isPinned)
             ?.sort(groupSorter)
             ?.forEach(group => {
                 this.otcGroupsDiv && this.addOtcGroup(
-                    group.tag,
+                    group.groupName,
                     true,
                     this.otcGroupsDiv);
             });
 
         // Add unpinned groups
-        this.settings.tagGroups
+        this.settings.otcGroups
             ?.filter(otcGroup => !otcGroup.isPinned)
             ?.sort(groupSorter)
             ?.forEach(group => {
                 this.otcGroupsDiv && this.addOtcGroup(
-                    group.tag,
+                    group.groupName,
                     false,
                     this.otcGroupsDiv);
             });
