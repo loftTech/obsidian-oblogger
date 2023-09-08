@@ -124,7 +124,12 @@ interface ObloggerSettings_v3 extends ObloggerSettings_v2 {
     rxGroups: RxGroupSettings_v1[];
 }
 
-export type ObloggerSettings = ObloggerSettings_v3
+interface ObloggerSettings_v4 extends ObloggerSettings_v3 {
+    rxGroups: GroupSettings[];
+    otcGroups: GroupSettings[];
+}
+
+export type ObloggerSettings = ObloggerSettings_v4
 
 const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } = {
     0: (settings: ObloggerSettings) => {
@@ -167,6 +172,33 @@ const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } =
             });
             newSettings.version = 3;
         }
+    },
+    3: (settings: ObloggerSettings) => {
+        const newSettings = settings as ObloggerSettings_v4;
+        if (newSettings) {
+            newSettings.rxGroups.forEach(group => {
+                group.isPinned = false;
+            });
+
+            // Transfer the data from the deprecated tagGroups to the new otcGroups
+            newSettings.otcGroups = newSettings.tagGroups.map(tagGroup => {
+                return {
+                    groupName: tagGroup.tag,
+                    collapsedFolders: tagGroup.collapsedFolders,
+                    isPinned: tagGroup.isPinned,
+                    isVisible: true,
+                    sortMethod: tagGroup.sortMethod ?? ContainerSortMethod.ALPHABETICAL,
+                    sortAscending: tagGroup.sortAscending ?? true,
+                    excludedFolders: tagGroup.excludedFolders,
+                    templatesFolderVisible: tagGroup.templatesFolderVisible,
+                    logsFolderVisible: tagGroup.logsFolderVisible
+                }
+            });
+            // Clear the now deprecated option
+            newSettings.tagGroups = [];
+
+            newSettings.version = 4;
+        }
     }
 };
 
@@ -180,7 +212,7 @@ export const upgradeSettings = (currentVersion: number, settings: ObloggerSettin
     UPGRADE_FUNCTIONS[currentVersion](settings);
 }
 
-export const CURRENT_VERSION = 3;
+export const CURRENT_VERSION = 4;
 
 export const DEFAULT_SETTINGS: ObloggerSettings = {
     version: 3,
