@@ -1,21 +1,5 @@
 import { TFile } from "obsidian";
 
-interface OtcGroupSettings_v0 {
-    tag: string;
-    collapsedFolders: string[];
-    isPinned: boolean;
-    sortMethod?: string;
-    sortAscending?: boolean;
-}
-
-interface OtcGroupSettings_v1 extends OtcGroupSettings_v0 {
-    excludedFolders: string[];
-    templatesFolderVisible: boolean;
-    logsFolderVisible: boolean;
-}
-
-export type OtcGroupSettings = OtcGroupSettings_v1;
-
 export const ContainerSortMethod = {
     ALPHABETICAL: "alphabetical",
     CTIME: "ctime",
@@ -64,6 +48,22 @@ interface RxGroupSettings_v1 extends RxGroupSettings_v0 {
 }
 
 export type RxGroupSettings = RxGroupSettings_v1;
+
+interface OtcGroupSettings_v0 {
+    tag: string;
+    collapsedFolders: string[];
+    isPinned: boolean;
+    sortMethod?: string;
+    sortAscending?: boolean;
+}
+
+interface OtcGroupSettings_v1 extends OtcGroupSettings_v0 {
+    excludedFolders: string[];
+    templatesFolderVisible: boolean;
+    logsFolderVisible: boolean;
+}
+
+export type OtcGroupSettings = OtcGroupSettings_v1;
 
 export const PostLogAction = {
     QUIETLY: "quietly",
