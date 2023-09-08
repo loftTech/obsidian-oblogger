@@ -1,21 +1,5 @@
 import { TFile } from "obsidian";
 
-interface OtcGroupSettings_v0 {
-    tag: string;
-    collapsedFolders: string[];
-    isPinned: boolean;
-    sortMethod?: string;
-    sortAscending?: boolean;
-}
-
-interface OtcGroupSettings_v1 extends OtcGroupSettings_v0 {
-    excludedFolders: string[];
-    templatesFolderVisible: boolean;
-    logsFolderVisible: boolean;
-}
-
-export type OtcGroupSettings = OtcGroupSettings_v1;
-
 export const ContainerSortMethod = {
     ALPHABETICAL: "alphabetical",
     CTIME: "ctime",
@@ -48,7 +32,6 @@ export const RxGroupType = {
     DAILIES: "dailies"
 }
 
-// TODO(#64): combine this with OtcGroupSettings
 interface RxGroupSettings_v0 {
     groupName: string;
     collapsedFolders: string[];
@@ -63,7 +46,41 @@ interface RxGroupSettings_v1 extends RxGroupSettings_v0 {
     logsFolderVisible: boolean;
 }
 
+/**
+ * @deprecated Use {@link GroupSettings} instead
+ */
 export type RxGroupSettings = RxGroupSettings_v1;
+
+interface OtcGroupSettings_v0 {
+    tag: string;
+    collapsedFolders: string[];
+    isPinned: boolean;
+    sortMethod?: string;
+    sortAscending?: boolean;
+}
+
+interface OtcGroupSettings_v1 extends OtcGroupSettings_v0 {
+    excludedFolders: string[];
+    templatesFolderVisible: boolean;
+    logsFolderVisible: boolean;
+}
+
+/**
+ * @deprecated Use {@link GroupSettings} instead
+ */
+export type OtcGroupSettings = OtcGroupSettings_v1;
+
+export interface GroupSettings {
+    groupName: string;
+    collapsedFolders: string[];
+    isPinned: boolean;
+    isVisible: boolean;
+    sortMethod: string;
+    sortAscending: boolean;
+    excludedFolders: string[];
+    templatesFolderVisible: boolean;
+    logsFolderVisible: boolean;
+}
 
 export const PostLogAction = {
     QUIETLY: "quietly",
@@ -99,11 +116,19 @@ interface ObloggerSettings_v2 extends ObloggerSettings_v1 {
 }
 
 interface ObloggerSettings_v3 extends ObloggerSettings_v2 {
+    /**
+     * @deprecated Use {@link ObloggerSettings_v4.otcGroups} instead
+     */
     tagGroups: OtcGroupSettings_v1[];
     rxGroups: RxGroupSettings_v1[];
 }
 
-export type ObloggerSettings = ObloggerSettings_v3
+interface ObloggerSettings_v4 extends ObloggerSettings_v3 {
+    rxGroups: GroupSettings[];
+    otcGroups: GroupSettings[];
+}
+
+export type ObloggerSettings = ObloggerSettings_v4
 
 const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } = {
     0: (settings: ObloggerSettings) => {
@@ -139,12 +164,41 @@ const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } =
 
                 group.excludedFolders = [];
             });
+            // This is deprecated in a later version. It's okay that we're using
+            // it here because it will be upgraded shortly...
             newSettings.tagGroups.forEach(group => {
                 group.logsFolderVisible = false;
                 group.templatesFolderVisible = false;
                 group.excludedFolders = [];
             });
             newSettings.version = 3;
+        }
+    },
+    3: (settings: ObloggerSettings) => {
+        const newSettings = settings as ObloggerSettings_v4;
+        if (newSettings) {
+            newSettings.rxGroups.forEach(group => {
+                group.isPinned = false;
+            });
+
+            // Transfer the data from the deprecated tagGroups to the new otcGroups
+            newSettings.otcGroups = newSettings.tagGroups.map(tagGroup => {
+                return {
+                    groupName: tagGroup.tag,
+                    collapsedFolders: tagGroup.collapsedFolders ?? [],
+                    isPinned: tagGroup.isPinned ?? false,
+                    isVisible: true,
+                    sortMethod: tagGroup.sortMethod ?? ContainerSortMethod.ALPHABETICAL,
+                    sortAscending: tagGroup.sortAscending ?? true,
+                    excludedFolders: tagGroup.excludedFolders ?? [],
+                    templatesFolderVisible: tagGroup.templatesFolderVisible ?? false,
+                    logsFolderVisible: tagGroup.logsFolderVisible ?? false
+                }
+            });
+            // Clear the now deprecated option
+            newSettings.tagGroups = [];
+
+            newSettings.version = 4;
         }
     }
 };
@@ -159,9 +213,9 @@ export const upgradeSettings = (currentVersion: number, settings: ObloggerSettin
     UPGRADE_FUNCTIONS[currentVersion](settings);
 }
 
-export const CURRENT_VERSION = 3;
+export const CURRENT_VERSION = 4;
 
-export const DEFAULT_SETTINGS: ObloggerSettings = {
+export const DEFAULT_SETTINGS: ObloggerSettings_v3 = {
     version: 3,
     avatarVisible: true,
     vaultVisible: true,
@@ -170,6 +224,7 @@ export const DEFAULT_SETTINGS: ObloggerSettings = {
     otcSeparatorVisible: true,
     recentsCount: 10,
     postLogAction: PostLogAction.QUIETLY,
+    // this is deprecated, but it's expected here in v3, it'll be removed in v4
     tagGroups: [],
     loggingPath: "",
     avatarPath: "",

@@ -1,6 +1,6 @@
 import { App, FrontMatterCache, Menu, setIcon, TFile } from "obsidian";
 import {FileClickCallback, GroupFolder, FileAddedCallback} from "./group_folder";
-import { ObloggerSettings, OtcGroupSettings, RxGroupSettings } from "./settings";
+import { GroupSettings, ObloggerSettings, OtcGroupSettings, RxGroupSettings } from "./settings";
 import { buildStateFromFile, FileState } from "./constants";
 import { FolderSuggestModal } from "./folder_suggest_modal";
 
@@ -101,16 +101,13 @@ export abstract class ViewContainer extends GroupFolder {
     }
 
     protected isVisible(): boolean {
-        return (this.getGroupSetting() as RxGroupSettings)?.isVisible ?? true;
+        return this.getGroupSetting()?.isVisible ?? true;
     }
 
-    protected getGroupSetting() {
-        // todo(#64): this is a little dangerous because someone could have a tag that
-        //  conflicts with an rx group name and this would return the wrong thing
-        return (
-            (this.settings.rxGroups.find(group => group.groupName === this.groupName)) ??
-            (this.settings.tagGroups.find(group => group.tag === this.groupName))
-        );
+    protected getGroupSetting(): GroupSettings | undefined {
+        // default to fetching from rx groups. override in TagGroupContainer
+        // to fetch from otc groups.
+        return this.settings.rxGroups.find(group => group.groupName === this.groupName);
     }
 
     protected requestRender() {
