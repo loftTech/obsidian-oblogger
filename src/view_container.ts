@@ -529,7 +529,7 @@ export abstract class ViewContainer extends GroupFolder {
         if (!groupSetting.templatesFolderVisible) {
             excludedFolders.push(...this.getTemplatesFolders());
         }
-        if (!groupSetting.logsFolderVisible && this.settings) {
+        if (!groupSetting.logsFolderVisible && this.settings && this.settings.loggingPath) {
             excludedFolders.push(this.settings.loggingPath);
         }
 
