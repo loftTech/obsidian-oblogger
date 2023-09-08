@@ -215,7 +215,7 @@ export const upgradeSettings = (currentVersion: number, settings: ObloggerSettin
 
 export const CURRENT_VERSION = 4;
 
-export const DEFAULT_SETTINGS: ObloggerSettings = {
+export const DEFAULT_SETTINGS: ObloggerSettings_v3 = {
     version: 3,
     avatarVisible: true,
     vaultVisible: true,
