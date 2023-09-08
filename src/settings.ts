@@ -65,6 +65,18 @@ interface OtcGroupSettings_v1 extends OtcGroupSettings_v0 {
 
 export type OtcGroupSettings = OtcGroupSettings_v1;
 
+export interface GroupSettings {
+    groupName: string;
+    collapsedFolders: string[];
+    isPinned: boolean;
+    isVisible: boolean;
+    sortMethod: string;
+    sortAscending: boolean;
+    excludedFolders: string[];
+    templatesFolderVisible: boolean;
+    logsFolderVisible: boolean;
+}
+
 export const PostLogAction = {
     QUIETLY: "quietly",
     OPEN: "open",
