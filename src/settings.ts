@@ -185,14 +185,14 @@ const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } =
             newSettings.otcGroups = newSettings.tagGroups.map(tagGroup => {
                 return {
                     groupName: tagGroup.tag,
-                    collapsedFolders: tagGroup.collapsedFolders,
-                    isPinned: tagGroup.isPinned,
+                    collapsedFolders: tagGroup.collapsedFolders ?? [],
+                    isPinned: tagGroup.isPinned ?? false,
                     isVisible: true,
                     sortMethod: tagGroup.sortMethod ?? ContainerSortMethod.ALPHABETICAL,
                     sortAscending: tagGroup.sortAscending ?? true,
-                    excludedFolders: tagGroup.excludedFolders,
-                    templatesFolderVisible: tagGroup.templatesFolderVisible,
-                    logsFolderVisible: tagGroup.logsFolderVisible
+                    excludedFolders: tagGroup.excludedFolders ?? [],
+                    templatesFolderVisible: tagGroup.templatesFolderVisible ?? false,
+                    logsFolderVisible: tagGroup.logsFolderVisible ?? false
                 }
             });
             // Clear the now deprecated option
