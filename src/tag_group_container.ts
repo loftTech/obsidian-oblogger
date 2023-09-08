@@ -1,7 +1,7 @@
 import { App, getAllTags, Menu, MenuItem, TFile } from "obsidian";
 import { FileClickCallback, FileAddedCallback } from "./group_folder";
 import { ViewContainer } from "./view_container";
-import { ContainerSortMethod, getSortMethodDisplayText, ObloggerSettings } from "./settings";
+import { ContainerSortMethod, getSortMethodDisplayText, GroupSettings, ObloggerSettings } from "./settings";
 import { FileState } from "./constants";
 
 
@@ -48,6 +48,11 @@ export class TagGroupContainer extends ViewContainer {
             pinCallback,
             isPinned
         );
+    }
+
+    protected getGroupSetting(): GroupSettings | undefined {
+        // override to search otcGroups instead of rxGroups
+        return this.settings.otcGroups.find(group => group.groupName === this.groupName);
     }
 
     protected wouldBeRendered(state: FileState): boolean {
