@@ -1,6 +1,6 @@
-import { App, FrontMatterCache, Menu, setIcon, TFile } from "obsidian";
+import { App, FrontMatterCache, Menu, MenuItem, setIcon, TFile } from "obsidian";
 import { GroupFolder } from "./group_folder";
-import { GroupSettings, ObloggerSettings } from "../settings";
+import { getSortMethodDisplayText, GroupSettings, ObloggerSettings } from "../settings";
 import { buildStateFromFile, FileState } from "../constants";
 import { FolderSuggestModal } from "../folder_suggest_modal";
 import { ContainerCallbacks } from "./container_callbacks";
@@ -92,6 +92,50 @@ export abstract class ViewContainer extends GroupFolder {
 
     protected requestRender() {
         this.callbacks.requestRenderCallback && this.callbacks.requestRenderCallback();
+    }
+
+    protected addSortOptionsToMenu(menu: Menu, sortMethods: string[]) {
+        const changeSortMethod = async (method: string) => {
+            const groupSetting = this.getGroupSetting();
+            if (groupSetting === undefined) {
+                return;
+            }
+
+            if (groupSetting.sortMethod === method) {
+                groupSetting.sortAscending = !groupSetting.sortAscending;
+            } else {
+                groupSetting.sortMethod = method;
+                groupSetting.sortAscending = true;
+            }
+            await this.callbacks.saveSettingsCallback();
+            this.requestRender();
+        }
+
+        const setupItem = (item: MenuItem, method: string) => {
+            item.onClick(() => {
+                return changeSortMethod(method);
+            });
+
+            if (method === this.getGroupSetting()?.sortMethod) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                item.iconEl.addClass("untagged-sort-confirmation");
+
+                item.setIcon(
+                    this.getGroupSetting()?.sortAscending ?
+                        "down-arrow-with-tail" :
+                        "up-arrow-with-tail");
+            } else {
+                item.setIcon("down-arrow-with-tail");
+            }
+        }
+
+        sortMethods.forEach(method => {
+            menu.addItem(item => {
+                item.setTitle(getSortMethodDisplayText(method));
+                setupItem(item, method);
+            })
+        });
     }
 
     protected getContextMenu() {

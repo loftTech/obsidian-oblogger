@@ -1,5 +1,5 @@
 import { ObloggerSettings, ContainerSortMethod, getSortMethodDisplayText, RxGroupType, getFileType } from "../../settings";
-import { App, Menu, MenuItem, moment, TFile } from "obsidian";
+import { App, Menu, moment, TFile } from "obsidian";
 import { FileState } from "../../constants";
 import { ContainerCallbacks } from "../container_callbacks";
 import { RxContainer } from "./rx_container";
@@ -71,53 +71,16 @@ export class FilesContainer extends RxContainer {
         return (e: MouseEvent) => {
             const menu = new Menu();
 
-            const changeSortMethod = async (method: string) => {
-                const groupSetting = this.getGroupSetting();
-                if (groupSetting === undefined) {
-                    return;
-                }
-
-                if (groupSetting.sortMethod === method) {
-                    groupSetting.sortAscending = !groupSetting.sortAscending;
-                } else {
-                    groupSetting.sortMethod = method;
-                    groupSetting.sortAscending = true;
-                }
-                await this.callbacks.saveSettingsCallback();
-                this.requestRender();
-            }
-
-            const setupItem = (item: MenuItem, method: string) => {
-                item.onClick(() => {
-                    return changeSortMethod(method);
-                });
-                if (method === this.getGroupSetting()?.sortMethod) {
-
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
-                    item.iconEl.addClass("untagged-sort-confirmation");
-
-                    item.setIcon(
-                        this.getGroupSetting()?.sortAscending ?
-                            "down-arrow-with-tail" :
-                            "up-arrow-with-tail");
-                } else {
-                    item.setIcon("down-arrow-with-tail");
-                }
-            }
-
-            [
-                ContainerSortMethod.ALPHABETICAL,
-                ContainerSortMethod.CTIME,
-                ContainerSortMethod.MTIME,
-                ContainerSortMethod.TYPE,
-                ContainerSortMethod.EXTENSION
-            ].forEach(method => {
-                menu.addItem(item => {
-                    item.setTitle(getSortMethodDisplayText(method));
-                    setupItem(item, method);
-                })
-            })
+            this.addSortOptionsToMenu(
+                menu,
+                [
+                    ContainerSortMethod.ALPHABETICAL,
+                    ContainerSortMethod.CTIME,
+                    ContainerSortMethod.MTIME,
+                    ContainerSortMethod.TYPE,
+                    ContainerSortMethod.EXTENSION
+                ]
+            );
 
             menu.showAtMouseEvent(e);
         }

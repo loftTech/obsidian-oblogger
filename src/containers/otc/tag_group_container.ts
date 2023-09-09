@@ -1,4 +1,4 @@
-import { App, getAllTags, Menu, MenuItem, TFile } from "obsidian";
+import { App, getAllTags, Menu, TFile } from "obsidian";
 import { ViewContainer } from "../view_container";
 import { ContainerSortMethod, getSortMethodDisplayText, GroupSettings, ObloggerSettings } from "../../settings";
 import { FileState } from "../../constants";
@@ -25,7 +25,7 @@ export class TagGroupContainer extends ViewContainer {
         super(
             app,
             baseTag,
-            false,
+            false, // showStatusIcon
             settings,
             false, // isMovable
             true, // canCollapseInnerFolders
@@ -156,52 +156,14 @@ export class TagGroupContainer extends ViewContainer {
         return (e: MouseEvent) => {
             const menu = new Menu();
 
-            const changeSortMethod = async (method: string) => {
-                const groupSetting = this.getGroupSetting();
-                if (groupSetting === undefined) {
-                    console.warn("undefined group settings")
-                    return;
-                }
-
-                if (groupSetting.sortMethod === method) {
-                    groupSetting.sortAscending = !groupSetting.sortAscending;
-                } else {
-                    groupSetting.sortMethod = method;
-                    groupSetting.sortAscending = true;
-                }
-                await this.callbacks.saveSettingsCallback();
-                this.requestRender();
-            }
-
-            const setupItem = (item: MenuItem, method: string) => {
-                item.onClick(() => {
-                    return changeSortMethod(method);
-                });
-                if (method === this.getGroupSetting()?.sortMethod) {
-                    // Note: iconEl is added to MenuItem at run time
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
-                    item.iconEl.addClass("untagged-sort-confirmation");
-
-                    item.setIcon(
-                        this.getGroupSetting()?.sortAscending ?
-                            "down-arrow-with-tail" :
-                            "up-arrow-with-tail");
-                } else {
-                    item.setIcon("down-arrow-with-tail");
-                }
-            }
-
-            [
-                ContainerSortMethod.ALPHABETICAL,
-                ContainerSortMethod.CTIME,
-                ContainerSortMethod.MTIME
-            ].forEach(method => {
-                menu.addItem(item => {
-                    item.setTitle(getSortMethodDisplayText(method));
-                    setupItem(item, method);
-                })
-            })
+            this.addSortOptionsToMenu(
+                menu,
+                [
+                    ContainerSortMethod.ALPHABETICAL,
+                    ContainerSortMethod.CTIME,
+                    ContainerSortMethod.MTIME
+                ]
+            );
 
             menu.showAtMouseEvent(e);
         }
