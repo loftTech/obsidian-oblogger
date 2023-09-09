@@ -1,4 +1,4 @@
-import { App, FrontMatterCache, Menu, MenuItem, setIcon, TFile } from "obsidian";
+import { App, FrontMatterCache, Menu, MenuItem, moment, setIcon, TFile } from "obsidian";
 import { GroupFolder } from "./group_folder";
 import { getSortMethodDisplayText, GroupSettings, ObloggerSettings } from "../settings";
 import { buildStateFromFile, FileState } from "../constants";
@@ -135,6 +135,47 @@ export abstract class ViewContainer extends GroupFolder {
                 item.setTitle(getSortMethodDisplayText(method));
                 setupItem(item, method);
             })
+        });
+    }
+
+    protected buildDateFileStructure(
+        unsortedFiles: TFile[],
+        ascending: boolean,
+        useCTime: boolean
+    ) {
+        unsortedFiles.sort((fileA: TFile, fileB: TFile) => {
+            const timestampA = useCTime ? fileA.stat.ctime : fileA.stat.mtime;
+            const timestampB = useCTime ? fileB.stat.ctime : fileB.stat.mtime;
+
+            const monthA = moment(timestampA).format("YYYY-MM");
+            const monthB = moment(timestampB).format("YYYY-MM");
+            if (monthA < monthB) {
+                return ascending ? 1 : -1;
+            } else if (monthA > monthB) {
+                return ascending ? -1 : 1;
+            }
+
+            const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
+            if (bookmarkSorting != 0) {
+                return bookmarkSorting;
+            }
+
+            return (ascending ? 1 : -1) * (timestampB - timestampA);
+        }).forEach(file => {
+            const cache = this.app.metadataCache.getFileCache(file);
+            if (cache === null) {
+                console.error("Cache is null after filtering files. This shouldn't happen.");
+                return;
+            }
+            const entryDateString = useCTime ? file.stat.ctime : file.stat.mtime;
+            const entryDate = moment(entryDateString);
+            const entryDateYear = entryDate.format("YYYY");
+            const entryDateMonth = entryDate.format("MM");
+            this.addFileToFolder(
+                file,
+                `${entryDateYear}/${entryDateMonth}`,
+                "/"
+            );
         });
     }
 

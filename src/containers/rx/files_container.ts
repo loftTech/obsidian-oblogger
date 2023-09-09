@@ -1,5 +1,5 @@
 import { ObloggerSettings, ContainerSortMethod, getSortMethodDisplayText, RxGroupType, getFileType } from "../../settings";
-import { App, Menu, moment, TFile } from "obsidian";
+import { App, Menu, TFile } from "obsidian";
 import { FileState } from "../../constants";
 import { ContainerCallbacks } from "../container_callbacks";
 import { RxContainer } from "./rx_container";
@@ -105,47 +105,6 @@ export class FilesContainer extends RxContainer {
                     "/"
                 );
             });
-    }
-
-    private buildDateFileStructure(
-        unsortedFiles: TFile[],
-        ascending: boolean,
-        useCTime: boolean
-    ) {
-        unsortedFiles.sort((fileA: TFile, fileB: TFile) => {
-            const timestampA = useCTime ? fileA.stat.ctime : fileA.stat.mtime;
-            const timestampB = useCTime ? fileB.stat.ctime : fileB.stat.mtime;
-
-            const monthA = moment(timestampA).format("YYYY-MM");
-            const monthB = moment(timestampB).format("YYYY-MM");
-            if (monthA < monthB) {
-                return ascending ? 1 : -1;
-            } else if (monthA > monthB) {
-                return ascending ? -1 : 1;
-            }
-
-            const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
-            if (bookmarkSorting != 0) {
-                return bookmarkSorting;
-            }
-
-            return (ascending ? 1 : -1) * (timestampB - timestampA);
-        }).forEach(file => {
-            const cache = this.app.metadataCache.getFileCache(file);
-            if (cache === null) {
-                console.error("Cache is null after filtering files. This shouldn't happen.");
-                return;
-            }
-            const entryDateString = useCTime ? file.stat.ctime : file.stat.mtime;
-            const entryDate = moment(entryDateString);
-            const entryDateYear = entryDate.format("YYYY");
-            const entryDateMonth = entryDate.format("MM");
-            this.addFileToFolder(
-                file,
-                `${entryDateYear}/${entryDateMonth}`,
-                "/"
-            );
-        })
     }
 
     private buildExtensionFileStructure(unsortedFiles: TFile[], ascending: boolean) {
