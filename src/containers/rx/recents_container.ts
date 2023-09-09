@@ -1,8 +1,8 @@
-import {FileClickCallback, FileAddedCallback } from "../group_folder";
 import { ViewContainer } from "../view_container";
 import { App, Menu } from "obsidian";
 import { ObloggerSettings, RxGroupType } from "../../settings";
 import { FileState } from "../../constants";
+import { ContainerCallbacks } from "../container_callbacks";
 
 const RECENT_COUNT_OPTIONS = [5, 10, 15];
 
@@ -11,33 +11,19 @@ export class RecentsContainer extends ViewContainer {
 
     constructor(
         app: App,
-        fileClickCallback: FileClickCallback,
-        fileAddedCallback: FileAddedCallback,
-        collapseChangedCallback: (groupName: string, collapsedFolders: string[], save: boolean) => void,
-        requestRenderCallback: () => void,
         settings: ObloggerSettings,
-        saveSettingsCallback: () => Promise<void>,
-        moveCallback: (up: boolean) => void,
-        hideCallback: () => void
+        callbacks: ContainerCallbacks
     ) {
         super(
             app,
             RxGroupType.RECENTS,
-            fileClickCallback,
-            fileAddedCallback,
-            collapseChangedCallback,
             true,
-            requestRenderCallback,
             settings,
-            saveSettingsCallback,
-            (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
-            moveCallback,
-            hideCallback,
             true, // isMovable
             false, // canCollapseInnerFolders
             false, // canBePinned
-            undefined,
-            false); // isPinned
+            false, // isPinned
+            callbacks);
 
         this.recentsCount = settings.recentsCount;
     }
@@ -104,7 +90,7 @@ export class RecentsContainer extends ViewContainer {
                         this.recentsCount = amount;
                         this.requestRender();
                         this.settings.recentsCount = amount;
-                        this.saveSettingsCallback();
+                        return this.callbacks.saveSettingsCallback();
                     });
                     item.setIcon(this.recentsCount === amount ? "check" : "");
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

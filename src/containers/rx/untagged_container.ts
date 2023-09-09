@@ -1,8 +1,8 @@
-import { FileClickCallback, FileAddedCallback } from "../group_folder";
 import { ViewContainer } from "../view_container";
 import { App, getAllTags, Menu, MenuItem, moment, TFile } from "obsidian";
 import { ObloggerSettings, ContainerSortMethod, getSortMethodDisplayText, RxGroupType } from "../../settings";
 import { FileState } from "../../constants";
+import { ContainerCallbacks } from "../container_callbacks";
 
 interface RenderedFile {
     file: TFile;
@@ -15,33 +15,19 @@ export class UntaggedContainer extends ViewContainer {
 
     constructor(
         app: App,
-        fileClickCallback: FileClickCallback,
-        fileAddedCallback: FileAddedCallback,
-        collapseChangedCallback: (groupName: string, collapsedFolders: string[], save: boolean) => void,
-        requestRenderCallback: () => void,
         settings: ObloggerSettings,
-        saveSettingsCallback: () => Promise<void>,
-        moveCallback: (up: boolean) => void,
-        hideCallback: () => void
+        callbacks: ContainerCallbacks
     ) {
         super(
             app,
             RxGroupType.UNTAGGED,
-            fileClickCallback,
-            fileAddedCallback,
-            collapseChangedCallback,
             false,
-            requestRenderCallback,
             settings,
-            saveSettingsCallback,
-            (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
-            moveCallback,
-            hideCallback,
             true, // isMovable
             false, // canCollapseInnerFolders
             false, // canBePinned
-            undefined,
-            false); // isPinned
+            false, // isPinned
+            callbacks);
     }
 
     protected wouldBeRendered(state: FileState): boolean {
@@ -133,7 +119,7 @@ export class UntaggedContainer extends ViewContainer {
                     groupSetting.sortMethod = method;
                     groupSetting.sortAscending = true;
                 }
-                await this.saveSettingsCallback();
+                await this.callbacks.saveSettingsCallback();
                 this.requestRender();
             }
 
