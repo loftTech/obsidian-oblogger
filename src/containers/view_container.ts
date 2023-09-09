@@ -1,6 +1,6 @@
 import { App, FrontMatterCache, Menu, MenuItem, moment, setIcon, TFile } from "obsidian";
 import { GroupFolder } from "./group_folder";
-import { getSortMethodDisplayText, GroupSettings, ObloggerSettings } from "../settings";
+import { ContainerSortMethod, getSortMethodDisplayText, GroupSettings, ObloggerSettings } from "../settings";
 import { buildStateFromFile, FileState } from "../constants";
 import { FolderSuggestModal } from "../folder_suggest_modal";
 import { ContainerCallbacks } from "./container_callbacks";
@@ -136,6 +136,36 @@ export abstract class ViewContainer extends GroupFolder {
                 setupItem(item, method);
             })
         });
+    }
+
+    protected shouldRenderBasedOnSortMethodSetting(
+        oldState: FileState,
+        newState: FileState
+    ): boolean {
+        const groupSettings = this.getGroupSetting();
+        switch(groupSettings?.sortMethod) {
+            case ContainerSortMethod.ALPHABETICAL:
+                // shouldn't actually happen because we should be deciding
+                // to render before we hit this point. But just in case...
+                return oldState.basename !== newState.basename;
+            case ContainerSortMethod.CTIME:
+                return oldState.ctime !== newState.ctime;
+            case ContainerSortMethod.MTIME: {
+                // if the doc should be at the top/bottom of the list and it's
+                // not, then re-render
+                const oldMostRecentFile =
+                    groupSettings?.sortAscending ?
+                        this.sortedFiles.last() :
+                        this.sortedFiles.first();
+                return (
+                    oldState.mtime !== newState.mtime &&
+                    oldMostRecentFile !== newState.file);
+            }
+            case ContainerSortMethod.EXTENSION:
+            case ContainerSortMethod.TYPE:
+                return oldState.extension !== newState.extension;
+        }
+        return false;
     }
 
     protected buildDateFileStructure(

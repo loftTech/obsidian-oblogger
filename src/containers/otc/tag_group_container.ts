@@ -65,27 +65,7 @@ export class TagGroupContainer extends ViewContainer {
         oldState: FileState,
         newState: FileState
     ): boolean {
-        const groupSettings = this.getGroupSetting();
-        switch(groupSettings?.sortMethod) {
-            case ContainerSortMethod.ALPHABETICAL:
-                // shouldn't actually happen because we should be deciding
-                // to render before we hit this point. But just in case...
-                return oldState.basename !== newState.basename;
-            case ContainerSortMethod.CTIME:
-                return oldState.ctime !== newState.ctime;
-            case ContainerSortMethod.MTIME: {
-                // if the doc should be at the top/bottom of the list and it's
-                // not, then re-render
-                const oldMostRecentFile =
-                    groupSettings?.sortAscending ?
-                        this.sortedFiles.last() :
-                        this.sortedFiles.first();
-                return (
-                    oldState.mtime !== newState.mtime &&
-                    oldMostRecentFile !== newState.file);
-            }
-        }
-        return false;
+        return this.shouldRenderBasedOnSortMethodSetting(oldState, newState);
     }
 
     protected getEmptyMessage(): string {

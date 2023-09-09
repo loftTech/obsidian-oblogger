@@ -31,18 +31,7 @@ export class FilesContainer extends RxContainer {
         oldState: FileState,
         newState: FileState
     ): boolean {
-        switch(this.getGroupSetting()?.sortMethod) {
-            case ContainerSortMethod.ALPHABETICAL:
-                return oldState.basename !== newState.basename;
-            case ContainerSortMethod.CTIME:
-                return oldState.ctime !== newState.ctime;
-            case ContainerSortMethod.MTIME:
-                return oldState.mtime !== newState.mtime;
-            case ContainerSortMethod.EXTENSION:
-            case ContainerSortMethod.TYPE:
-                return oldState.extension !== newState.extension;
-        }
-        return false;
+        return this.shouldRenderBasedOnSortMethodSetting(oldState, newState);
     }
 
     protected getEmptyMessage(): string {
