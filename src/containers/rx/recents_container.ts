@@ -1,12 +1,12 @@
-import { ViewContainer } from "../view_container";
 import { App, Menu } from "obsidian";
 import { ObloggerSettings, RxGroupType } from "../../settings";
 import { FileState } from "../../constants";
 import { ContainerCallbacks } from "../container_callbacks";
+import { RxContainer } from "./rx_container";
 
 const RECENT_COUNT_OPTIONS = [5, 10, 15];
 
-export class RecentsContainer extends ViewContainer {
+export class RecentsContainer extends RxContainer {
     recentsCount = 10;
 
     constructor(
@@ -16,14 +16,12 @@ export class RecentsContainer extends ViewContainer {
     ) {
         super(
             app,
-            RxGroupType.RECENTS,
-            true,
             settings,
-            true, // isMovable
-            false, // canCollapseInnerFolders
-            false, // canBePinned
-            false, // isPinned
-            callbacks);
+            callbacks,
+            RxGroupType.RECENTS,
+            true, // showStatusIcon,
+            false // canCollapseInnerFolders
+        );
 
         this.recentsCount = settings.recentsCount;
     }
@@ -44,28 +42,8 @@ export class RecentsContainer extends ViewContainer {
         return "No recents";
     }
 
-    protected getHideText(): string {
-        return "Hide";
-    }
-
-    protected getHideIcon(): string {
-        return "eye-off"
-    }
-
     protected getTitleText(): string {
         return "Recents";
-    }
-
-    protected getTitleTooltip(): string {
-        return "";
-    }
-
-    protected getTextIcon(): string {
-        return "";
-    }
-
-    protected getTextIconTooltip(): string {
-        return "";
     }
 
     protected getPillText(): string {
@@ -104,10 +82,6 @@ export class RecentsContainer extends ViewContainer {
             // @ts-ignore
             menu.dom.addClass("oblogger-pill-menu");
         }
-    }
-
-    protected getContainerClass(): string {
-        return "rx-child";
     }
 
     protected buildFileStructure(excludedFolders: string[]): void {

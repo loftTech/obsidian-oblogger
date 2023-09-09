@@ -1,10 +1,10 @@
-import { ViewContainer } from "../view_container";
 import { ObloggerSettings, ContainerSortMethod, getSortMethodDisplayText, RxGroupType, getFileType } from "../../settings";
 import { App, Menu, MenuItem, moment, TFile } from "obsidian";
 import { FileState } from "../../constants";
 import { ContainerCallbacks } from "../container_callbacks";
+import { RxContainer } from "./rx_container";
 
-export class FilesContainer extends ViewContainer {
+export class FilesContainer extends RxContainer {
     constructor(
         app: App,
         settings: ObloggerSettings,
@@ -15,14 +15,12 @@ export class FilesContainer extends ViewContainer {
 
         super(
             app,
-            RxGroupType.FILES,
-            false,
             settings,
-            true, // isMovable
-            true, // canCollapseInnerFolders
-            false, // canBePinned
-            false, // isPinned
-            callbacks);
+            callbacks,
+            RxGroupType.FILES,
+            false, // showStatusIcon,
+            true // canCollapseInnerFolders
+        );
     }
 
     protected wouldBeRendered(state: FileState): boolean {
@@ -63,18 +61,6 @@ export class FilesContainer extends ViewContainer {
 
     protected getTitleText(): string {
         return "Files";
-    }
-
-    protected getTitleTooltip(): string {
-        return "";
-    }
-
-    protected getTextIcon(): string {
-        return "";
-    }
-
-    protected getTextIconTooltip(): string {
-        return "";
     }
 
     protected getPillText(): string {
@@ -135,18 +121,6 @@ export class FilesContainer extends ViewContainer {
 
             menu.showAtMouseEvent(e);
         }
-    }
-
-    protected getContainerClass(): string {
-        return "rx-child";
-    }
-
-    protected getHideText(): string {
-        return "Hide";
-    }
-
-    protected getHideIcon(): string {
-        return "eye-off"
     }
 
     private buildAlphabeticalFileStructure(

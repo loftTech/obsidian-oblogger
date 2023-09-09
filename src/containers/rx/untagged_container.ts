@@ -1,8 +1,8 @@
-import { ViewContainer } from "../view_container";
 import { App, getAllTags, Menu, MenuItem, moment, TFile } from "obsidian";
 import { ObloggerSettings, ContainerSortMethod, getSortMethodDisplayText, RxGroupType } from "../../settings";
 import { FileState } from "../../constants";
 import { ContainerCallbacks } from "../container_callbacks";
+import { RxContainer } from "./rx_container";
 
 interface RenderedFile {
     file: TFile;
@@ -10,7 +10,7 @@ interface RenderedFile {
     ctime: number;
 }
 
-export class UntaggedContainer extends ViewContainer {
+export class UntaggedContainer extends RxContainer {
     renderedFiles: RenderedFile[];
 
     constructor(
@@ -20,14 +20,12 @@ export class UntaggedContainer extends ViewContainer {
     ) {
         super(
             app,
-            RxGroupType.UNTAGGED,
-            false,
             settings,
-            true, // isMovable
-            false, // canCollapseInnerFolders
-            false, // canBePinned
-            false, // isPinned
-            callbacks);
+            callbacks,
+            RxGroupType.UNTAGGED,
+            false, // showStatusIcon,
+            false // canCollapseInnerFolders
+        );
     }
 
     protected wouldBeRendered(state: FileState): boolean {
@@ -65,28 +63,8 @@ export class UntaggedContainer extends ViewContainer {
         return "No untagged documents";
     }
 
-    protected getHideText(): string {
-        return "Hide";
-    }
-
-    protected getHideIcon(): string {
-        return "eye-off"
-    }
-
     protected getTitleText(): string {
         return "Untagged";
-    }
-
-    protected getTitleTooltip(): string {
-        return "";
-    }
-
-    protected getTextIcon(): string {
-        return "";
-    }
-
-    protected getTextIconTooltip(): string {
-        return "";
     }
 
     protected getPillText(): string {
@@ -155,10 +133,6 @@ export class UntaggedContainer extends ViewContainer {
 
             menu.showAtMouseEvent(e);
         }
-    }
-
-    protected getContainerClass(): string {
-        return "rx-child";
     }
 
     protected addFileToFolder(file: TFile, remainingTag:string, pathPrefix:string) {

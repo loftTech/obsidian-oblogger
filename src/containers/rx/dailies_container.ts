@@ -1,11 +1,11 @@
 import { App, FrontMatterCache, getAllTags, Menu, moment, Notice, TFile } from "obsidian";
-import { ViewContainer } from "../view_container";
 import { ObloggerSettings, RxGroupType } from "../../settings";
 import { NewTagModal } from "../../new_tag_modal";
 import { FileState } from "../../constants";
 import { ContainerCallbacks } from "../container_callbacks";
+import { RxContainer } from "./rx_container";
 
-export class DailiesContainer extends ViewContainer {
+export class DailiesContainer extends RxContainer {
     fileEntryDates: { file: TFile, date: string }[]
 
     constructor(
@@ -15,14 +15,12 @@ export class DailiesContainer extends ViewContainer {
     ) {
         super(
             app,
-            RxGroupType.DAILIES,
-            false, // showStatusIcon
             settings,
-            true, // isMovable
-            true, // canCollapseInnerFolders
-            false, // canBePinned
-            false, // isPinned
-            callbacks);
+            callbacks,
+            RxGroupType.DAILIES,
+            false, // showStatusIcon,
+            true // canCollapseInnerFolders
+        );
 
         this.fileEntryDates = [];
     }
@@ -50,28 +48,8 @@ export class DailiesContainer extends ViewContainer {
         return `No documents tagged #${this.settings.dailiesTag};`
     }
 
-    protected getHideText(): string {
-        return "Hide";
-    }
-
-    protected getHideIcon(): string {
-        return "eye-off"
-    }
-
     protected getTitleText(): string {
         return "Daily Notes";
-    }
-
-    protected getTitleTooltip(): string {
-        return "";
-    }
-
-    protected getTextIcon(): string {
-        return "";
-    }
-
-    protected getTextIconTooltip(): string {
-        return "";
     }
 
     protected getPillText(): string {
@@ -107,10 +85,6 @@ export class DailiesContainer extends ViewContainer {
             });
             menu.showAtMouseEvent(e);
         }
-    }
-
-    protected getContainerClass(): string {
-        return "rx-child";
     }
 
     private shouldIncludeFile(file: TFile, excludedFolders: string[]): boolean {
