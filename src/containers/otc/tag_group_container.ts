@@ -1,8 +1,8 @@
 import { App, getAllTags, Menu, MenuItem, TFile } from "obsidian";
-import { FileClickCallback, FileAddedCallback } from "./group_folder";
-import { ViewContainer } from "./view_container";
-import { ContainerSortMethod, getSortMethodDisplayText, GroupSettings, ObloggerSettings } from "./settings";
-import { FileState } from "./constants";
+import { FileClickCallback, FileAddedCallback } from "../group_folder";
+import { ViewContainer } from "../view_container";
+import { ContainerSortMethod, getSortMethodDisplayText, GroupSettings, ObloggerSettings } from "../../settings";
+import { FileState } from "../../constants";
 
 
 type TagFileMap = { [key: string]: TFile[] };

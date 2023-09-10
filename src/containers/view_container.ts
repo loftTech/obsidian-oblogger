@@ -1,8 +1,8 @@
 import { App, FrontMatterCache, Menu, setIcon, TFile } from "obsidian";
 import {FileClickCallback, GroupFolder, FileAddedCallback} from "./group_folder";
-import { GroupSettings, ObloggerSettings } from "./settings";
-import { buildStateFromFile, FileState } from "./constants";
-import { FolderSuggestModal } from "./folder_suggest_modal";
+import { GroupSettings, ObloggerSettings } from "../settings";
+import { buildStateFromFile, FileState } from "../constants";
+import { FolderSuggestModal } from "../folder_suggest_modal";
 
 interface RenderedFileCache {
     file: TFile;

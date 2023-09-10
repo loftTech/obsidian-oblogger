@@ -9,14 +9,14 @@ import {
     CachedMetadata
 } from "obsidian";
 import { ObloggerSettings, RxGroupType, GroupSettings, ContainerSortMethod } from "./settings";
-import { TagGroupContainer } from "./tag_group_container";
-import { DailiesContainer } from "./dailies_container";
-import { FileClickCallback, GroupFolder } from "./group_folder";
-import { RecentsContainer } from "./recents_container";
-import { UntaggedContainer } from "./untagged_container";
-import { FilesContainer } from "./files_container";
+import { TagGroupContainer } from "./containers/otc/tag_group_container";
+import { DailiesContainer } from "./containers/rx/dailies_container";
+import { FileClickCallback, GroupFolder } from "./containers/group_folder";
+import { RecentsContainer } from "./containers/rx/recents_container";
+import { UntaggedContainer } from "./containers/rx/untagged_container";
+import { FilesContainer } from "./containers/rx/files_container";
 import { ImageFileSuggestModal } from "./image_file_suggest_modal";
-import { ViewContainer } from "./view_container";
+import { ViewContainer } from "./containers/view_container";
 import { buildSeparator } from "./misc_components";
 import { NewTagModal } from "./new_tag_modal";
 import { buildStateFromFile, FileState } from "./constants";

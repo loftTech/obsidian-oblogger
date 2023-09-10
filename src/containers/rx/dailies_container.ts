@@ -1,9 +1,9 @@
 import { App, FrontMatterCache, getAllTags, Menu, moment, Notice, TFile } from "obsidian";
-import { FileClickCallback, FileAddedCallback } from "./group_folder";
-import { ViewContainer } from "./view_container";
-import { ObloggerSettings, RxGroupType } from "./settings";
-import { NewTagModal } from "./new_tag_modal";
-import { FileState } from "./constants";
+import { FileClickCallback, FileAddedCallback } from "../group_folder";
+import { ViewContainer } from "../view_container";
+import { ObloggerSettings, RxGroupType } from "../../settings";
+import { NewTagModal } from "../../new_tag_modal";
+import { FileState } from "../../constants";
 
 export class DailiesContainer extends ViewContainer {
     fileEntryDates: { file: TFile, date: string }[]

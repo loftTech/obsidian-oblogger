@@ -1,10 +1,18 @@
-import { ViewContainer } from "./view_container";
-import { FileAddedCallback, FileClickCallback } from "./group_folder";
-import { ObloggerSettings, ContainerSortMethod, getSortMethodDisplayText, RxGroupType, getFileType } from "./settings";
-import { App, Menu, MenuItem, moment, TFile } from "obsidian";
-import { FileState } from "./constants";
+import { FileClickCallback, FileAddedCallback } from "../group_folder";
+import { ViewContainer } from "../view_container";
+import { App, getAllTags, Menu, MenuItem, moment, TFile } from "obsidian";
+import { ObloggerSettings, ContainerSortMethod, getSortMethodDisplayText, RxGroupType } from "../../settings";
+import { FileState } from "../../constants";
 
-export class FilesContainer extends ViewContainer {
+interface RenderedFile {
+    file: TFile;
+    mtime: number;
+    ctime: number;
+}
+
+export class UntaggedContainer extends ViewContainer {
+    renderedFiles: RenderedFile[];
+
     constructor(
         app: App,
         fileClickCallback: FileClickCallback,
@@ -18,7 +26,7 @@ export class FilesContainer extends ViewContainer {
     ) {
         super(
             app,
-            RxGroupType.FILES,
+            RxGroupType.UNTAGGED,
             fileClickCallback,
             fileAddedCallback,
             collapseChangedCallback,
@@ -26,54 +34,61 @@ export class FilesContainer extends ViewContainer {
             requestRenderCallback,
             settings,
             saveSettingsCallback,
-            (isCollapsed) => isCollapsed ? "package" : "package-open",
+            (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
             moveCallback,
             hideCallback,
             true, // isMovable
-            true, // canCollapseInnerFolders
+            false, // canCollapseInnerFolders
             false, // canBePinned
             undefined,
             false); // isPinned
     }
 
     protected wouldBeRendered(state: FileState): boolean {
-        return state.extension !== "md";
+        return state.tags.length === 0;
     }
 
     protected shouldRender(
-        oldState: FileState,
-        newState: FileState
+      oldState: FileState,
+      newState: FileState
     ): boolean {
-        switch(this.getGroupSetting()?.sortMethod) {
+        const groupSettings = this.getGroupSetting();
+        switch(groupSettings?.sortMethod) {
             case ContainerSortMethod.ALPHABETICAL:
+                // shouldn't actually happen because we should be deciding
+                // to render before we hit this point. But just in case...
                 return oldState.basename !== newState.basename;
             case ContainerSortMethod.CTIME:
                 return oldState.ctime !== newState.ctime;
-            case ContainerSortMethod.MTIME:
-                return oldState.mtime !== newState.mtime;
-            case ContainerSortMethod.EXTENSION:
-            case ContainerSortMethod.TYPE:
-                return oldState.extension !== newState.extension;
+            case ContainerSortMethod.MTIME: {
+                // if the doc should be at the top/bottom of the list and it's
+                // not, then re-render
+                const oldMostRecentFile =
+                    groupSettings?.sortAscending ?
+                        this.sortedFiles.last() :
+                        this.sortedFiles.first();
+                return (
+                    oldState.mtime !== newState.mtime &&
+                    oldMostRecentFile !== newState.file);
+            }
         }
         return false;
     }
 
     protected getEmptyMessage(): string {
-        return "No special files";
+        return "No untagged documents";
     }
 
-    protected getPillTooltipText(): string {
-        return "Sort";
+    protected getHideText(): string {
+        return "Hide";
     }
 
-    protected getPillIcon(): string {
-        return this.getGroupSetting()?.sortAscending ?
-            "down-arrow-with-tail" :
-            "up-arrow-with-tail"
+    protected getHideIcon(): string {
+        return "eye-off"
     }
 
     protected getTitleText(): string {
-        return "Files";
+        return "Untagged";
     }
 
     protected getTitleTooltip(): string {
@@ -90,6 +105,16 @@ export class FilesContainer extends ViewContainer {
 
     protected getPillText(): string {
         return getSortMethodDisplayText(this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL);
+    }
+
+    protected getPillTooltipText(): string {
+        return "Sort";
+    }
+
+    protected getPillIcon(): string {
+        return this.getGroupSetting()?.sortAscending ?
+            "down-arrow-with-tail" :
+            "up-arrow-with-tail"
     }
 
     protected getPillClickHandler(): ((e: MouseEvent) => void) | undefined {
@@ -134,9 +159,7 @@ export class FilesContainer extends ViewContainer {
             [
                 ContainerSortMethod.ALPHABETICAL,
                 ContainerSortMethod.CTIME,
-                ContainerSortMethod.MTIME,
-                ContainerSortMethod.TYPE,
-                ContainerSortMethod.EXTENSION
+                ContainerSortMethod.MTIME
             ].forEach(method => {
                 menu.addItem(item => {
                     item.setTitle(getSortMethodDisplayText(method));
@@ -152,12 +175,13 @@ export class FilesContainer extends ViewContainer {
         return "rx-child";
     }
 
-    protected getHideText(): string {
-        return "Hide";
-    }
-
-    protected getHideIcon(): string {
-        return "eye-off"
+    protected addFileToFolder(file: TFile, remainingTag:string, pathPrefix:string) {
+        this.renderedFiles.push({
+            file: file,
+            mtime: file.stat.mtime,
+            ctime: file.stat.ctime
+        });
+        super.addFileToFolder(file, remainingTag, pathPrefix);
     }
 
     private buildAlphabeticalFileStructure(
@@ -172,12 +196,19 @@ export class FilesContainer extends ViewContainer {
                 }
                 return (ascending ? 1 : -1) * this.sortFilesByName(fileA, fileB);
             })
-            .forEach(file => {
-                this.addFileToFolder(
-                    file,
-                    "",
-                    "/"
-                );
+            .forEach((file: TFile) => {
+                const cache = this.app.metadataCache.getFileCache(file);
+                if (cache === null) {
+                    return;
+                }
+
+                if ((getAllTags(cache)?.length ?? -1) === 0) {
+                    this.addFileToFolder(
+                        file,
+                        "",
+                        "/"
+                    );
+                }
             });
     }
 
@@ -219,74 +250,44 @@ export class FilesContainer extends ViewContainer {
                 `${entryDateYear}/${entryDateMonth}`,
                 "/"
             );
-        })
-    }
-
-    private buildExtensionFileStructure(unsortedFiles: TFile[], ascending: boolean) {
-        unsortedFiles.sort((fileA: TFile, fileB: TFile) => {
-            if (fileA.extension != fileB.extension) {
-                return (ascending ? 1 : -1) * (fileA.extension < fileB.extension ? -1 : 1);
-            }
-
-            const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
-            if (bookmarkSorting != 0) {
-                return bookmarkSorting;
-            }
-
-            return this.sortFilesByName(fileA, fileB);
-        }).forEach(file => {
-            this.addFileToFolder(file, file.extension, "/")
         });
     }
 
-    private buildTypeFileStructure(unsortedFiles: TFile[], ascending: boolean) {
-        unsortedFiles.sort((fileA: TFile, fileB: TFile) => {
-            const aType = getFileType(fileA.extension) ?? "unknown";
-            const bType = getFileType(fileB.extension) ?? "unknown";
-            if (aType != bType) {
-                return (ascending ? 1 : -1) * (aType < bType ? -1 : 1);
-            }
-
-            const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
-            if (bookmarkSorting != 0) {
-                return bookmarkSorting;
-            }
-
-            return this.sortFilesByName(fileA, fileB);
-        }).forEach(file => {
-            this.addFileToFolder(file, getFileType(file.extension) ?? "unknown", "/")
-        })
-    }
-
     protected buildFileStructure(excludedFolders: string[]): void {
+        this.renderedFiles = [];
+
         const includedFiles = this.app.vault.getFiles().filter(file => {
+            if (file.extension !== "md") {
+                return false;
+            }
 
             if (this.isFileExcluded(file, excludedFolders)) {
                 return false;
             }
 
-            return file.extension !== "md";
+            const cache = this.app.metadataCache.getFileCache(file);
+            return cache !== null && ((getAllTags(cache)?.length ?? 1) <= 0);
         });
 
-        const ascending = this.getGroupSetting()?.sortAscending ?? true;
-
-        switch (this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.TYPE) {
+        switch (this.getGroupSetting()?.sortMethod) {
             case ContainerSortMethod.ALPHABETICAL:
-                this.buildAlphabeticalFileStructure(includedFiles, ascending);
+                this.buildAlphabeticalFileStructure(
+                    includedFiles,
+                    this.getGroupSetting()?.sortAscending ?? true);
                 break;
             case ContainerSortMethod.CTIME:
-                this.buildDateFileStructure(includedFiles, ascending, true);
+                this.buildDateFileStructure(
+                    includedFiles,
+                    this.getGroupSetting()?.sortAscending ?? true,
+                    true);
                 break;
             case ContainerSortMethod.MTIME:
-                this.buildDateFileStructure(includedFiles, ascending, false);
-                break;
-            case ContainerSortMethod.EXTENSION:
-                this.buildExtensionFileStructure(includedFiles, ascending);
-                break;
-            case ContainerSortMethod.TYPE:
-            default:
-                this.buildTypeFileStructure(includedFiles, ascending);
+                this.buildDateFileStructure(
+                    includedFiles,
+                    this.getGroupSetting()?.sortAscending ?? true,
+                    false);
                 break;
         }
     }
 }
+

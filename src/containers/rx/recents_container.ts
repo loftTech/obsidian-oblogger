@@ -1,8 +1,8 @@
-import {FileClickCallback, FileAddedCallback } from "./group_folder";
-import { ViewContainer } from "./view_container";
+import {FileClickCallback, FileAddedCallback } from "../group_folder";
+import { ViewContainer } from "../view_container";
 import { App, Menu } from "obsidian";
-import { ObloggerSettings, RxGroupType } from "./settings";
-import { FileState } from "./constants";
+import { ObloggerSettings, RxGroupType } from "../../settings";
+import { FileState } from "../../constants";
 
 const RECENT_COUNT_OPTIONS = [5, 10, 15];
 

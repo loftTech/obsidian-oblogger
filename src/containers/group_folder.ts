@@ -5,8 +5,8 @@ import {
     setIcon,
     TFile
 } from "obsidian";
-import { getFileTypeIcon } from "./settings";
-import { isBookmarked } from "./constants";
+import { getFileTypeIcon } from "../settings";
+import { isBookmarked } from "../constants";
 
 const COLLAPSED_CLASS_IDENTIFIER = "collapsed";
 
