@@ -1,6 +1,6 @@
 import { App, FrontMatterCache, Menu, setIcon, TFile } from "obsidian";
 import {FileClickCallback, GroupFolder, FileAddedCallback} from "./group_folder";
-import { GroupSettings, ObloggerSettings, OtcGroupSettings, RxGroupSettings } from "../settings";
+import { GroupSettings, ObloggerSettings } from "../settings";
 import { buildStateFromFile, FileState } from "../constants";
 import { FolderSuggestModal } from "../folder_suggest_modal";
 
@@ -519,7 +519,7 @@ export abstract class ViewContainer extends GroupFolder {
     public render(
         modifiedFiles: FileState[],
         forced: boolean,
-        groupSetting: OtcGroupSettings | RxGroupSettings
+        groupSetting: GroupSettings
     ) {
         const collapsedFolders = groupSetting.collapsedFolders ?? [];
         const excludedFolders = [...groupSetting.excludedFolders ?? []];
