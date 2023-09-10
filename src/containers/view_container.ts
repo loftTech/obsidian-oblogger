@@ -1,8 +1,9 @@
 import { App, FrontMatterCache, Menu, setIcon, TFile } from "obsidian";
-import {FileClickCallback, GroupFolder, FileAddedCallback} from "./group_folder";
+import { GroupFolder } from "./group_folder";
 import { GroupSettings, ObloggerSettings } from "../settings";
 import { buildStateFromFile, FileState } from "../constants";
 import { FolderSuggestModal } from "../folder_suggest_modal";
+import { ContainerCallbacks } from "./container_callbacks";
 
 interface RenderedFileCache {
     file: TFile;
@@ -17,13 +18,7 @@ export abstract class ViewContainer extends GroupFolder {
     isPinned: boolean;
     renderedFileCaches: RenderedFileCache[]
 
-    fileClickCallback: FileClickCallback;
-    fileAddedCallback: FileAddedCallback;
-    requestRenderCallback: () => void;
-    saveSettingsCallback: () => Promise<void>;
-    hideCallback: () => void;
-    moveCallback: (up: boolean) => void;
-    pinCallback: ((pin: boolean) => void) | undefined;
+    callbacks: ContainerCallbacks;
 
     protected abstract getTitleText(): string;
     protected abstract getTitleTooltip(): string;
@@ -47,31 +42,23 @@ export abstract class ViewContainer extends GroupFolder {
     protected constructor(
         app: App,
         viewName: string,
-        fileClickCallback: FileClickCallback,
-        fileAddedCallback: FileAddedCallback,
-        collapseChangedCallback: (groupName: string, collapsedFolders: string[], save: boolean) => void,
         showStatusIcon: boolean,
-        requestRenderCallback: () => void,
         settings: ObloggerSettings,
-        saveSettingsCallback: () => Promise<void>,
-        getGroupIconCallback: (isCollapsed: boolean) => string,
-        moveCallback: (up: boolean) => void,
-        hideCallback: () => void,
         isMovable: boolean,
         canCollapseInnerFolders: boolean,
         canBePinned: boolean,
-        pinCallback: ((pin: boolean) => void) | undefined,
-        isPinned: boolean
+        isPinned: boolean,
+        callbacks: ContainerCallbacks
     ) {
         super(
             app,
             viewName,
             "/",
             (save: boolean) => {
-                collapseChangedCallback(viewName, this.getCollapsedFolders(), save);
+                callbacks.collapseChangedCallback(viewName, this.getCollapsedFolders(), save);
             },
             showStatusIcon,
-            getGroupIconCallback,
+            callbacks.getGroupIconCallback,
             () => { return this.getEmptyMessage() });
 
         this.settings = settings;
@@ -79,14 +66,7 @@ export abstract class ViewContainer extends GroupFolder {
         this.canCollapseInnerFolders = canCollapseInnerFolders;
         this.canBePinned = canBePinned;
         this.isPinned = isPinned;
-
-        this.fileClickCallback = fileClickCallback;
-        this.fileAddedCallback = fileAddedCallback;
-        this.requestRenderCallback = requestRenderCallback;
-        this.saveSettingsCallback = saveSettingsCallback;
-        this.hideCallback = hideCallback;
-        this.moveCallback = moveCallback;
-        this.pinCallback = pinCallback;
+        this.callbacks = callbacks;
     }
 
     protected addFileToFolder(
@@ -111,7 +91,7 @@ export abstract class ViewContainer extends GroupFolder {
     }
 
     protected requestRender() {
-        this.requestRenderCallback && this.requestRenderCallback();
+        this.callbacks.requestRenderCallback && this.callbacks.requestRenderCallback();
     }
 
     protected getContextMenu() {
@@ -124,7 +104,7 @@ export abstract class ViewContainer extends GroupFolder {
                     .setIcon("arrow-up")
                     .setSection("movement")
                     .onClick(() => {
-                        this.moveCallback(true)
+                        this.callbacks.moveCallback(true)
                     })
             );
 
@@ -134,7 +114,7 @@ export abstract class ViewContainer extends GroupFolder {
                     .setIcon("arrow-down")
                     .setSection("movement")
                     .onClick(() => {
-                        this.moveCallback(false)
+                        this.callbacks.moveCallback(false)
                     })
             );
         }
@@ -146,7 +126,7 @@ export abstract class ViewContainer extends GroupFolder {
                     .setIcon(this.isPinned ? "pin-off" : "pin")
                     .setSection("movement")
                     .onClick(() => {
-                        this.pinCallback && this.pinCallback(!this.isPinned)
+                        this.callbacks.pinCallback && this.callbacks.pinCallback(!this.isPinned)
                     })
             );
         }
@@ -182,7 +162,7 @@ export abstract class ViewContainer extends GroupFolder {
                     .onClick(async () => {
                         if (groupSetting) {
                             groupSetting.templatesFolderVisible = !groupSetting.templatesFolderVisible;
-                            await this.saveSettingsCallback();
+                            await this.callbacks.saveSettingsCallback();
                             this.requestRender();
                         } else {
                             console.warn(`Unable to get group setting for ${this.groupName}`)
@@ -197,7 +177,7 @@ export abstract class ViewContainer extends GroupFolder {
                     .onClick(async () => {
                         if (groupSetting) {
                             groupSetting.logsFolderVisible = !groupSetting.logsFolderVisible;
-                            await this.saveSettingsCallback();
+                            await this.callbacks.saveSettingsCallback();
                             this.requestRender();
                         } else {
                             console.warn(`Unable to get group setting for ${this.groupName}`)
@@ -213,7 +193,7 @@ export abstract class ViewContainer extends GroupFolder {
                         .onClick(async () => {
                             if (groupSetting) {
                                 groupSetting.excludedFolders.remove(folderPath);
-                                await this.saveSettingsCallback();
+                                await this.callbacks.saveSettingsCallback();
                                 this.requestRender();
                             } else {
                                 console.warn(`Unable to get group setting for ${this.groupName}`)
@@ -233,7 +213,7 @@ export abstract class ViewContainer extends GroupFolder {
                             async (selectedPath: string) => {
                                 if (!groupSetting?.excludedFolders.contains(selectedPath)) {
                                     groupSetting?.excludedFolders.push(selectedPath);
-                                    await this.saveSettingsCallback();
+                                    await this.callbacks.saveSettingsCallback();
                                     this.requestRender();
                                 }
                             }
@@ -248,7 +228,7 @@ export abstract class ViewContainer extends GroupFolder {
                 .setIcon(this.getHideIcon())
                 .setSection("danger")
                 .onClick(() => {
-                    this.hideCallback()
+                    this.callbacks.hideCallback()
                 })
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
@@ -548,8 +528,8 @@ export abstract class ViewContainer extends GroupFolder {
 
         super.rebuild(
             collapsedFolders,
-            this.fileClickCallback,
-            this.fileAddedCallback
+            this.callbacks.fileClickCallback,
+            this.callbacks.fileAddedCallback
         );
 
         this.rootElement.setAttribute("group-name", this.groupName);

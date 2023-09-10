@@ -1,42 +1,28 @@
 import { App, FrontMatterCache, getAllTags, Menu, moment, Notice, TFile } from "obsidian";
-import { FileClickCallback, FileAddedCallback } from "../group_folder";
 import { ViewContainer } from "../view_container";
 import { ObloggerSettings, RxGroupType } from "../../settings";
 import { NewTagModal } from "../../new_tag_modal";
 import { FileState } from "../../constants";
+import { ContainerCallbacks } from "../container_callbacks";
 
 export class DailiesContainer extends ViewContainer {
     fileEntryDates: { file: TFile, date: string }[]
 
     constructor(
         app: App,
-        fileClickCallback: FileClickCallback,
-        fileAddedCallback: FileAddedCallback,
-        collapseChangedCallback: (groupName: string, collapsedFolders: string[], save: boolean) => void,
-        requestRenderCallback: () => void,
         settings: ObloggerSettings,
-        saveSettingsCallback: () => Promise<void>,
-        moveCallback: (up: boolean) => void,
-        hideCallback: () => void
+        callbacks: ContainerCallbacks
     ) {
         super(
             app,
             RxGroupType.DAILIES,
-            fileClickCallback,
-            fileAddedCallback,
-            collapseChangedCallback,
             false, // showStatusIcon
-            requestRenderCallback,
             settings,
-            saveSettingsCallback,
-            (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
-            moveCallback,
-            hideCallback,
             true, // isMovable
             true, // canCollapseInnerFolders
             false, // canBePinned
-            undefined,
-            false); // isPinned
+            false, // isPinned
+            callbacks);
 
         this.fileEntryDates = [];
     }
@@ -113,7 +99,7 @@ export class DailiesContainer extends ViewContainer {
                             return;
                         }
                         this.settings.dailiesTag = result;
-                        this.saveSettingsCallback();
+                        await this.callbacks.saveSettingsCallback();
                         this.requestRender();
                     });
                     modal.open();

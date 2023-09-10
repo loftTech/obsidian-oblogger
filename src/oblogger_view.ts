@@ -20,6 +20,7 @@ import { ViewContainer } from "./containers/view_container";
 import { buildSeparator } from "./misc_components";
 import { NewTagModal } from "./new_tag_modal";
 import { buildStateFromFile, FileState } from "./constants";
+import { ContainerCallbacks } from "./containers/container_callbacks";
 
 export const VIEW_TYPE_OBLOGGER = "oblogger-view";
 const RENDER_DELAY_MS = 100;
@@ -196,6 +197,7 @@ export class ObloggerView extends ItemView {
                 if ("screenX" in e) {
                     menu.showAtPosition({ x: e.pageX, y: e.pageY });
                 } else {
+                    // noinspection JSUnresolvedReference
                     menu.showAtPosition({
                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                         // @ts-ignore
@@ -743,27 +745,30 @@ export class ObloggerView extends ItemView {
         isPinned: boolean,
         parent: HTMLElement
     ) {
-        const removeCallback = async () => { return await this.removeOtcGroup(groupName); }
-        const moveCallback = (up: boolean) => { return this.moveOtcGroup(groupName, up); }
-        const pinCallback = (pin: boolean) => { return this.pinOtcGroup(groupName, pin); }
+        const callbacks: ContainerCallbacks = {
+            fileClickCallback: this.fileClickCallback,
+            fileAddedCallback: this.fileAddedCallback,
+            collapseChangedCallback: this.tagGroupCollapseChangedCallback,
+            requestRenderCallback: () => { this.requestRender() },
+            saveSettingsCallback: this.saveSettingsCallback,
+            getGroupIconCallback: (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
+            hideCallback: async () => { return await this.removeOtcGroup(groupName); },
+            moveCallback: (up: boolean) => { return this.moveOtcGroup(groupName, up); },
+            pinCallback: (pin: boolean) => { return this.pinOtcGroup(groupName, pin); }
+        };
 
         const container = new TagGroupContainer(
             this.app,
             groupName,
-            removeCallback,
-            moveCallback,
-            this.fileClickCallback,
-            this.fileAddedCallback,
-            this.tagGroupCollapseChangedCallback,
-            () => { this.requestRender() },
             this.settings,
-            this.saveSettingsCallback,
-            pinCallback,
-            isPinned);
+            isPinned,
+            callbacks);
+
         this.otcGroups.push({
             tag: groupName,
             container: container
-        })
+        });
+
         parent.appendChild(container.rootElement);
         this.requestRender();
     }
@@ -840,16 +845,21 @@ export class ObloggerView extends ItemView {
 
         const createRxGroup = (groupName: string) => {
             const ctor = getRxType(groupName);
+            const callbacks: ContainerCallbacks = {
+                fileClickCallback: this.fileClickCallback,
+                fileAddedCallback: this.fileAddedCallback,
+                collapseChangedCallback: this.rxGroupCollapseChangeCallback,
+                requestRenderCallback: () => { this.requestRender() },
+                saveSettingsCallback: this.saveSettingsCallback,
+                getGroupIconCallback: (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
+                hideCallback: () => { return this.hideRxGroup(groupName); },
+                moveCallback: (up: boolean) => { return this.moveRxGroup(groupName, up); },
+                pinCallback: undefined
+            }
             return new ctor(
                 this.app,
-                this.fileClickCallback,
-                this.fileAddedCallback,
-                this.rxGroupCollapseChangeCallback,
-                () => { this.requestRender() },
                 this.settings,
-                this.saveSettingsCallback,
-                (up: boolean) => { return this.moveRxGroup(groupName, up); },
-                () => { return this.hideRxGroup(groupName); });
+                callbacks);
         }
 
         this.rxContainers = this.settings?.rxGroups.map(rxGroupSetting => {
