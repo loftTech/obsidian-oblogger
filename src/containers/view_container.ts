@@ -1,6 +1,6 @@
-import { App, FrontMatterCache, Menu, setIcon, TFile } from "obsidian";
+import { App, FrontMatterCache, Menu, MenuItem, moment, setIcon, TFile } from "obsidian";
 import { GroupFolder } from "./group_folder";
-import { GroupSettings, ObloggerSettings } from "../settings";
+import { ContainerSortMethod, getSortMethodDisplayText, GroupSettings, ObloggerSettings } from "../settings";
 import { buildStateFromFile, FileState } from "../constants";
 import { FolderSuggestModal } from "../folder_suggest_modal";
 import { ContainerCallbacks } from "./container_callbacks";
@@ -92,6 +92,121 @@ export abstract class ViewContainer extends GroupFolder {
 
     protected requestRender() {
         this.callbacks.requestRenderCallback && this.callbacks.requestRenderCallback();
+    }
+
+    protected addSortOptionsToMenu(menu: Menu, sortMethods: string[]) {
+        const changeSortMethod = async (method: string) => {
+            const groupSetting = this.getGroupSetting();
+            if (groupSetting === undefined) {
+                return;
+            }
+
+            if (groupSetting.sortMethod === method) {
+                groupSetting.sortAscending = !groupSetting.sortAscending;
+            } else {
+                groupSetting.sortMethod = method;
+                groupSetting.sortAscending = true;
+            }
+            await this.callbacks.saveSettingsCallback();
+            this.requestRender();
+        }
+
+        const setupItem = (item: MenuItem, method: string) => {
+            item.onClick(() => {
+                return changeSortMethod(method);
+            });
+
+            if (method === this.getGroupSetting()?.sortMethod) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                item.iconEl.addClass("untagged-sort-confirmation");
+
+                item.setIcon(
+                    this.getGroupSetting()?.sortAscending ?
+                        "down-arrow-with-tail" :
+                        "up-arrow-with-tail");
+            } else {
+                item.setIcon("down-arrow-with-tail");
+            }
+        }
+
+        sortMethods.forEach(method => {
+            menu.addItem(item => {
+                item.setTitle(getSortMethodDisplayText(method));
+                setupItem(item, method);
+            })
+        });
+    }
+
+    protected shouldRenderBasedOnSortMethodSetting(
+        oldState: FileState,
+        newState: FileState
+    ): boolean {
+        const groupSettings = this.getGroupSetting();
+        switch(groupSettings?.sortMethod) {
+            case ContainerSortMethod.ALPHABETICAL:
+                // shouldn't actually happen because we should be deciding
+                // to render before we hit this point. But just in case...
+                return oldState.basename !== newState.basename;
+            case ContainerSortMethod.CTIME:
+                return oldState.ctime !== newState.ctime;
+            case ContainerSortMethod.MTIME: {
+                // if the doc should be at the top/bottom of the list and it's
+                // not, then re-render
+                const oldMostRecentFile =
+                    groupSettings?.sortAscending ?
+                        this.sortedFiles.last() :
+                        this.sortedFiles.first();
+                return (
+                    oldState.mtime !== newState.mtime &&
+                    oldMostRecentFile !== newState.file);
+            }
+            case ContainerSortMethod.EXTENSION:
+            case ContainerSortMethod.TYPE:
+                return oldState.extension !== newState.extension;
+        }
+        return false;
+    }
+
+    protected buildDateFileStructure(
+        unsortedFiles: TFile[],
+        ascending: boolean,
+        useCTime: boolean
+    ) {
+        unsortedFiles.sort((fileA: TFile, fileB: TFile) => {
+            const timestampA = useCTime ? fileA.stat.ctime : fileA.stat.mtime;
+            const timestampB = useCTime ? fileB.stat.ctime : fileB.stat.mtime;
+
+            const monthA = moment(timestampA).format("YYYY-MM");
+            const monthB = moment(timestampB).format("YYYY-MM");
+            if (monthA < monthB) {
+                return ascending ? 1 : -1;
+            } else if (monthA > monthB) {
+                return ascending ? -1 : 1;
+            }
+
+            const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
+            if (bookmarkSorting != 0) {
+                return bookmarkSorting;
+            }
+
+            return (ascending ? 1 : -1) * (timestampB - timestampA);
+        }).forEach(file => {
+            const cache = this.app.metadataCache.getFileCache(file);
+            if (cache === null) {
+                console.error("Cache is null after filtering files. This shouldn't happen.");
+                return;
+            }
+            const entryDateString = useCTime ? file.stat.ctime : file.stat.mtime;
+            const entryDate = moment(entryDateString);
+            const entryDateYear = entryDate.format("YYYY");
+            const entryDateMonth = entryDate.format("MM");
+            this.addFileToFolder(
+                file,
+                `${entryDateYear}/${entryDateMonth}`,
+                "/"
+            );
+        });
     }
 
     protected getContextMenu() {

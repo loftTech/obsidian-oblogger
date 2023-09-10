@@ -1,8 +1,8 @@
-import { ViewContainer } from "../view_container";
-import { App, getAllTags, Menu, MenuItem, moment, TFile } from "obsidian";
+import { App, getAllTags, Menu, TFile } from "obsidian";
 import { ObloggerSettings, ContainerSortMethod, getSortMethodDisplayText, RxGroupType } from "../../settings";
 import { FileState } from "../../constants";
 import { ContainerCallbacks } from "../container_callbacks";
+import { RxContainer } from "./rx_container";
 
 interface RenderedFile {
     file: TFile;
@@ -10,7 +10,7 @@ interface RenderedFile {
     ctime: number;
 }
 
-export class UntaggedContainer extends ViewContainer {
+export class UntaggedContainer extends RxContainer {
     renderedFiles: RenderedFile[];
 
     constructor(
@@ -20,14 +20,12 @@ export class UntaggedContainer extends ViewContainer {
     ) {
         super(
             app,
-            RxGroupType.UNTAGGED,
-            false,
             settings,
-            true, // isMovable
-            false, // canCollapseInnerFolders
-            false, // canBePinned
-            false, // isPinned
-            callbacks);
+            callbacks,
+            RxGroupType.UNTAGGED,
+            false, // showStatusIcon,
+            false // canCollapseInnerFolders
+        );
     }
 
     protected wouldBeRendered(state: FileState): boolean {
@@ -38,55 +36,15 @@ export class UntaggedContainer extends ViewContainer {
       oldState: FileState,
       newState: FileState
     ): boolean {
-        const groupSettings = this.getGroupSetting();
-        switch(groupSettings?.sortMethod) {
-            case ContainerSortMethod.ALPHABETICAL:
-                // shouldn't actually happen because we should be deciding
-                // to render before we hit this point. But just in case...
-                return oldState.basename !== newState.basename;
-            case ContainerSortMethod.CTIME:
-                return oldState.ctime !== newState.ctime;
-            case ContainerSortMethod.MTIME: {
-                // if the doc should be at the top/bottom of the list and it's
-                // not, then re-render
-                const oldMostRecentFile =
-                    groupSettings?.sortAscending ?
-                        this.sortedFiles.last() :
-                        this.sortedFiles.first();
-                return (
-                    oldState.mtime !== newState.mtime &&
-                    oldMostRecentFile !== newState.file);
-            }
-        }
-        return false;
+        return this.shouldRenderBasedOnSortMethodSetting(oldState, newState);
     }
 
     protected getEmptyMessage(): string {
         return "No untagged documents";
     }
 
-    protected getHideText(): string {
-        return "Hide";
-    }
-
-    protected getHideIcon(): string {
-        return "eye-off"
-    }
-
     protected getTitleText(): string {
         return "Untagged";
-    }
-
-    protected getTitleTooltip(): string {
-        return "";
-    }
-
-    protected getTextIcon(): string {
-        return "";
-    }
-
-    protected getTextIconTooltip(): string {
-        return "";
     }
 
     protected getPillText(): string {
@@ -107,58 +65,17 @@ export class UntaggedContainer extends ViewContainer {
         return (e: MouseEvent) => {
             const menu = new Menu();
 
-            const changeSortMethod = async (method: string) => {
-                const groupSetting = this.getGroupSetting();
-                if (groupSetting === undefined) {
-                    return;
-                }
-
-                if (groupSetting.sortMethod === method) {
-                    groupSetting.sortAscending = !groupSetting.sortAscending;
-                } else {
-                    groupSetting.sortMethod = method;
-                    groupSetting.sortAscending = true;
-                }
-                await this.callbacks.saveSettingsCallback();
-                this.requestRender();
-            }
-
-            const setupItem = (item: MenuItem, method: string) => {
-                item.onClick(() => {
-                    return changeSortMethod(method);
-                });
-                if (method === this.getGroupSetting()?.sortMethod) {
-
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
-                    item.iconEl.addClass("untagged-sort-confirmation");
-
-                    item.setIcon(
-                        this.getGroupSetting()?.sortAscending ?
-                            "down-arrow-with-tail" :
-                            "up-arrow-with-tail");
-                } else {
-                    item.setIcon("down-arrow-with-tail");
-                }
-            }
-
-            [
-                ContainerSortMethod.ALPHABETICAL,
-                ContainerSortMethod.CTIME,
-                ContainerSortMethod.MTIME
-            ].forEach(method => {
-                menu.addItem(item => {
-                    item.setTitle(getSortMethodDisplayText(method));
-                    setupItem(item, method);
-                })
-            })
+            this.addSortOptionsToMenu(
+                menu,
+                [
+                    ContainerSortMethod.ALPHABETICAL,
+                    ContainerSortMethod.CTIME,
+                    ContainerSortMethod.MTIME
+                ]
+            );
 
             menu.showAtMouseEvent(e);
         }
-    }
-
-    protected getContainerClass(): string {
-        return "rx-child";
     }
 
     protected addFileToFolder(file: TFile, remainingTag:string, pathPrefix:string) {
@@ -196,47 +113,6 @@ export class UntaggedContainer extends ViewContainer {
                     );
                 }
             });
-    }
-
-    private buildDateFileStructure(
-        unsortedFiles: TFile[],
-        ascending: boolean,
-        useCTime: boolean
-    ) {
-        unsortedFiles.sort((fileA: TFile, fileB: TFile) => {
-            const timestampA = useCTime ? fileA.stat.ctime : fileA.stat.mtime;
-            const timestampB = useCTime ? fileB.stat.ctime : fileB.stat.mtime;
-
-            const monthA = moment(timestampA).format("YYYY-MM");
-            const monthB = moment(timestampB).format("YYYY-MM");
-            if (monthA < monthB) {
-                return ascending ? 1 : -1;
-            } else if (monthA > monthB) {
-                return ascending ? -1 : 1;
-            }
-
-            const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
-            if (bookmarkSorting != 0) {
-                return bookmarkSorting;
-            }
-
-            return (ascending ? 1 : -1) * (timestampB - timestampA);
-        }).forEach(file => {
-            const cache = this.app.metadataCache.getFileCache(file);
-            if (cache === null) {
-                console.error("Cache is null after filtering files. This shouldn't happen.");
-                return;
-            }
-            const entryDateString = useCTime ? file.stat.ctime : file.stat.mtime;
-            const entryDate = moment(entryDateString);
-            const entryDateYear = entryDate.format("YYYY");
-            const entryDateMonth = entryDate.format("MM");
-            this.addFileToFolder(
-                file,
-                `${entryDateYear}/${entryDateMonth}`,
-                "/"
-            );
-        });
     }
 
     protected buildFileStructure(excludedFolders: string[]): void {

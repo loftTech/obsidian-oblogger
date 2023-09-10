@@ -1,3 +1,8 @@
+// We're using deprecated symbols in this because we're loading possibly old
+// json settings and we want to keep track of previous (now deprecated) versions
+// of the settings objects
+// noinspection JSDeprecatedSymbols
+
 import { TFile } from "obsidian";
 
 export const ContainerSortMethod = {

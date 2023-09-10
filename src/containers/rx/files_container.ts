@@ -1,10 +1,10 @@
-import { ViewContainer } from "../view_container";
 import { ObloggerSettings, ContainerSortMethod, getSortMethodDisplayText, RxGroupType, getFileType } from "../../settings";
-import { App, Menu, MenuItem, moment, TFile } from "obsidian";
+import { App, Menu, TFile } from "obsidian";
 import { FileState } from "../../constants";
 import { ContainerCallbacks } from "../container_callbacks";
+import { RxContainer } from "./rx_container";
 
-export class FilesContainer extends ViewContainer {
+export class FilesContainer extends RxContainer {
     constructor(
         app: App,
         settings: ObloggerSettings,
@@ -15,14 +15,12 @@ export class FilesContainer extends ViewContainer {
 
         super(
             app,
-            RxGroupType.FILES,
-            false,
             settings,
-            true, // isMovable
-            true, // canCollapseInnerFolders
-            false, // canBePinned
-            false, // isPinned
-            callbacks);
+            callbacks,
+            RxGroupType.FILES,
+            false, // showStatusIcon,
+            true // canCollapseInnerFolders
+        );
     }
 
     protected wouldBeRendered(state: FileState): boolean {
@@ -33,18 +31,7 @@ export class FilesContainer extends ViewContainer {
         oldState: FileState,
         newState: FileState
     ): boolean {
-        switch(this.getGroupSetting()?.sortMethod) {
-            case ContainerSortMethod.ALPHABETICAL:
-                return oldState.basename !== newState.basename;
-            case ContainerSortMethod.CTIME:
-                return oldState.ctime !== newState.ctime;
-            case ContainerSortMethod.MTIME:
-                return oldState.mtime !== newState.mtime;
-            case ContainerSortMethod.EXTENSION:
-            case ContainerSortMethod.TYPE:
-                return oldState.extension !== newState.extension;
-        }
-        return false;
+        return this.shouldRenderBasedOnSortMethodSetting(oldState, newState);
     }
 
     protected getEmptyMessage(): string {
@@ -65,18 +52,6 @@ export class FilesContainer extends ViewContainer {
         return "Files";
     }
 
-    protected getTitleTooltip(): string {
-        return "";
-    }
-
-    protected getTextIcon(): string {
-        return "";
-    }
-
-    protected getTextIconTooltip(): string {
-        return "";
-    }
-
     protected getPillText(): string {
         return getSortMethodDisplayText(this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL);
     }
@@ -85,68 +60,19 @@ export class FilesContainer extends ViewContainer {
         return (e: MouseEvent) => {
             const menu = new Menu();
 
-            const changeSortMethod = async (method: string) => {
-                const groupSetting = this.getGroupSetting();
-                if (groupSetting === undefined) {
-                    return;
-                }
-
-                if (groupSetting.sortMethod === method) {
-                    groupSetting.sortAscending = !groupSetting.sortAscending;
-                } else {
-                    groupSetting.sortMethod = method;
-                    groupSetting.sortAscending = true;
-                }
-                await this.callbacks.saveSettingsCallback();
-                this.requestRender();
-            }
-
-            const setupItem = (item: MenuItem, method: string) => {
-                item.onClick(() => {
-                    return changeSortMethod(method);
-                });
-                if (method === this.getGroupSetting()?.sortMethod) {
-
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
-                    item.iconEl.addClass("untagged-sort-confirmation");
-
-                    item.setIcon(
-                        this.getGroupSetting()?.sortAscending ?
-                            "down-arrow-with-tail" :
-                            "up-arrow-with-tail");
-                } else {
-                    item.setIcon("down-arrow-with-tail");
-                }
-            }
-
-            [
-                ContainerSortMethod.ALPHABETICAL,
-                ContainerSortMethod.CTIME,
-                ContainerSortMethod.MTIME,
-                ContainerSortMethod.TYPE,
-                ContainerSortMethod.EXTENSION
-            ].forEach(method => {
-                menu.addItem(item => {
-                    item.setTitle(getSortMethodDisplayText(method));
-                    setupItem(item, method);
-                })
-            })
+            this.addSortOptionsToMenu(
+                menu,
+                [
+                    ContainerSortMethod.ALPHABETICAL,
+                    ContainerSortMethod.CTIME,
+                    ContainerSortMethod.MTIME,
+                    ContainerSortMethod.TYPE,
+                    ContainerSortMethod.EXTENSION
+                ]
+            );
 
             menu.showAtMouseEvent(e);
         }
-    }
-
-    protected getContainerClass(): string {
-        return "rx-child";
-    }
-
-    protected getHideText(): string {
-        return "Hide";
-    }
-
-    protected getHideIcon(): string {
-        return "eye-off"
     }
 
     private buildAlphabeticalFileStructure(
@@ -168,47 +94,6 @@ export class FilesContainer extends ViewContainer {
                     "/"
                 );
             });
-    }
-
-    private buildDateFileStructure(
-        unsortedFiles: TFile[],
-        ascending: boolean,
-        useCTime: boolean
-    ) {
-        unsortedFiles.sort((fileA: TFile, fileB: TFile) => {
-            const timestampA = useCTime ? fileA.stat.ctime : fileA.stat.mtime;
-            const timestampB = useCTime ? fileB.stat.ctime : fileB.stat.mtime;
-
-            const monthA = moment(timestampA).format("YYYY-MM");
-            const monthB = moment(timestampB).format("YYYY-MM");
-            if (monthA < monthB) {
-                return ascending ? 1 : -1;
-            } else if (monthA > monthB) {
-                return ascending ? -1 : 1;
-            }
-
-            const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
-            if (bookmarkSorting != 0) {
-                return bookmarkSorting;
-            }
-
-            return (ascending ? 1 : -1) * (timestampB - timestampA);
-        }).forEach(file => {
-            const cache = this.app.metadataCache.getFileCache(file);
-            if (cache === null) {
-                console.error("Cache is null after filtering files. This shouldn't happen.");
-                return;
-            }
-            const entryDateString = useCTime ? file.stat.ctime : file.stat.mtime;
-            const entryDate = moment(entryDateString);
-            const entryDateYear = entryDate.format("YYYY");
-            const entryDateMonth = entryDate.format("MM");
-            this.addFileToFolder(
-                file,
-                `${entryDateYear}/${entryDateMonth}`,
-                "/"
-            );
-        })
     }
 
     private buildExtensionFileStructure(unsortedFiles: TFile[], ascending: boolean) {
