@@ -37,6 +37,15 @@ export const RxGroupType = {
     DAILIES: "dailies"
 }
 
+export const OtcGroupType = {
+    TAG_GROUP: "tag_group"
+}
+
+export const GroupType = {
+    ...RxGroupType,
+    ...OtcGroupType
+}
+
 interface RxGroupSettings_v0 {
     groupName: string;
     collapsedFolders: string[];
@@ -75,7 +84,7 @@ interface OtcGroupSettings_v1 extends OtcGroupSettings_v0 {
  */
 export type OtcGroupSettings = OtcGroupSettings_v1;
 
-export interface GroupSettings {
+export interface GroupSettings_v0 {
     groupName: string;
     collapsedFolders: string[];
     isPinned: boolean;
@@ -86,6 +95,12 @@ export interface GroupSettings {
     templatesFolderVisible: boolean;
     logsFolderVisible: boolean;
 }
+
+export interface GroupSettings_v1 extends GroupSettings_v0 {
+    groupType: string;
+}
+
+export type GroupSettings = GroupSettings_v1;
 
 export const PostLogAction = {
     QUIETLY: "quietly",
@@ -129,11 +144,16 @@ interface ObloggerSettings_v3 extends ObloggerSettings_v2 {
 }
 
 interface ObloggerSettings_v4 extends ObloggerSettings_v3 {
-    rxGroups: GroupSettings[];
-    otcGroups: GroupSettings[];
+    rxGroups: GroupSettings_v0[];
+    otcGroups: GroupSettings_v0[];
 }
 
-export type ObloggerSettings = ObloggerSettings_v4
+interface ObloggerSettings_v5 extends ObloggerSettings_v4 {
+    rxGroups: GroupSettings_v1[];
+    otcGroups: GroupSettings_v1[];
+}
+
+export type ObloggerSettings = ObloggerSettings_v5
 
 const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } = {
     0: (settings: ObloggerSettings) => {
@@ -204,6 +224,19 @@ const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } =
             newSettings.tagGroups = [];
 
             newSettings.version = 4;
+        }
+    },
+    4: (settings: ObloggerSettings) => {
+        const newSettings = settings as ObloggerSettings_v5;
+        if (newSettings) {
+            newSettings.rxGroups.forEach(group => {
+                group.groupType = group.groupName;
+                group.groupName = "";
+            });
+            newSettings.otcGroups.forEach(group => {
+                group.groupType = OtcGroupType.TAG_GROUP;
+            })
+            newSettings.version = 5;
         }
     }
 };
