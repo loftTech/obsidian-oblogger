@@ -8,7 +8,14 @@ import {
     Notice,
     CachedMetadata
 } from "obsidian";
-import { ObloggerSettings, RxGroupType, GroupSettings, ContainerSortMethod, OtcGroupType } from "./settings";
+import {
+    ObloggerSettings,
+    RxGroupType,
+    GroupSettings,
+    ContainerSortMethod,
+    OtcGroupType,
+    getGroupSettings
+} from "./settings";
 import { TagGroupContainer } from "./containers/otc/tag_group_container";
 import { DailiesContainer } from "./containers/rx/dailies_container";
 import { FileClickCallback, GroupFolder } from "./containers/group_folder";
@@ -233,14 +240,10 @@ export class ObloggerView extends ItemView {
             if (!save) {
                 return;
             }
-            const group = this.settings?.otcGroups.find(
-                group => {
-                    return (
-                        group.groupType === OtcGroupType.TAG_GROUP &&
-                        group.groupName === groupName
-                    );
-                }
-            );
+            const group = getGroupSettings(
+                this.settings,
+                OtcGroupType.TAG_GROUP,
+                groupName);
             if (!group) {
                 new Notice(`Unable to find tag ${groupName} to update the collapse for.`);
                 return;
