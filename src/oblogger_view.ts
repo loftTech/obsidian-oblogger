@@ -14,7 +14,7 @@ import {
     GroupSettings,
     ContainerSortMethod,
     OtcGroupType,
-    getGroupSettings
+    getGroupSettings, isValidRxGroupType
 } from "./settings";
 import { TagGroupContainer } from "./containers/otc/tag_group_container";
 import { DailiesContainer } from "./containers/rx/dailies_container";
@@ -676,14 +676,14 @@ export class ObloggerView extends ItemView {
         new Notice(`"${tag}" removed`);
     }
 
-    private async moveRxGroup(groupName: string, up: boolean) {
+    private async moveRxGroup(groupType: string, up: boolean) {
         if (!this.settings) {
             return;
         }
 
-        const currentIndex = this.settings.rxGroups.findIndex(group => group.groupName === groupName);
+        const currentIndex = this.settings.rxGroups.findIndex(group => group.groupType === groupType);
         if (currentIndex === -1) {
-            console.warn(`Group ${groupName} doesn't exist.`);
+            console.warn(`Rx group with type ${groupType} doesn't exist.`);
             return;
         }
 
@@ -820,10 +820,15 @@ export class ObloggerView extends ItemView {
             });
     }
 
-    private async hideRxGroup(groupName: string) {
-        const groupSetting = this.settings.rxGroups.find(group => group.groupName === groupName);
+    private async hideRxGroup(groupType: string) {
+        if (!isValidRxGroupType(groupType)) {
+            console.warn(`Unknown rx group type: ${groupType}. Not hiding.`);
+            return;
+        }
+
+        const groupSetting = getGroupSettings(this.settings, groupType, "")
         if (!groupSetting) {
-            console.warn(`Unable to find settings for group ${groupName}`)
+            console.warn(`Unable to find settings for group type ${groupType}`)
             return;
         }
         groupSetting.isVisible = !groupSetting.isVisible;
@@ -838,8 +843,8 @@ export class ObloggerView extends ItemView {
 
         this.rxContainers = [];
 
-        const getRxType = (groupName: string) => {
-            switch(groupName) {
+        const getRxType = (groupType: string) => {
+            switch(groupType) {
                 case RxGroupType.RECENTS:
                     return RecentsContainer;
                 case RxGroupType.DAILIES:
@@ -852,8 +857,12 @@ export class ObloggerView extends ItemView {
             }
         }
 
-        const createRxGroup = (groupName: string) => {
-            const ctor = getRxType(groupName);
+        const createRxGroup = (groupType: string) => {
+            if (!Object.values(RxGroupType).contains(groupType)) {
+                console.warn(`Unknown rx group type ${groupType}. Not creating.`);
+                return;
+            }
+            const ctor = getRxType(groupType);
             const callbacks: ContainerCallbacks = {
                 fileClickCallback: this.fileClickCallback,
                 fileAddedCallback: this.fileAddedCallback,
@@ -861,8 +870,8 @@ export class ObloggerView extends ItemView {
                 requestRenderCallback: () => { this.requestRender() },
                 saveSettingsCallback: this.saveSettingsCallback,
                 getGroupIconCallback: (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
-                hideCallback: () => { return this.hideRxGroup(groupName); },
-                moveCallback: (up: boolean) => { return this.moveRxGroup(groupName, up); },
+                hideCallback: () => { return this.hideRxGroup(groupType); },
+                moveCallback: (up: boolean) => { return this.moveRxGroup(groupType, up); },
                 pinCallback: undefined
             }
             return new ctor(
@@ -871,9 +880,13 @@ export class ObloggerView extends ItemView {
                 callbacks);
         }
 
-        this.rxContainers = this.settings?.rxGroups.map(rxGroupSetting => {
-            return createRxGroup(rxGroupSetting.groupName)
-        }) ?? []
+        this.rxContainers = [];
+        this.settings?.rxGroups.forEach(rxGroupSetting => {
+            const newGroup = createRxGroup(rxGroupSetting.groupType);
+            if (newGroup) {
+                this.rxContainers.push(newGroup);
+            }
+        })
 
         this.rxGroupsDiv.empty();
         this.rxContainers.forEach(container =>

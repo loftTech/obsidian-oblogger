@@ -37,6 +37,10 @@ export const RxGroupType = {
     DAILIES: "dailies"
 }
 
+export const isValidRxGroupType = (groupType: string): boolean => {
+    return Object.values(RxGroupType).contains(groupType);
+}
+
 export const OtcGroupType = {
     TAG_GROUP: "tag_group"
 }
