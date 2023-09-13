@@ -153,7 +153,7 @@ interface ObloggerSettings_v5 extends ObloggerSettings_v4 {
     otcGroups: GroupSettings_v1[];
 }
 
-export type ObloggerSettings = ObloggerSettings_v5
+export type ObloggerSettings = ObloggerSettings_v5;
 
 const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } = {
     0: (settings: ObloggerSettings) => {
