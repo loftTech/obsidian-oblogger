@@ -311,6 +311,19 @@ export const DEFAULT_SETTINGS: ObloggerSettings_v3 = {
     dailiesTag: "daily"
 };
 
+export const getGroupSettings = (
+    settings: ObloggerSettings,
+    groupType: string,
+    groupName: string
+): GroupSettings | undefined => {
+    return [
+        ...settings.otcGroups,
+        ...settings.rxGroups
+    ].find((group: GroupSettings) => {
+        return group.groupType === groupType && group.groupName === groupName
+    });
+}
+
 export enum FileType {
     image = "image",
     audio = "audio",
