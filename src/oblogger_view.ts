@@ -8,7 +8,7 @@ import {
     Notice,
     CachedMetadata
 } from "obsidian";
-import { ObloggerSettings, RxGroupType, GroupSettings, ContainerSortMethod } from "./settings";
+import { ObloggerSettings, RxGroupType, GroupSettings, ContainerSortMethod, OtcGroupType } from "./settings";
 import { TagGroupContainer } from "./containers/otc/tag_group_container";
 import { DailiesContainer } from "./containers/rx/dailies_container";
 import { FileClickCallback, GroupFolder } from "./containers/group_folder";
@@ -234,7 +234,12 @@ export class ObloggerView extends ItemView {
                 return;
             }
             const group = this.settings?.otcGroups.find(
-                group => group.groupName === groupName
+                group => {
+                    return (
+                        group.groupType === OtcGroupType.TAG_GROUP &&
+                        group.groupName === groupName
+                    );
+                }
             );
             if (!group) {
                 new Notice(`Unable to find tag ${groupName} to update the collapse for.`);
@@ -530,6 +535,7 @@ export class ObloggerView extends ItemView {
             }
             this.settings.otcGroups.push({
                 groupName: result,
+                groupType: OtcGroupType.TAG_GROUP,
                 collapsedFolders: [],
                 isVisible: true,
                 isPinned: false,
