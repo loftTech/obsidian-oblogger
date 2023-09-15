@@ -30,24 +30,38 @@ export const getSortMethodDisplayText = (sortMethod: string) => {
     }
 }
 
-export const RxGroupType = {
-    RECENTS: "recents",
-    FILES: "files",
-    UNTAGGED: "untagged",
-    DAILIES: "dailies"
+// Note: when adding new types, ensure that the value = NAME.toLowerCase()
+export enum RxGroupType {
+    RECENTS = "recents",
+    FILES = "files",
+    UNTAGGED = "untagged",
+    DAILIES = "dailies"
 }
 
-export const isValidRxGroupType = (groupType: string): boolean => {
-    return Object.values(RxGroupType).contains(groupType);
+export const isValidRxGroupType = (groupType: RxGroupType): boolean => {
+    return Object.keys(RxGroupType)
+        .map(t => t.toLowerCase())
+        .contains(groupType as string);
 }
 
-export const OtcGroupType = {
-    TAG_GROUP: "tag_group"
+// Note: when adding new types, ensure that the value = NAME.toLowerCase()
+export enum OtcGroupType {
+    TAG_GROUP = "tag_group"
 }
 
-export const GroupType = {
-    ...RxGroupType,
-    ...OtcGroupType
+export const isValidOtcGroupType = (groupType: OtcGroupType): boolean => {
+    return Object.keys(OtcGroupType)
+        .map(t => t.toLowerCase())
+        .contains(groupType as string);
+}
+
+export type GroupType = RxGroupType | OtcGroupType;
+
+export const isValidGroupType = (groupType: GroupType): boolean => {
+    return (
+        isValidRxGroupType(groupType as RxGroupType) ||
+        isValidOtcGroupType(groupType as OtcGroupType)
+    );
 }
 
 interface RxGroupSettings_v0 {
@@ -101,7 +115,7 @@ export interface GroupSettings_v0 {
 }
 
 export interface GroupSettings_v1 extends GroupSettings_v0 {
-    groupType: string;
+    groupType: GroupType;
 }
 
 export type GroupSettings = GroupSettings_v1;
@@ -181,14 +195,14 @@ const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } =
         if (newSettings) {
             newSettings.rxGroups.forEach(group => {
                 group.logsFolderVisible = [
-                    RxGroupType.DAILIES,
-                    RxGroupType.FILES,
-                    RxGroupType.RECENTS
+                    RxGroupType.DAILIES as string,
+                    RxGroupType.FILES as string,
+                    RxGroupType.RECENTS as string
                 ].contains(group.groupName);
 
                 group.templatesFolderVisible = [
-                    RxGroupType.FILES,
-                    RxGroupType.RECENTS
+                    RxGroupType.FILES as string,
+                    RxGroupType.RECENTS as string
                 ].contains(group.groupName);
 
                 group.excludedFolders = [];
@@ -234,7 +248,8 @@ const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } =
         const newSettings = settings as ObloggerSettings_v5;
         if (newSettings) {
             newSettings.rxGroups.forEach(group => {
-                group.groupType = group.groupName;
+                // todo: what happens if group.groupName is malformed
+                group.groupType = group.groupName as RxGroupType;
                 group.groupName = "";
             });
             newSettings.otcGroups.forEach(group => {
@@ -255,7 +270,7 @@ export const upgradeSettings = (currentVersion: number, settings: ObloggerSettin
     UPGRADE_FUNCTIONS[currentVersion](settings);
 }
 
-export const CURRENT_VERSION = 4;
+export const CURRENT_VERSION = 5;
 
 export const DEFAULT_SETTINGS: ObloggerSettings_v3 = {
     version: 3,
@@ -317,7 +332,7 @@ export const DEFAULT_SETTINGS: ObloggerSettings_v3 = {
 
 export const getGroupSettings = (
     settings: ObloggerSettings,
-    groupType: string,
+    groupType: GroupType,
     groupName: string
 ): GroupSettings | undefined => {
     return [

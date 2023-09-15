@@ -1,5 +1,5 @@
 import { ViewContainer } from "../view_container";
-import { ObloggerSettings } from "../../settings";
+import { ObloggerSettings, RxGroupType } from "../../settings";
 import { ContainerCallbacks } from "../container_callbacks";
 import { App } from "obsidian";
 
@@ -8,13 +8,14 @@ export abstract class RxContainer extends ViewContainer {
         app: App,
         settings: ObloggerSettings,
         callbacks: ContainerCallbacks,
-        groupType: string,
+        groupType: RxGroupType,
         showStatusIcon: boolean,
         canCollapseInnerFolders: boolean
     ) {
         super(
             app,
-            groupType, // viewName
+            "", // viewName
+            groupType,
             showStatusIcon,
             settings,
             true, // isMovable

@@ -14,7 +14,8 @@ import {
     GroupSettings,
     ContainerSortMethod,
     OtcGroupType,
-    getGroupSettings, isValidRxGroupType
+    getGroupSettings,
+    isValidRxGroupType
 } from "./settings";
 import { TagGroupContainer } from "./containers/otc/tag_group_container";
 import { DailiesContainer } from "./containers/rx/dailies_container";
@@ -67,16 +68,6 @@ export class ObloggerView extends ItemView {
     fileAddedCallback: (
         file: TFile,
         contentItem: HTMLElement) => void;
-    rxGroupCollapseChangeCallback: (
-        groupName: string,
-        collapsedFolders: string[],
-        save: boolean
-    ) => void;
-    tagGroupCollapseChangedCallback: (
-        groupName: string,
-        collapsedFolders: string[],
-        save: boolean
-    ) => void;
 
     constructor(
         leaf: WorkspaceLeaf,
@@ -217,41 +208,6 @@ export class ObloggerView extends ItemView {
             });
         }
 
-        this.rxGroupCollapseChangeCallback = (
-            groupName: string,
-            collapsedFolders: string[],
-            save: boolean
-        ) => {
-            if (!save) {
-                return;
-            }
-            const groupSetting = this.settings?.rxGroups.find(group => group.groupName === groupName);
-            if (groupSetting) {
-                groupSetting.collapsedFolders = collapsedFolders;
-                return this.saveSettingsCallback();
-            }
-        }
-
-        this.tagGroupCollapseChangedCallback = (
-            groupName: string,
-            collapsedFolders: string[],
-            save: boolean
-        ) => {
-            if (!save) {
-                return;
-            }
-            const group = getGroupSettings(
-                this.settings,
-                OtcGroupType.TAG_GROUP,
-                groupName);
-            if (!group) {
-                new Notice(`Unable to find tag ${groupName} to update the collapse for.`);
-                return;
-            }
-            group.collapsedFolders = collapsedFolders;
-            return this.saveSettingsCallback();
-        }
-
         this.app.workspace.onLayoutReady(() => {
             // Hook up to the bookmarks plugin
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -329,18 +285,22 @@ export class ObloggerView extends ItemView {
     }
 
     private renderRxGroup(
-        groupName: string,
+        groupType: RxGroupType,
         modifiedFiles: FileState[],
         forced: boolean
     ) {
-        const groupSetting = this.settings?.rxGroups.find(group => group.groupName === groupName);
+        const groupSetting = getGroupSettings(
+            this.settings,
+            groupType,
+            "");
         if (!groupSetting) {
-            console.warn(`unable to find settings for rx group ${groupName}`);
+            console.warn(`unable to find settings for rx group ${groupType}`);
             return;
         }
-        const container = this.rxContainers.find(container => container.groupName === groupName);
+        const container = this.rxContainers.find(
+            container => container.groupType === groupType);
         if (!container) {
-            console.warn(`unable to find container for rx group ${groupName}`);
+            console.warn(`unable to find container for rx group ${groupType}`);
             return;
         }
         container.render(
@@ -644,7 +604,7 @@ export class ObloggerView extends ItemView {
                     this.settings.rxGroups.forEach(groupSetting => {
                         menu.addItem(item => {
                             const isVisible = groupSetting.isVisible;
-                            item.setTitle(`${isVisible ? "Hide" : "Show"} ${groupSetting.groupName}`);
+                            item.setTitle(`${isVisible ? "Hide" : "Show"} ${groupSetting.groupType}`);
                             item.setIcon(isVisible ? "eye-off" : "eye");
                             item.onClick(async () => {
                                 groupSetting.isVisible = !groupSetting.isVisible;
@@ -658,7 +618,7 @@ export class ObloggerView extends ItemView {
             });
     }
 
-    private async removeOtcGroup(tag: string) {
+    private async removeTagGroup(tag: string) {
         const tagGroup = this.otcGroups.find((tg) => tg.tag === tag);
         if (tagGroup === undefined) {
             new Notice("Nothing to delete");
@@ -676,7 +636,7 @@ export class ObloggerView extends ItemView {
         new Notice(`"${tag}" removed`);
     }
 
-    private async moveRxGroup(groupType: string, up: boolean) {
+    private async moveRxGroup(groupType: RxGroupType, up: boolean) {
         if (!this.settings) {
             return;
         }
@@ -713,7 +673,7 @@ export class ObloggerView extends ItemView {
         this.requestRender();
     }
 
-    private async moveOtcGroup(tag: string, up: boolean): Promise<void> {
+    private async moveTagGroup(tag: string, up: boolean): Promise<void> {
         const currentIndex = this.settings.otcGroups.findIndex(group => group.groupName === tag);
         if (currentIndex === -1) {
             console.warn(`Tag ${tag} doesn't exist.`);
@@ -737,7 +697,7 @@ export class ObloggerView extends ItemView {
         this.requestRender();
     }
 
-    private async pinOtcGroup(tag: string, pin: boolean): Promise<void> {
+    private async pinTagGroup(tag: string, pin: boolean): Promise<void> {
         const otcGroup = this.settings.otcGroups.find((otcGroup) => otcGroup.groupName === tag);
         if (otcGroup === undefined) {
             new Notice(`Unable to find tag ${tag} to ${pin ? "pin" : "unpin"}`);
@@ -749,7 +709,7 @@ export class ObloggerView extends ItemView {
         this.requestRender();
     }
 
-    private addOtcGroup(
+    private addTagGroup(
         groupName: string,
         isPinned: boolean,
         parent: HTMLElement
@@ -757,13 +717,12 @@ export class ObloggerView extends ItemView {
         const callbacks: ContainerCallbacks = {
             fileClickCallback: this.fileClickCallback,
             fileAddedCallback: this.fileAddedCallback,
-            collapseChangedCallback: this.tagGroupCollapseChangedCallback,
             requestRenderCallback: () => { this.requestRender() },
             saveSettingsCallback: this.saveSettingsCallback,
             getGroupIconCallback: (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
-            hideCallback: async () => { return await this.removeOtcGroup(groupName); },
-            moveCallback: (up: boolean) => { return this.moveOtcGroup(groupName, up); },
-            pinCallback: (pin: boolean) => { return this.pinOtcGroup(groupName, pin); }
+            hideCallback: async () => { return await this.removeTagGroup(groupName); },
+            moveCallback: (up: boolean) => { return this.moveTagGroup(groupName, up); },
+            pinCallback: (pin: boolean) => { return this.pinTagGroup(groupName, pin); }
         };
 
         const container = new TagGroupContainer(
@@ -783,7 +742,6 @@ export class ObloggerView extends ItemView {
     }
 
     private reloadOtcGroups() {
-        console.log("reloading otc groups")
         this.otcGroupsDiv?.empty();
 
         this.otcGroups = [];
@@ -802,7 +760,7 @@ export class ObloggerView extends ItemView {
             ?.filter(otcGroup => otcGroup.isPinned)
             ?.sort(groupSorter)
             ?.forEach(group => {
-                this.otcGroupsDiv && this.addOtcGroup(
+                this.otcGroupsDiv && this.addTagGroup(
                     group.groupName,
                     true,
                     this.otcGroupsDiv);
@@ -813,14 +771,14 @@ export class ObloggerView extends ItemView {
             ?.filter(otcGroup => !otcGroup.isPinned)
             ?.sort(groupSorter)
             ?.forEach(group => {
-                this.otcGroupsDiv && this.addOtcGroup(
+                this.otcGroupsDiv && this.addTagGroup(
                     group.groupName,
                     false,
                     this.otcGroupsDiv);
             });
     }
 
-    private async hideRxGroup(groupType: string) {
+    private async hideRxGroup(groupType: RxGroupType) {
         if (!isValidRxGroupType(groupType)) {
             console.warn(`Unknown rx group type: ${groupType}. Not hiding.`);
             return;
@@ -843,7 +801,7 @@ export class ObloggerView extends ItemView {
 
         this.rxContainers = [];
 
-        const getRxType = (groupType: string) => {
+        const getRxType = (groupType: RxGroupType) => {
             switch(groupType) {
                 case RxGroupType.RECENTS:
                     return RecentsContainer;
@@ -857,8 +815,8 @@ export class ObloggerView extends ItemView {
             }
         }
 
-        const createRxGroup = (groupType: string) => {
-            if (!Object.values(RxGroupType).contains(groupType)) {
+        const createRxGroup = (groupType: RxGroupType) => {
+            if (!isValidRxGroupType(groupType)) {
                 console.warn(`Unknown rx group type ${groupType}. Not creating.`);
                 return;
             }
@@ -866,7 +824,6 @@ export class ObloggerView extends ItemView {
             const callbacks: ContainerCallbacks = {
                 fileClickCallback: this.fileClickCallback,
                 fileAddedCallback: this.fileAddedCallback,
-                collapseChangedCallback: this.rxGroupCollapseChangeCallback,
                 requestRenderCallback: () => { this.requestRender() },
                 saveSettingsCallback: this.saveSettingsCallback,
                 getGroupIconCallback: (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
@@ -882,7 +839,7 @@ export class ObloggerView extends ItemView {
 
         this.rxContainers = [];
         this.settings?.rxGroups.forEach(rxGroupSetting => {
-            const newGroup = createRxGroup(rxGroupSetting.groupType);
+            const newGroup = createRxGroup(rxGroupSetting.groupType as RxGroupType);
             if (newGroup) {
                 this.rxContainers.push(newGroup);
             }
