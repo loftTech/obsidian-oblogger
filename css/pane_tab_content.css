@@ -376,6 +376,12 @@ body.styled-scrollbars .oblogger-content {
     transition: transform 100ms ease-in-out;
 }
 
+.oblogger-content .greeter-title-default-avatar .svg-icon {
+    color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/90%);
+    height: 52px;
+    width: 52px;
+}
+
 .oblogger-pill-menu-icon .svg-icon {
     color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/90%);
     height: 12px;
