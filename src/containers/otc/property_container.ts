@@ -74,15 +74,11 @@ export class PropertyContainer extends OtcContainer {
             filesWithValue.forEach(fileWithFrontmatter => {
                 this.addFileToFolder(
                     fileWithFrontmatter.file,
-                    "",
-                    value
+                    value,
+                    "/"
                 )
             });
         });
-
-        // todo: use this call when creating the container
-        // this.app.metadataCache.getAllPropertyInfos()
-
     }
 
     protected getTextIcon(): string {
