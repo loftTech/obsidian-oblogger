@@ -30,11 +30,61 @@ export const getSortMethodDisplayText = (sortMethod: string) => {
     }
 }
 
-export const RxGroupType = {
-    RECENTS: "recents",
-    FILES: "files",
-    UNTAGGED: "untagged",
-    DAILIES: "dailies"
+// Note: when adding new types, ensure that the value = NAME.toLowerCase()
+export enum RxGroupType {
+    RECENTS = "recents",
+    FILES = "files",
+    UNTAGGED = "untagged",
+    DAILIES = "dailies"
+}
+
+export const isValidRxGroupType = (groupType: RxGroupType): boolean => {
+    return Object.keys(RxGroupType)
+        .map(t => t.toLowerCase())
+        .contains(groupType as string);
+}
+
+// Note: when adding new types, ensure that the value = NAME.toLowerCase()
+export enum OtcGroupType {
+    TAG_GROUP = "tag_group"
+}
+
+export const isValidOtcGroupType = (groupType: OtcGroupType): boolean => {
+    return Object.keys(OtcGroupType)
+        .map(t => t.toLowerCase())
+        .contains(groupType as string);
+}
+
+export type GroupType = RxGroupType | OtcGroupType;
+
+export const isValidGroupType = (groupType: GroupType): boolean => {
+    return (
+        isValidRxGroupType(groupType as RxGroupType) ||
+        isValidOtcGroupType(groupType as OtcGroupType)
+    );
+}
+
+/**
+ * @description:validates that the enums are properly formed (that the
+ * key.toLowerCase() equals the value). should be called on launch (or better
+ * yet, at compile time).
+ */
+export const areEnumsValid = (): boolean => {
+    const allEnums = Object
+        .entries(RxGroupType)
+        .map((rxGroupType) => {
+            return [rxGroupType.first(), String(rxGroupType.last())];
+        }).concat(
+            Object
+                .entries(OtcGroupType)
+                .map((otcGroupType) => {
+                    return [otcGroupType.first(), String(otcGroupType.last())];
+                })
+        );
+    return !allEnums
+        .some(groupType => {
+            return groupType.first()?.toLowerCase() !== groupType.last();
+        });
 }
 
 interface RxGroupSettings_v0 {
@@ -75,7 +125,7 @@ interface OtcGroupSettings_v1 extends OtcGroupSettings_v0 {
  */
 export type OtcGroupSettings = OtcGroupSettings_v1;
 
-export interface GroupSettings {
+export interface GroupSettings_v0 {
     groupName: string;
     collapsedFolders: string[];
     isPinned: boolean;
@@ -86,6 +136,12 @@ export interface GroupSettings {
     templatesFolderVisible: boolean;
     logsFolderVisible: boolean;
 }
+
+export interface GroupSettings_v1 extends GroupSettings_v0 {
+    groupType: GroupType;
+}
+
+export type GroupSettings = GroupSettings_v1;
 
 export const PostLogAction = {
     QUIETLY: "quietly",
@@ -129,11 +185,16 @@ interface ObloggerSettings_v3 extends ObloggerSettings_v2 {
 }
 
 interface ObloggerSettings_v4 extends ObloggerSettings_v3 {
-    rxGroups: GroupSettings[];
-    otcGroups: GroupSettings[];
+    rxGroups: GroupSettings_v0[];
+    otcGroups: GroupSettings_v0[];
 }
 
-export type ObloggerSettings = ObloggerSettings_v4
+interface ObloggerSettings_v5 extends ObloggerSettings_v4 {
+    rxGroups: GroupSettings_v1[];
+    otcGroups: GroupSettings_v1[];
+}
+
+export type ObloggerSettings = ObloggerSettings_v5;
 
 const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } = {
     0: (settings: ObloggerSettings) => {
@@ -157,14 +218,14 @@ const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } =
         if (newSettings) {
             newSettings.rxGroups.forEach(group => {
                 group.logsFolderVisible = [
-                    RxGroupType.DAILIES,
-                    RxGroupType.FILES,
-                    RxGroupType.RECENTS
+                    RxGroupType.DAILIES as string,
+                    RxGroupType.FILES as string,
+                    RxGroupType.RECENTS as string
                 ].contains(group.groupName);
 
                 group.templatesFolderVisible = [
-                    RxGroupType.FILES,
-                    RxGroupType.RECENTS
+                    RxGroupType.FILES as string,
+                    RxGroupType.RECENTS as string
                 ].contains(group.groupName);
 
                 group.excludedFolders = [];
@@ -205,9 +266,39 @@ const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } =
 
             newSettings.version = 4;
         }
+    },
+    4: (settings: ObloggerSettings) => {
+        const newSettings = settings as ObloggerSettings_v5;
+        if (newSettings) {
+            // Rx groups used to have their type as their name, so make sure
+            // we only have valid rx group types in the names and then transfer
+            // the name to the type, clearing the name.
+            newSettings.rxGroups
+                .filter(group => {
+                    return isValidRxGroupType(group.groupName as RxGroupType);
+                }).map(group => {
+                    group.groupType = group.groupName as RxGroupType;
+                    group.groupName = "";
+                    return group;
+                });
+
+            // All otc groups from <= v4 are tag groups. The names are
+            // correctly the tag their filtering on, so just set the type
+            newSettings.otcGroups.forEach(group => {
+                group.groupType = OtcGroupType.TAG_GROUP;
+            });
+
+            newSettings.version = 5;
+        }
     }
 };
 
+/**
+ * Takes in a version number and a settings object and attempts to upgrade
+ * the settings object to the next version.
+ * @param currentVersion Current version of the settings object
+ * @param settings Settings object to upgrade
+ */
 export const upgradeSettings = (currentVersion: number, settings: ObloggerSettings) => {
     const availableUpgrades = Object.keys(UPGRADE_FUNCTIONS);
     if (!availableUpgrades.contains(currentVersion.toString())) {
@@ -218,7 +309,7 @@ export const upgradeSettings = (currentVersion: number, settings: ObloggerSettin
     UPGRADE_FUNCTIONS[currentVersion](settings);
 }
 
-export const CURRENT_VERSION = 4;
+export const CURRENT_VERSION = 5;
 
 export const DEFAULT_SETTINGS: ObloggerSettings_v3 = {
     version: 3,
@@ -277,6 +368,19 @@ export const DEFAULT_SETTINGS: ObloggerSettings_v3 = {
     ],
     dailiesTag: "daily"
 };
+
+export const getGroupSettings = (
+    settings: ObloggerSettings,
+    groupType: GroupType,
+    groupName: string
+): GroupSettings | undefined => {
+    return [
+        ...settings.otcGroups,
+        ...settings.rxGroups
+    ].find((group: GroupSettings) => {
+        return group.groupType === groupType && group.groupName === groupName
+    });
+}
 
 export enum FileType {
     image = "image",

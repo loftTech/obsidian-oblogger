@@ -48,7 +48,7 @@ export class UntaggedContainer extends RxContainer {
     }
 
     protected getPillText(): string {
-        return getSortMethodDisplayText(this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL);
+        return getSortMethodDisplayText(this.getGroupSettings()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL);
     }
 
     protected getPillTooltipText(): string {
@@ -56,7 +56,7 @@ export class UntaggedContainer extends RxContainer {
     }
 
     protected getPillIcon(): string {
-        return this.getGroupSetting()?.sortAscending ?
+        return this.getGroupSettings()?.sortAscending ?
             "down-arrow-with-tail" :
             "up-arrow-with-tail"
     }
@@ -131,22 +131,22 @@ export class UntaggedContainer extends RxContainer {
             return cache !== null && ((getAllTags(cache)?.length ?? 1) <= 0);
         });
 
-        switch (this.getGroupSetting()?.sortMethod) {
+        switch (this.getGroupSettings()?.sortMethod) {
             case ContainerSortMethod.ALPHABETICAL:
                 this.buildAlphabeticalFileStructure(
                     includedFiles,
-                    this.getGroupSetting()?.sortAscending ?? true);
+                    this.getGroupSettings()?.sortAscending ?? true);
                 break;
             case ContainerSortMethod.CTIME:
                 this.buildDateFileStructure(
                     includedFiles,
-                    this.getGroupSetting()?.sortAscending ?? true,
+                    this.getGroupSettings()?.sortAscending ?? true,
                     true);
                 break;
             case ContainerSortMethod.MTIME:
                 this.buildDateFileStructure(
                     includedFiles,
-                    this.getGroupSetting()?.sortAscending ?? true,
+                    this.getGroupSettings()?.sortAscending ?? true,
                     false);
                 break;
         }

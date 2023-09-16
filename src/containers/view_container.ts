@@ -1,6 +1,14 @@
 import { App, FrontMatterCache, Menu, MenuItem, moment, setIcon, TFile } from "obsidian";
 import { GroupFolder } from "./group_folder";
-import { ContainerSortMethod, getSortMethodDisplayText, GroupSettings, ObloggerSettings } from "../settings";
+import {
+    ContainerSortMethod,
+    getGroupSettings,
+    getSortMethodDisplayText,
+    GroupSettings,
+    GroupType,
+    isValidGroupType,
+    ObloggerSettings
+} from "../settings";
 import { buildStateFromFile, FileState } from "../constants";
 import { FolderSuggestModal } from "../folder_suggest_modal";
 import { ContainerCallbacks } from "./container_callbacks";
@@ -17,6 +25,7 @@ export abstract class ViewContainer extends GroupFolder {
     canBePinned: boolean;
     isPinned: boolean;
     renderedFileCaches: RenderedFileCache[]
+    groupType: GroupType;
 
     callbacks: ContainerCallbacks;
 
@@ -42,6 +51,7 @@ export abstract class ViewContainer extends GroupFolder {
     protected constructor(
         app: App,
         viewName: string,
+        groupType: GroupType,
         showStatusIcon: boolean,
         settings: ObloggerSettings,
         isMovable: boolean,
@@ -55,13 +65,28 @@ export abstract class ViewContainer extends GroupFolder {
             viewName,
             "/",
             (save: boolean) => {
-                callbacks.collapseChangedCallback(viewName, this.getCollapsedFolders(), save);
+                if (!save) {
+                    return;
+                }
+                const groupSetting = getGroupSettings(
+                    this.settings,
+                    groupType,
+                    viewName);
+                if (groupSetting) {
+                    groupSetting.collapsedFolders = this.getCollapsedFolders();
+                    return callbacks.saveSettingsCallback();
+                }
             },
             showStatusIcon,
             callbacks.getGroupIconCallback,
             () => { return this.getEmptyMessage() });
 
+        if (!isValidGroupType(groupType)) {
+            console.warn(`Unknown group type ${groupType} with name ${viewName}. Continuing...`);
+        }
+
         this.settings = settings;
+        this.groupType = groupType;
         this.isMovable = isMovable;
         this.canCollapseInnerFolders = canCollapseInnerFolders;
         this.canBePinned = canBePinned;
@@ -80,14 +105,12 @@ export abstract class ViewContainer extends GroupFolder {
         super.addFileToFolder(file, remainingTag, pathPrefix);
     }
 
-    protected isVisible(): boolean {
-        return this.getGroupSetting()?.isVisible ?? true;
+    protected getGroupSettings(): GroupSettings | undefined {
+        return getGroupSettings(this.settings, this.groupType, this.groupName);
     }
 
-    protected getGroupSetting(): GroupSettings | undefined {
-        // default to fetching from rx groups. override in TagGroupContainer
-        // to fetch from otc groups.
-        return this.settings.rxGroups.find(group => group.groupName === this.groupName);
+    protected isVisible(): boolean {
+        return this.getGroupSettings()?.isVisible ?? true;
     }
 
     protected requestRender() {
@@ -96,7 +119,7 @@ export abstract class ViewContainer extends GroupFolder {
 
     protected addSortOptionsToMenu(menu: Menu, sortMethods: string[]) {
         const changeSortMethod = async (method: string) => {
-            const groupSetting = this.getGroupSetting();
+            const groupSetting = this.getGroupSettings();
             if (groupSetting === undefined) {
                 return;
             }
@@ -116,13 +139,13 @@ export abstract class ViewContainer extends GroupFolder {
                 return changeSortMethod(method);
             });
 
-            if (method === this.getGroupSetting()?.sortMethod) {
+            if (method === this.getGroupSettings()?.sortMethod) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 item.iconEl.addClass("untagged-sort-confirmation");
 
                 item.setIcon(
-                    this.getGroupSetting()?.sortAscending ?
+                    this.getGroupSettings()?.sortAscending ?
                         "down-arrow-with-tail" :
                         "up-arrow-with-tail");
             } else {
@@ -142,7 +165,7 @@ export abstract class ViewContainer extends GroupFolder {
         oldState: FileState,
         newState: FileState
     ): boolean {
-        const groupSettings = this.getGroupSetting();
+        const groupSettings = this.getGroupSettings();
         switch(groupSettings?.sortMethod) {
             case ContainerSortMethod.ALPHABETICAL:
                 // shouldn't actually happen because we should be deciding
@@ -258,7 +281,7 @@ export abstract class ViewContainer extends GroupFolder {
             );
         }
 
-        const groupSetting = this.getGroupSetting();
+        const groupSetting = this.getGroupSettings();
 
         menu.addItem(item => {
             item

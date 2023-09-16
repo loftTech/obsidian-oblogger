@@ -85,7 +85,6 @@ export class RecentsContainer extends RxContainer {
     }
 
     protected buildFileStructure(excludedFolders: string[]): void {
-        console.log(excludedFolders)
         let foundFilesCount = 0;
         this.app.vault
             .getFiles()

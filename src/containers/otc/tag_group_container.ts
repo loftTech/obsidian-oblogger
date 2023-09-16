@@ -1,6 +1,12 @@
 import { App, getAllTags, Menu, TFile } from "obsidian";
 import { ViewContainer } from "../view_container";
-import { ContainerSortMethod, getSortMethodDisplayText, GroupSettings, ObloggerSettings } from "../../settings";
+import {
+    ContainerSortMethod,
+    getSortMethodDisplayText,
+    GroupSettings,
+    ObloggerSettings,
+    OtcGroupType
+} from "../../settings";
 import { FileState } from "../../constants";
 import { ContainerCallbacks } from "../container_callbacks";
 
@@ -25,6 +31,7 @@ export class TagGroupContainer extends ViewContainer {
         super(
             app,
             baseTag,
+            OtcGroupType.TAG_GROUP,
             false, // showStatusIcon
             settings,
             false, // isMovable
@@ -35,7 +42,7 @@ export class TagGroupContainer extends ViewContainer {
         );
     }
 
-    protected getGroupSetting(): GroupSettings | undefined {
+    protected getGroupSettings(): GroupSettings | undefined {
         // override to search otcGroups instead of rxGroups
         return this.settings.otcGroups.find(group => group.groupName === this.groupName);
     }
@@ -109,7 +116,7 @@ export class TagGroupContainer extends ViewContainer {
     }
 
     protected getPillText(): string {
-        return getSortMethodDisplayText(this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL);
+        return getSortMethodDisplayText(this.getGroupSettings()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL);
     }
 
     protected getPillTooltipText(): string {
@@ -127,7 +134,7 @@ export class TagGroupContainer extends ViewContainer {
     }
 
     protected getPillIcon(): string {
-        return (this.getGroupSetting()?.sortAscending ?? true) ?
+        return (this.getGroupSettings()?.sortAscending ?? true) ?
             "down-arrow-with-tail" :
             "up-arrow-with-tail"
     }
@@ -227,8 +234,8 @@ export class TagGroupContainer extends ViewContainer {
 
         const tagFiles = this.getAllAssociatedTags(excludedFolders);
         const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
-        const ascending = this.getGroupSetting()?.sortAscending ?? true;
-        const sortMethod = this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL;
+        const ascending = this.getGroupSettings()?.sortAscending ?? true;
+        const sortMethod = this.getGroupSettings()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL;
         const fileSortingFn = this.getFileSortingFn(sortMethod);
 
         Object.keys(tagFiles).sort((tagA: string, tagB: string) => {

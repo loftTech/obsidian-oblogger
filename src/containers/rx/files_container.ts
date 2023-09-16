@@ -43,7 +43,7 @@ export class FilesContainer extends RxContainer {
     }
 
     protected getPillIcon(): string {
-        return this.getGroupSetting()?.sortAscending ?
+        return this.getGroupSettings()?.sortAscending ?
             "down-arrow-with-tail" :
             "up-arrow-with-tail"
     }
@@ -53,7 +53,7 @@ export class FilesContainer extends RxContainer {
     }
 
     protected getPillText(): string {
-        return getSortMethodDisplayText(this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL);
+        return getSortMethodDisplayText(this.getGroupSettings()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL);
     }
 
     protected getPillClickHandler(): ((e: MouseEvent) => void) | undefined {
@@ -142,9 +142,9 @@ export class FilesContainer extends RxContainer {
             return file.extension !== "md";
         });
 
-        const ascending = this.getGroupSetting()?.sortAscending ?? true;
+        const ascending = this.getGroupSettings()?.sortAscending ?? true;
 
-        switch (this.getGroupSetting()?.sortMethod ?? ContainerSortMethod.TYPE) {
+        switch (this.getGroupSettings()?.sortMethod ?? ContainerSortMethod.TYPE) {
             case ContainerSortMethod.ALPHABETICAL:
                 this.buildAlphabeticalFileStructure(includedFiles, ascending);
                 break;
