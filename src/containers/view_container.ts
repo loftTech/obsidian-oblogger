@@ -4,8 +4,10 @@ import {
     ContainerSortMethod,
     getGroupSettings,
     getSortMethodDisplayText,
-    GroupSettings, GroupType, isValidGroupType,
-    ObloggerSettings, OtcGroupType, RxGroupType
+    GroupSettings,
+    GroupType,
+    isValidGroupType,
+    ObloggerSettings
 } from "../settings";
 import { buildStateFromFile, FileState } from "../constants";
 import { FolderSuggestModal } from "../folder_suggest_modal";
