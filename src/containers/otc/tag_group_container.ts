@@ -1,14 +1,8 @@
-import { App, getAllTags, Menu, TFile } from "obsidian";
-import { ViewContainer } from "../view_container";
-import {
-    ContainerSortMethod,
-    getSortMethodDisplayText,
-    GroupSettings,
-    ObloggerSettings,
-    OtcGroupType
-} from "../../settings";
+import { App, getAllTags, TFile } from "obsidian";
+import { ContainerSortMethod, ObloggerSettings, OtcGroupType } from "../../settings";
 import { FileState } from "../../constants";
 import { ContainerCallbacks } from "../container_callbacks";
+import { OtcContainer } from "./otc_container";
 
 
 type TagFileMap = { [key: string]: TFile[] };
@@ -18,7 +12,7 @@ interface FileTags {
     tags: string[];
 }
 
-export class TagGroupContainer extends ViewContainer {
+export class TagGroupContainer extends OtcContainer {
     renderedFileTags: FileTags[];
 
     constructor(
@@ -30,21 +24,12 @@ export class TagGroupContainer extends ViewContainer {
     ) {
         super(
             app,
-            baseTag,
-            OtcGroupType.TAG_GROUP,
-            false, // showStatusIcon
             settings,
-            false, // isMovable
-            true, // canCollapseInnerFolders
-            true, // canBePinned
-            isPinned,
-            callbacks
+            callbacks,
+            OtcGroupType.TAG_GROUP,
+            baseTag,
+            isPinned
         );
-    }
-
-    protected getGroupSettings(): GroupSettings | undefined {
-        // override to search otcGroups instead of rxGroups
-        return this.settings.otcGroups.find(group => group.groupName === this.groupName);
     }
 
     protected wouldBeRendered(state: FileState): boolean {
@@ -66,29 +51,6 @@ export class TagGroupContainer extends ViewContainer {
                     return tag.split("/").slice(0, nestDepth).join("/") === this.groupName;
                 }
             }).length ?? 0) > 0;
-    }
-
-    protected shouldRender(
-        oldState: FileState,
-        newState: FileState
-    ): boolean {
-        return this.shouldRenderBasedOnSortMethodSetting(oldState, newState);
-    }
-
-    protected getEmptyMessage(): string {
-        return "";
-    }
-
-    protected getHideText(): string {
-        return "Remove";
-    }
-
-    protected getHideIcon(): string {
-        return "trash"
-    }
-
-    protected isVisible(): boolean {
-        return true;
     }
 
     private getIsolatedTagMatch(): RegExpMatchArray | null {
@@ -115,14 +77,6 @@ export class TagGroupContainer extends ViewContainer {
         return this.getIsolatedTagMatch() ? "Nested within multiple tags" : "";
     }
 
-    protected getPillText(): string {
-        return getSortMethodDisplayText(this.getGroupSettings()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL);
-    }
-
-    protected getPillTooltipText(): string {
-        return "Sort";
-    }
-
     protected getTitleTooltip(): string {
         if (this.getIsolatedTagMatch()) {
             return "Associated tags:\n\n" + Object.keys(this.getAllAssociatedTags([]))
@@ -131,29 +85,6 @@ export class TagGroupContainer extends ViewContainer {
                 .join("\n");
         }
         return `#${this.groupName}`;
-    }
-
-    protected getPillIcon(): string {
-        return (this.getGroupSettings()?.sortAscending ?? true) ?
-            "down-arrow-with-tail" :
-            "up-arrow-with-tail"
-    }
-
-    protected getPillClickHandler(): ((e: MouseEvent) => void) | undefined {
-        return (e: MouseEvent) => {
-            const menu = new Menu();
-
-            this.addSortOptionsToMenu(
-                menu,
-                [
-                    ContainerSortMethod.ALPHABETICAL,
-                    ContainerSortMethod.CTIME,
-                    ContainerSortMethod.MTIME
-                ]
-            );
-
-            menu.showAtMouseEvent(e);
-        }
     }
 
     private getFileTags(
@@ -210,24 +141,6 @@ export class TagGroupContainer extends ViewContainer {
             }, {});
     }
 
-    private getFileSortingFn(sortMethod: string) {
-        switch (sortMethod) {
-            case ContainerSortMethod.MTIME:
-                return (fileA: TFile, fileB: TFile) => {
-                    return fileA.stat.mtime - fileB.stat.mtime;
-                }
-            case ContainerSortMethod.CTIME:
-                return (fileA: TFile, fileB: TFile) => {
-                    return fileA.stat.ctime - fileB.stat.ctime;
-                }
-            case ContainerSortMethod.ALPHABETICAL:
-            default:
-                return (fileA: TFile, fileB: TFile) => {
-                    return fileA.name < fileB.name ? -1 : fileA.name > fileB.name ? 1 : 0;
-                }
-        }
-    }
-
     protected buildFileStructure(excludedFolders: string[]) {
         // clear the cache
         this.renderedFileTags = [];
@@ -269,9 +182,5 @@ export class TagGroupContainer extends ViewContainer {
                     );
                 });
         });
-    }
-
-    protected getContainerClass(): string {
-        return "otc-child";
     }
 }
