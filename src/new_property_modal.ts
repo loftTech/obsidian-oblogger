@@ -1,7 +1,7 @@
 import { App, FuzzySuggestModal, Notice } from "obsidian";
 
 
-export class NewTagModal extends FuzzySuggestModal<string> {
+export class NewPropertyModal extends FuzzySuggestModal<string> {
     onSelect: (tag: string) => void
 
     constructor(app: App, onSelect: (tag: string) => Promise<void>) {
@@ -9,22 +9,10 @@ export class NewTagModal extends FuzzySuggestModal<string> {
         this.onSelect = onSelect;
     }
     getItems(): string[] {
+        // The `getAllPropertyInfos()` function is added at runtime
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        const allTags = Object.keys(this.app.metadataCache.getTags());
-        const individualTags = new Set<string>();
-        allTags.forEach(fullTag => {
-            fullTag.split("/").forEach(splitTag => {
-                if (allTags.contains(splitTag)) {
-                    return;
-                }
-                if (splitTag.startsWith("#")) {
-                    splitTag = splitTag.substring(1);
-                }
-                individualTags.add(`.../${splitTag}/...`);
-            });
-        });
-        return allTags.concat(Array.from(individualTags));
+        return Object.keys(this.app.metadataCache.getAllPropertyInfos());
     }
 
     getItemText(tag: string): string {
@@ -35,7 +23,6 @@ export class NewTagModal extends FuzzySuggestModal<string> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onChooseItem(value: string, evt: MouseEvent | KeyboardEvent) {
         new Notice(`Selected ${value}`);
-        const tag = value.startsWith("#") ? value.substring(1) : value;
-        this.onSelect(tag);
+        this.onSelect(value);
     }
 }
