@@ -269,76 +269,24 @@ export class ObloggerView extends ItemView {
         this.registerInterval(this.renderTimeout);
     }
 
-    private renderTagGroups(containers: GroupFolder[], modifiedFiles: FileState[]) {
-        containers.forEach(container => this.renderTagGroup(container, modifiedFiles));
+    private renderContainers(containers: ViewContainer[], modifiedFiles: FileState[]) {
+        containers.forEach(container => this.renderContainer(container, modifiedFiles));
     }
 
-    private renderTagGroup(group: GroupFolder, modifiedFiles: FileState[]) {
-        const maybeSettingsGroup = this.settings?.otcGroups.find(
-            settingsGroup => settingsGroup.groupName === group.groupName
-        );
-
-        if (!maybeSettingsGroup) {
-            console.warn(`unable to find settings for tag group ${group.groupName}`);
-            return;
-        }
-
-        if (group instanceof TagGroupContainer) {
-            group.render(modifiedFiles, false, maybeSettingsGroup);
-        }
-    }
-
-    private renderRxGroup(
-        groupType: RxGroupType,
-        modifiedFiles: FileState[],
-        forced: boolean
-    ) {
-        const groupSetting = getGroupSettings(
+    private renderContainer(container: ViewContainer, modifiedFiles: FileState[]) {
+        const groupSettings = getGroupSettings(
             this.settings,
-            groupType,
-            "");
-        if (!groupSetting) {
-            console.warn(`unable to find settings for rx group ${groupType}`);
+            container.groupType,
+            container.groupName);
+
+        if (!groupSettings) {
+            console.warn(
+                `Unable to find settings for container of type 
+                ${container.groupType} with name ${container.groupName}`);
             return;
         }
-        const container = this.rxContainers.find(
-            container => container.groupType === groupType);
-        if (!container) {
-            console.warn(`unable to find container for rx group ${groupType}`);
-            return;
-        }
-        container.render(
-            modifiedFiles,
-            forced,
-            groupSetting);
-    }
 
-    private renderDailies(modifiedFiles: FileState[]) {
-        this.renderRxGroup(
-            RxGroupType.DAILIES,
-            modifiedFiles,
-            false);
-    }
-
-    private renderFiles(modifiedFiles: FileState[]) {
-        this.renderRxGroup(
-            RxGroupType.FILES,
-            modifiedFiles,
-            false);
-    }
-
-    private renderUntagged(modifiedFiles: FileState[]) {
-        this.renderRxGroup(
-            RxGroupType.UNTAGGED,
-            modifiedFiles,
-            false);
-    }
-
-    private renderRecents(modifiedFiles: FileState[]) {
-        this.renderRxGroup(
-            RxGroupType.RECENTS,
-            modifiedFiles,
-            false);
+        container.render(modifiedFiles, false, groupSettings);
     }
 
     private async renderNow(modifiedFiles: FileState[]) {
@@ -348,18 +296,17 @@ export class ObloggerView extends ItemView {
         this.renderRXSeparator();
         this.renderOTCSeparator();
 
-        this.renderRecents(modifiedFiles);
-        this.renderDailies(modifiedFiles);
-        this.renderUntagged(modifiedFiles);
-        this.renderFiles(modifiedFiles);
+        // render rx containers
+        Object.values(RxGroupType).forEach(groupType => {
+            const containers = this.rxContainers.filter(container => container.groupType === groupType);
+            this.renderContainers(containers, modifiedFiles);
+        });
 
+        // render otc containers
         Object.values(OtcGroupType).forEach(groupType => {
             const containers = this.otcContainers.filter(container => container.groupType === groupType);
-            switch(groupType) {
-                case OtcGroupType.TAG_GROUP:
-                    this.renderTagGroups(containers, modifiedFiles);
-            }
-        })
+            this.renderContainers(containers, modifiedFiles);
+        });
 
         this.highlightLastOpenFile();
 
@@ -506,6 +453,7 @@ export class ObloggerView extends ItemView {
             if (!this.settings.otcGroups) {
                 this.settings.otcGroups = [];
             }
+            // add the group to settings and then reload
             this.settings.otcGroups.push({
                 groupName: result,
                 groupType: OtcGroupType.TAG_GROUP,
