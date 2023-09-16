@@ -1,23 +1,23 @@
 import {
-    ItemView,
-    WorkspaceLeaf,
-    TFile,
     ButtonComponent,
-    moment,
-    Menu,
-    Notice,
     CachedMetadata,
-    setIcon
+    ItemView,
+    Menu,
+    moment,
+    Notice,
+    setIcon,
+    TFile,
+    WorkspaceLeaf
 } from "obsidian";
 import {
-    ObloggerSettings,
-    RxGroupType,
-    GroupSettings,
+    areEnumsValid,
     ContainerSortMethod,
-    OtcGroupType,
     getGroupSettings,
+    GroupSettings,
     isValidRxGroupType,
-    areEnumsValid
+    ObloggerSettings,
+    OtcGroupType,
+    RxGroupType
 } from "./settings";
 import { TagGroupContainer } from "./containers/otc/tag_group_container";
 import { DailiesContainer } from "./containers/rx/dailies_container";
@@ -42,11 +42,6 @@ declare module "obsidian" {
     }
 }
 
-interface TagGroup {
-    tag: string;
-    container: TagGroupContainer;
-}
-
 export class ObloggerView extends ItemView {
     settings: ObloggerSettings;
     avatarDiv: HTMLElement;
@@ -56,8 +51,8 @@ export class ObloggerView extends ItemView {
     clockDiv: HTMLElement;
     rxSeparatorDiv: HTMLElement;
     otcSeparatorDiv: HTMLElement;
-    otcGroups: TagGroup[]
-    rxContainers: ViewContainer[]
+    otcContainers: ViewContainer[];
+    rxContainers: ViewContainer[];
     lastOpenFile: TFile | undefined;
     renderTimeout: number | null = null;
     filesModifiedSinceRender: FileState[];
@@ -86,7 +81,6 @@ export class ObloggerView extends ItemView {
         this.fullRender = true;
         this.settings = settings;
         this.showLoggerCallbackFn = showLoggerCallbackFn;
-        this.otcGroups = [];
         this.saveSettingsCallback = saveSettingsCallback;
 
         this.lastOpenFile = this.app.workspace.getActiveFile() ?? undefined;
@@ -228,8 +222,7 @@ export class ObloggerView extends ItemView {
     }
 
     private highlightLastOpenFile() {
-        this.rxContainers
-            .concat(this.otcGroups.map(tg => tg.container))
+        this.rxContainers.concat(this.otcContainers)
             .forEach(container => {
                 this.lastOpenFile && container.highlightFile(this.lastOpenFile);
             });
@@ -273,6 +266,10 @@ export class ObloggerView extends ItemView {
             RENDER_DELAY_MS
         );
         this.registerInterval(this.renderTimeout);
+    }
+
+    private renderTagGroups(containers: GroupFolder[], modifiedFiles: FileState[]) {
+        containers.forEach(container => this.renderTagGroup(container, modifiedFiles));
     }
 
     private renderTagGroup(group: GroupFolder, modifiedFiles: FileState[]) {
@@ -355,7 +352,13 @@ export class ObloggerView extends ItemView {
         this.renderUntagged(modifiedFiles);
         this.renderFiles(modifiedFiles);
 
-        this.otcGroups.forEach(group => this.renderTagGroup(group.container, modifiedFiles));
+        Object.values(OtcGroupType).forEach(groupType => {
+            const containers = this.otcContainers.filter(container => container.groupType === groupType);
+            switch(groupType) {
+                case OtcGroupType.TAG_GROUP:
+                    this.renderTagGroups(containers, modifiedFiles);
+            }
+        })
 
         this.highlightLastOpenFile();
 
@@ -625,18 +628,24 @@ export class ObloggerView extends ItemView {
     }
 
     private async removeTagGroup(tag: string) {
-        const tagGroup = this.otcGroups.find((tg) => tg.tag === tag);
+        const tagGroups = this.otcContainers.filter(container => {
+            return (
+                container.groupType === OtcGroupType.TAG_GROUP &&
+                container.groupName === tag);
+        });
+        const tagGroup = tagGroups.first();
         if (tagGroup === undefined) {
             new Notice("Nothing to delete");
             return;
         }
-        if (tagGroup.tag !== tag) {
+        if (tagGroup.groupName !== tag) {
             console.debug("Something went wrong, tag group has wrong tag.");
             return;
         }
-        this.otcGroups.remove(tagGroup);
-        tagGroup.container.rootElement.remove();
-        this.settings.otcGroups = this.settings?.otcGroups.filter(group => group.groupName !== tag);
+        this.otcContainers.remove(tagGroup);
+        tagGroup.rootElement.remove();
+        this.settings.otcGroups = this.settings?.otcGroups
+            .filter(group => group.groupName !== tag);
         await this.saveSettingsCallback();
         this.requestRender();
         new Notice(`"${tag}" removed`);
@@ -738,20 +747,13 @@ export class ObloggerView extends ItemView {
             isPinned,
             callbacks);
 
-        this.otcGroups.push({
-            tag: groupName,
-            container: container
-        });
+        this.otcContainers.push(container);
 
         parent.appendChild(container.rootElement);
         this.requestRender();
     }
 
-    private reloadOtcGroups() {
-        this.otcGroupsDiv?.empty();
-
-        this.otcGroups = [];
-
+    private reloadTagGroups(groups: GroupSettings[]) {
         const groupSorter = (a: GroupSettings, b: GroupSettings): number => {
             const pattern = "\\.\\.\\./(.*)/\\.\\.\\.";
             const aTag = a.groupName.match(pattern)?.at(1) ?? a.groupName;
@@ -762,7 +764,7 @@ export class ObloggerView extends ItemView {
         }
 
         // Add pinned groups
-        this.settings?.otcGroups
+        groups
             ?.filter(otcGroup => otcGroup.isPinned)
             ?.sort(groupSorter)
             ?.forEach(group => {
@@ -773,7 +775,7 @@ export class ObloggerView extends ItemView {
             });
 
         // Add unpinned groups
-        this.settings.otcGroups
+        groups
             ?.filter(otcGroup => !otcGroup.isPinned)
             ?.sort(groupSorter)
             ?.forEach(group => {
@@ -782,6 +784,24 @@ export class ObloggerView extends ItemView {
                     false,
                     this.otcGroupsDiv);
             });
+    }
+
+    private reloadOtcGroups() {
+        // Try to get the containers to clean up after themselves
+        this.otcContainers?.forEach(container => container.rootElement.remove());
+        this.otcContainers = [];
+
+        // Dump whatever remains (hopefully not much)
+        this.otcGroupsDiv?.empty();
+
+        Object.values(OtcGroupType).forEach(groupType => {
+            const groups = this.settings?.otcGroups
+                .filter(group => group.groupType === groupType)
+            switch(groupType) {
+                case OtcGroupType.TAG_GROUP:
+                    this.reloadTagGroups(groups);
+            }
+        });
     }
 
     private async hideRxGroup(groupType: RxGroupType) {
@@ -805,6 +825,7 @@ export class ObloggerView extends ItemView {
             return;
         }
 
+        this.rxContainers?.forEach(container => container.rootElement.remove());
         this.rxContainers = [];
 
         const getRxType = (groupType: RxGroupType) => {
