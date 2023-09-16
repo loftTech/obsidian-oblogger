@@ -54,7 +54,7 @@ export class PropertyContainer extends OtcContainer {
             const filesWithValue = filesWithFrontmatter
                 .filter(fileWithFrontmatter => {
                     const maybeValue = fileWithFrontmatter.frontmatter[this.groupName];
-                    return maybeValue?.toLowerCase() === value.toLowerCase();
+                    return maybeValue?.toString().toLowerCase() === value.toLowerCase();
                 });
             if (filesWithValue.length === 0) {
                 // nothing to do
