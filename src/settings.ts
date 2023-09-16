@@ -57,6 +57,25 @@ export const isValidOtcGroupType = (groupType: OtcGroupType): boolean => {
 
 export type GroupType = RxGroupType | OtcGroupType;
 
+export const areEnumsValid = (): boolean => {
+    const allEnums = Object
+        .entries(RxGroupType)
+        .map((rxGroupType) => {
+            return [rxGroupType.first(), String(rxGroupType.last())];
+        }).concat(
+            Object
+                .entries(OtcGroupType)
+                .map((otcGroupType) => {
+                    return [otcGroupType.first(), String(otcGroupType.last())];
+                })
+        );
+    console.log(allEnums);
+    return !allEnums
+        .some(groupType => {
+            return groupType.first()?.toLowerCase() !== groupType.last();
+        });
+}
+
 export const isValidGroupType = (groupType: GroupType): boolean => {
     return (
         isValidRxGroupType(groupType as RxGroupType) ||

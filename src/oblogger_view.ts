@@ -16,7 +16,8 @@ import {
     ContainerSortMethod,
     OtcGroupType,
     getGroupSettings,
-    isValidRxGroupType
+    isValidRxGroupType,
+    areEnumsValid
 } from "./settings";
 import { TagGroupContainer } from "./containers/otc/tag_group_container";
 import { DailiesContainer } from "./containers/rx/dailies_container";
@@ -77,6 +78,10 @@ export class ObloggerView extends ItemView {
         saveSettingsCallback: () => Promise<void>
     ) {
         super(leaf);
+
+        // If there's a way to do this at compile time, then we should do that.
+        // But for now, a console assert is better than nothing.
+        console.assert(areEnumsValid());
 
         this.fullRender = true;
         this.settings = settings;
