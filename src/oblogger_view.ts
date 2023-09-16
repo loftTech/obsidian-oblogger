@@ -847,6 +847,7 @@ export class ObloggerView extends ItemView {
         // Dump whatever remains (hopefully not much)
         this.otcGroupsDiv?.empty();
 
+        // todo: need to add a separator somewhere in here?
         Object.values(OtcGroupType).forEach(groupType => {
             const groups = this.settings?.otcGroups
                 .filter(group => group.groupType === groupType)
