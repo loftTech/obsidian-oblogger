@@ -628,8 +628,6 @@ export class ObloggerView extends ItemView {
             });
     }
 
-    private movePropertyGroup(propertyName: string, up: boolean) { }
-
     private async removeOtcGroup(groupType: OtcGroupType, groupName: string) {
         const containers = this.otcContainers.filter(container => {
             return (
@@ -693,24 +691,31 @@ export class ObloggerView extends ItemView {
         this.requestRender();
     }
 
+    private movePropertyGroup(propertyName: string, up: boolean) { }
+
     private async moveTagGroup(tag: string, up: boolean): Promise<void> {
-        const currentIndex = this.settings.otcGroups.findIndex(group => group.groupName === tag);
+        const otcGroups = this.settings.otcGroups;
+        const currentIndex = otcGroups.findIndex(group => group.groupName === tag);
         if (currentIndex === -1) {
             console.warn(`Tag ${tag} doesn't exist.`);
             return;
         }
 
-        const newIndex = currentIndex + (up ? -1 : 1);
+        // find the next group of the same type
+        let newIndex = currentIndex + (up ? -1 : 1);
+        while (newIndex > 0 && otcGroups.at(newIndex)?.groupType !== OtcGroupType.TAG_GROUP) {
+            newIndex += (up ? -1 : 1);
+        }
 
-        if (newIndex < 0 || newIndex >= this.settings.otcGroups.length) {
+        if (newIndex < 0 || newIndex >= otcGroups.length) {
             console.log(`Already at ${up ? "top" : "bottom"}`);
             return;
         }
 
         // todo(#215): try to get this to one operation using splice to swap in place
-        const group = this.settings.otcGroups[currentIndex];
-        this.settings.otcGroups.remove(group);
-        this.settings.otcGroups.splice(newIndex, 0, group);
+        const group = otcGroups[currentIndex];
+        otcGroups.remove(group);
+        otcGroups.splice(newIndex, 0, group);
 
         await this.saveSettingsCallback();
         this.reloadOtcGroups();
