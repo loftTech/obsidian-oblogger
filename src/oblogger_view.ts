@@ -691,19 +691,23 @@ export class ObloggerView extends ItemView {
         this.requestRender();
     }
 
-    private movePropertyGroup(propertyName: string, up: boolean) { }
-
-    private async moveTagGroup(tag: string, up: boolean): Promise<void> {
+    private async moveOtcGroup(
+        groupType: OtcGroupType,
+        groupName: string,
+        up: boolean
+    ): Promise<void> {
         const otcGroups = this.settings.otcGroups;
-        const currentIndex = otcGroups.findIndex(group => group.groupName === tag);
+        const currentIndex = otcGroups.findIndex((group) => {
+            return group.groupType === groupType && group.groupName === groupName;
+        });
         if (currentIndex === -1) {
-            console.warn(`Tag ${tag} doesn't exist.`);
+            console.warn(`Group of type ${groupType} with name ${groupName} couldn't be found.`);
             return;
         }
 
         // find the next group of the same type
         let newIndex = currentIndex + (up ? -1 : 1);
-        while (newIndex > 0 && otcGroups.at(newIndex)?.groupType !== OtcGroupType.TAG_GROUP) {
+        while (newIndex > 0 && otcGroups.at(newIndex)?.groupType !== groupType) {
             newIndex += (up ? -1 : 1);
         }
 
@@ -750,7 +754,7 @@ export class ObloggerView extends ItemView {
             saveSettingsCallback: this.saveSettingsCallback,
             getGroupIconCallback: (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
             hideCallback: async () => { return await this.removeOtcGroup(OtcGroupType.TAG_GROUP, groupName); },
-            moveCallback: (up: boolean) => { return this.moveTagGroup(groupName, up); },
+            moveCallback: (up: boolean) => { return this.moveOtcGroup(OtcGroupType.TAG_GROUP, groupName, up); },
             pinCallback: (pin: boolean) => { return this.pinOtcGroup(OtcGroupType.TAG_GROUP, groupName, pin); }
         };
 
@@ -779,7 +783,7 @@ export class ObloggerView extends ItemView {
             saveSettingsCallback: this.saveSettingsCallback,
             getGroupIconCallback: (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
             hideCallback: async () => { return await this.removeOtcGroup(OtcGroupType.PROPERTY_GROUP, groupName); },
-            moveCallback: (up: boolean) => { return this.movePropertyGroup(groupName, up); },
+            moveCallback: (up: boolean) => { return this.moveOtcGroup(OtcGroupType.PROPERTY_GROUP, groupName, up); },
             pinCallback: (pin: boolean) => { return this.pinOtcGroup(OtcGroupType.PROPERTY_GROUP, groupName, pin); }
         };
 
