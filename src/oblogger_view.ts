@@ -6,7 +6,8 @@ import {
     moment,
     Menu,
     Notice,
-    CachedMetadata
+    CachedMetadata,
+    setIcon
 } from "obsidian";
 import {
     ObloggerSettings,
@@ -445,8 +446,8 @@ export class ObloggerView extends ItemView {
         this.greeterContainerDiv.appendChild(this.avatarDiv);
 
         const defaultAvatarDiv = document.createElement("div");
+        setIcon(defaultAvatarDiv, "orbit");
         defaultAvatarDiv.addClass("greeter-title-default-avatar");
-        defaultAvatarDiv.setText(this.app.vault.getName().charAt(0).toUpperCase());
         this.greeterContainerDiv.appendChild(defaultAvatarDiv);
 
         const avatarChangerDiv = document.createElement("div");

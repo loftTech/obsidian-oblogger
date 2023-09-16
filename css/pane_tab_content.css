@@ -278,14 +278,9 @@ body.styled-scrollbars .oblogger-content {
     align-items: center;
     background-color: hsla(240deg 15% 17%/60%);
     border-radius: 40px;
-    color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/90%);
     display: flex;
-    font-family: sans-serif;
-    font-size: 53px;
-    font-weight: 800;
     height: 68px;
     justify-content: center;
-    padding-top: 4px;
     position: absolute;
     transform: translateX(-50%) translateY(-50%);
     width: 68px;
@@ -379,6 +374,12 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .svg-icon {
     color: var(--nav-item-color);
     transition: transform 100ms ease-in-out;
+}
+
+.oblogger-content .greeter-title-default-avatar .svg-icon {
+    color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/90%);
+    height: 52px;
+    width: 52px;
 }
 
 .oblogger-pill-menu-icon .svg-icon {
