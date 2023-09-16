@@ -69,7 +69,6 @@ export const areEnumsValid = (): boolean => {
                     return [otcGroupType.first(), String(otcGroupType.last())];
                 })
         );
-    console.log(allEnums);
     return !allEnums
         .some(groupType => {
             return groupType.first()?.toLowerCase() !== groupType.last();
