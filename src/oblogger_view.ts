@@ -628,32 +628,32 @@ export class ObloggerView extends ItemView {
             });
     }
 
-    private removePropertyGroup(propertyName: string) { }
-
     private movePropertyGroup(propertyName: string, up: boolean) { }
 
-    private async removeTagGroup(tag: string) {
-        const tagGroups = this.otcContainers.filter(container => {
+    private async removeOtcGroup(groupType: OtcGroupType, groupName: string) {
+        const containers = this.otcContainers.filter(container => {
             return (
-                container.groupType === OtcGroupType.TAG_GROUP &&
-                container.groupName === tag);
+                container.groupType === groupType &&
+                container.groupName === groupName);
         });
-        const tagGroup = tagGroups.first();
-        if (tagGroup === undefined) {
-            new Notice("Nothing to delete");
+        const container = containers.first();
+        if (container === undefined) {
+            new Notice(`Unable to find group of type ${groupType} with name ${groupName}`);
             return;
         }
-        if (tagGroup.groupName !== tag) {
-            console.debug("Something went wrong, tag group has wrong tag.");
+        if (container.groupName !== groupName) {
+            console.debug("Something went wrong, container has the wrong name.");
             return;
         }
-        this.otcContainers.remove(tagGroup);
-        tagGroup.rootElement.remove();
+        this.otcContainers.remove(container);
+        container.rootElement.remove();
         this.settings.otcGroups = this.settings?.otcGroups
-            .filter(group => group.groupName !== tag);
+            .filter(group => {
+                return group.groupName !== groupName || group.groupType != groupType
+            });
         await this.saveSettingsCallback();
         this.requestRender();
-        new Notice(`"${tag}" removed`);
+        new Notice(`"${groupName}" removed`);
     }
 
     private async moveRxGroup(groupType: RxGroupType, up: boolean) {
@@ -744,7 +744,7 @@ export class ObloggerView extends ItemView {
             requestRenderCallback: () => { this.requestRender() },
             saveSettingsCallback: this.saveSettingsCallback,
             getGroupIconCallback: (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
-            hideCallback: async () => { return await this.removeTagGroup(groupName); },
+            hideCallback: async () => { return await this.removeOtcGroup(OtcGroupType.TAG_GROUP, groupName); },
             moveCallback: (up: boolean) => { return this.moveTagGroup(groupName, up); },
             pinCallback: (pin: boolean) => { return this.pinOtcGroup(OtcGroupType.TAG_GROUP, groupName, pin); }
         };
@@ -773,7 +773,7 @@ export class ObloggerView extends ItemView {
             requestRenderCallback: () => { this.requestRender() },
             saveSettingsCallback: this.saveSettingsCallback,
             getGroupIconCallback: (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
-            hideCallback: async () => { return await this.removePropertyGroup(groupName); },
+            hideCallback: async () => { return await this.removeOtcGroup(OtcGroupType.PROPERTY_GROUP, groupName); },
             moveCallback: (up: boolean) => { return this.movePropertyGroup(groupName, up); },
             pinCallback: (pin: boolean) => { return this.pinOtcGroup(OtcGroupType.PROPERTY_GROUP, groupName, pin); }
         };
