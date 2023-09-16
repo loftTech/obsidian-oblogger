@@ -32,6 +32,7 @@ import { NewTagModal } from "./new_tag_modal";
 import { buildStateFromFile, FileState } from "./constants";
 import { ContainerCallbacks } from "./containers/container_callbacks";
 import { PropertyContainer } from "./containers/otc/property_container";
+import { NewPropertyModal } from "./new_property_modal";
 
 export const VIEW_TYPE_OBLOGGER = "oblogger-view";
 const RENDER_DELAY_MS = 100;
@@ -448,6 +449,30 @@ export class ObloggerView extends ItemView {
         return this.greeterDiv;
     }
 
+    private showNewPropertyModal() {
+        const modal = new NewPropertyModal(this.app, async (result: string) => {
+            if (!this.settings.otcGroups) {
+                this.settings.otcGroups = [];
+            }
+            // add the group to settings and then reload
+            this.settings.otcGroups.push({
+                groupName: result,
+                groupType: OtcGroupType.PROPERTY_GROUP,
+                collapsedFolders: [],
+                isVisible: true,
+                isPinned: false,
+                sortMethod: ContainerSortMethod.ALPHABETICAL,
+                sortAscending: true,
+                excludedFolders: [],
+                logsFolderVisible: false,
+                templatesFolderVisible: false
+            });
+            await this.saveSettingsCallback();
+            this.reloadOtcGroups();
+        });
+        modal.open();
+    }
+
     private showNewTagModal() {
         const modal = new NewTagModal(this.app, async (result: string)=> {
             if (!this.settings.otcGroups) {
@@ -496,6 +521,11 @@ export class ObloggerView extends ItemView {
             .setIcon("folder-plus")
             .setTooltip("Add a new user tag group")
             .onClick(() => this.showNewTagModal());
+
+        new ButtonComponent(buttonBarDiv)
+            .setClass("button-bar-button")
+            .setIcon("dog")
+            .onClick(() => this.showNewPropertyModal());
 
         new ButtonComponent(buttonBarDiv)
             .setClass("button-bar-button")
