@@ -247,14 +247,24 @@ const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } =
     4: (settings: ObloggerSettings) => {
         const newSettings = settings as ObloggerSettings_v5;
         if (newSettings) {
-            newSettings.rxGroups.forEach(group => {
-                // todo: what happens if group.groupName is malformed
-                group.groupType = group.groupName as RxGroupType;
-                group.groupName = "";
-            });
+            // Rx groups used to have their type as their name, so make sure
+            // we only have valid rx group types in the names and then transfer
+            // the name to the type, clearing the name.
+            newSettings.rxGroups
+                .filter(group => {
+                    return isValidRxGroupType(group.groupName as RxGroupType);
+                }).map(group => {
+                    group.groupType = group.groupName as RxGroupType;
+                    group.groupName = "";
+                    return group;
+                });
+
+            // All otc groups from <= v4 are tag groups. The names are
+            // correctly the tag their filtering on, so just set the type
             newSettings.otcGroups.forEach(group => {
                 group.groupType = OtcGroupType.TAG_GROUP;
-            })
+            });
+
             newSettings.version = 5;
         }
     }
