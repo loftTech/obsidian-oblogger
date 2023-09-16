@@ -57,6 +57,18 @@ export const isValidOtcGroupType = (groupType: OtcGroupType): boolean => {
 
 export type GroupType = RxGroupType | OtcGroupType;
 
+export const isValidGroupType = (groupType: GroupType): boolean => {
+    return (
+        isValidRxGroupType(groupType as RxGroupType) ||
+        isValidOtcGroupType(groupType as OtcGroupType)
+    );
+}
+
+/**
+ * @description:validates that the enums are properly formed (that the
+ * key.toLowerCase() equals the value). should be called on launch (or better
+ * yet, at compile time).
+ */
 export const areEnumsValid = (): boolean => {
     const allEnums = Object
         .entries(RxGroupType)
@@ -73,13 +85,6 @@ export const areEnumsValid = (): boolean => {
         .some(groupType => {
             return groupType.first()?.toLowerCase() !== groupType.last();
         });
-}
-
-export const isValidGroupType = (groupType: GroupType): boolean => {
-    return (
-        isValidRxGroupType(groupType as RxGroupType) ||
-        isValidOtcGroupType(groupType as OtcGroupType)
-    );
 }
 
 interface RxGroupSettings_v0 {
@@ -288,6 +293,12 @@ const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } =
     }
 };
 
+/**
+ * Takes in a version number and a settings object and attempts to upgrade
+ * the settings object to the next version.
+ * @param currentVersion Current version of the settings object
+ * @param settings Settings object to upgrade
+ */
 export const upgradeSettings = (currentVersion: number, settings: ObloggerSettings) => {
     const availableUpgrades = Object.keys(UPGRADE_FUNCTIONS);
     if (!availableUpgrades.contains(currentVersion.toString())) {
