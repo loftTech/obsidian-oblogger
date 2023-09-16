@@ -31,6 +31,7 @@ import { buildSeparator } from "./misc_components";
 import { NewTagModal } from "./new_tag_modal";
 import { buildStateFromFile, FileState } from "./constants";
 import { ContainerCallbacks } from "./containers/container_callbacks";
+import { PropertyContainer } from "./containers/otc/property_container";
 
 export const VIEW_TYPE_OBLOGGER = "oblogger-view";
 const RENDER_DELAY_MS = 100;
@@ -627,6 +628,10 @@ export class ObloggerView extends ItemView {
             });
     }
 
+    private removePropertyGroup(propertyName: string) { }
+
+    private movePropertyGroup(propertyName: string, up: boolean) { }
+
     private async removeTagGroup(tag: string) {
         const tagGroups = this.otcContainers.filter(container => {
             return (
@@ -712,13 +717,17 @@ export class ObloggerView extends ItemView {
         this.requestRender();
     }
 
-    private async pinTagGroup(tag: string, pin: boolean): Promise<void> {
-        const otcGroup = this.settings.otcGroups.find((otcGroup) => otcGroup.groupName === tag);
-        if (otcGroup === undefined) {
-            new Notice(`Unable to find tag ${tag} to ${pin ? "pin" : "unpin"}`);
+    private async pinOtcGroup(
+        groupType: OtcGroupType,
+        groupName: string,
+        pin: boolean
+    ): Promise<void> {
+        const groupSettings = getGroupSettings(this.settings, groupType, groupName);
+        if (groupSettings === undefined) {
+            new Notice(`Unable to find group type ${groupType} with name ${groupName} to ${pin ? "pin" : "unpin"}`);
             return;
         }
-        otcGroup.isPinned = pin;
+        groupSettings.isPinned = pin;
         await this.saveSettingsCallback();
         this.reloadOtcGroups();
         this.requestRender();
@@ -737,7 +746,7 @@ export class ObloggerView extends ItemView {
             getGroupIconCallback: (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
             hideCallback: async () => { return await this.removeTagGroup(groupName); },
             moveCallback: (up: boolean) => { return this.moveTagGroup(groupName, up); },
-            pinCallback: (pin: boolean) => { return this.pinTagGroup(groupName, pin); }
+            pinCallback: (pin: boolean) => { return this.pinOtcGroup(OtcGroupType.TAG_GROUP, groupName, pin); }
         };
 
         const container = new TagGroupContainer(
@@ -751,6 +760,63 @@ export class ObloggerView extends ItemView {
 
         parent.appendChild(container.rootElement);
         this.requestRender();
+    }
+
+    private addPropertyGroup(
+        groupName: string,
+        isPinned: boolean,
+        parent: HTMLElement
+    ) {
+        const callbacks: ContainerCallbacks = {
+            fileClickCallback: this.fileClickCallback,
+            fileAddedCallback: this.fileAddedCallback,
+            requestRenderCallback: () => { this.requestRender() },
+            saveSettingsCallback: this.saveSettingsCallback,
+            getGroupIconCallback: (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
+            hideCallback: async () => { return await this.removePropertyGroup(groupName); },
+            moveCallback: (up: boolean) => { return this.movePropertyGroup(groupName, up); },
+            pinCallback: (pin: boolean) => { return this.pinOtcGroup(OtcGroupType.PROPERTY_GROUP, groupName, pin); }
+        };
+
+        const container = new PropertyContainer(
+            this.app,
+            this.settings,
+            callbacks,
+            groupName,
+            isPinned);
+
+        this.otcContainers.push(container);
+
+        parent.appendChild(container.rootElement);
+        this.requestRender();
+    }
+
+    private reloadPropertyGroups(groups: GroupSettings[]) {
+        const groupSorter = (a: GroupSettings, b: GroupSettings): number => {
+            return a.groupName < b.groupName ? -1 : a.groupName > b.groupName ? -1 : 0;
+        }
+
+        // Add pinned groups
+        groups
+            ?.filter(otcGroup => otcGroup.isPinned)
+            ?.sort(groupSorter)
+            ?.forEach(group => {
+                this.otcGroupsDiv && this.addPropertyGroup(
+                    group.groupName,
+                    true,
+                    this.otcGroupsDiv);
+            });
+
+        // Add unpinned groups
+        groups
+            ?.filter(otcGroup => !otcGroup.isPinned)
+            ?.sort(groupSorter)
+            ?.forEach(group => {
+                this.otcGroupsDiv && this.addPropertyGroup(
+                    group.groupName,
+                    false,
+                    this.otcGroupsDiv);
+            });
     }
 
     private reloadTagGroups(groups: GroupSettings[]) {
@@ -800,6 +866,10 @@ export class ObloggerView extends ItemView {
             switch(groupType) {
                 case OtcGroupType.TAG_GROUP:
                     this.reloadTagGroups(groups);
+                    break;
+                case OtcGroupType.PROPERTY_GROUP:
+                    this.reloadPropertyGroups(groups);
+                    break;
             }
         });
     }
