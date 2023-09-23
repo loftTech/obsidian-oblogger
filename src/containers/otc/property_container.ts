@@ -22,12 +22,20 @@ export class PropertyContainer extends OtcContainer {
         );
     }
 
-    protected buildFileStructure(excludedFolders: string[]): void {
-        // This function exists at run-time
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        const values = this.app.metadataCache.getFrontmatterPropertyValuesForKey(this.groupName)
+    private getCondensedValue(value: unknown, valueType: string): string {
+        switch (valueType) {
+            case "tags":
+                if (Array.isArray(value)) {
+                    return (value as Array<string>).map(tag => `#${tag}`).join(", ");
+                }
+                return `#${value as string}`;
+            case "text":
+            default:
+                return (value as string) ?? "";
+        }
+    }
 
+    protected buildFileStructure(excludedFolders: string[]): void {
         // We explicitly filter out undefined frontmatter as a final step,
         // but the linter and ts don't understand that. Maybe there's a
         // cleaner way to do this that doesn't involve disabling the
@@ -50,11 +58,28 @@ export class PropertyContainer extends OtcContainer {
                 return !!(fileWithMetadata.frontmatter);
             });
 
+        // This function exists at run-time
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const propertyType = this.app.metadataCache.getAllPropertyInfos()[this.groupName].type;
+
+        const values = this.app.metadataCache
+            // This function exists at run-time
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            .getFrontmatterPropertyValuesForKey(this.groupName)
+            .map((value: unknown) => this.getCondensedValue(value, propertyType));
+        console.log(`values for ${this.groupName}: ${values}`)
         values.forEach((value: string) => {
             const filesWithValue = filesWithFrontmatter
                 .filter(fileWithFrontmatter => {
                     const maybeValue = fileWithFrontmatter.frontmatter[this.groupName];
-                    return maybeValue?.toString().toLowerCase() === value.toLowerCase();
+                    if (!maybeValue) {
+                        return false;
+                    }
+                    const condensedValue = this.getCondensedValue(maybeValue, propertyType);
+                    console.log(`comparing ${value} to ${condensedValue}`)
+                    return value.toLowerCase() === condensedValue.toLowerCase();
                 });
             if (filesWithValue.length === 0) {
                 // nothing to do
