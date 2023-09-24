@@ -44,7 +44,7 @@ export class PropertyContainer extends OtcContainer {
                 return value.split(",").map(v => v.trim());
             case "text":
             default:
-                return [(value as string) ?? ""];
+                return [((value as string) ?? "").trim()];
         }
     }
 
@@ -67,15 +67,15 @@ export class PropertyContainer extends OtcContainer {
         // This function exists at run-time
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        const propertyType = this.app.metadataCache.getAllPropertyInfos()[this.groupName].type;
+        const propertyType = this.app.metadataCache.getAllPropertyInfos()[this.groupName]?.type;
 
         type ValueMap = {[key: string]: TFile[]};
         const values = filesWithFrontmatter.reduce((acc: ValueMap, cur) => {
             this.getAllValues(cur.value, propertyType).forEach((value) => {
                 if (!Object.keys(acc).contains(value)) {
-                    acc[value.toString()] = [];
+                    acc[value.toString().trim()] = [];
                 }
-                acc[value.toString()].push(cur.file);
+                acc[value.toString().trim()].push(cur.file);
             });
             return acc;
         }, {});
