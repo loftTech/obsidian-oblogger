@@ -80,22 +80,30 @@ export class PropertyContainer extends OtcContainer {
             return acc;
         }, {});
 
-        Object.entries(values).forEach((mapping) => {
-            const value = mapping[0];
-            const files = mapping[1];
-            if (files.length === 0) {
-                // nothing to do
-                return;
-            }
-            // add as a folder containing the files
-            files.forEach(fileWithFrontmatter => {
-                this.addFileToFolder(
-                    fileWithFrontmatter,
-                    value,
-                    "/"
-                )
+        const ascending = this.getGroupSettings()?.sortAscending ?? true;
+        const modifier = ascending ? 1 : -1;
+
+        Object.entries(values)
+            .sort(([valueA], [valueB]) => {
+                return modifier * (valueA < valueB ? -1 : valueA > valueB ? 1 : 0);
+            })
+            .forEach(([value, files]) => {
+                if (files.length === 0) {
+                    // nothing to do
+                    return;
+                }
+                // add as a folder containing the files
+                files
+                    .sort((fileA, fileB) => {
+                        return modifier * (fileA.name < fileB.name ? -1 : fileA.name > fileB.name ? 1 : 0);
+                    })
+                    .forEach(fileWithFrontmatter => {
+                        this.addFileToFolder(
+                            fileWithFrontmatter,
+                            value,
+                            "/");
+                    });
             });
-        });
     }
 
     protected getTextIcon(): string {
