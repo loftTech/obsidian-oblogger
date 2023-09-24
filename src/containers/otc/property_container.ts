@@ -36,69 +36,56 @@ export class PropertyContainer extends OtcContainer {
     }
 
     protected buildFileStructure(excludedFolders: string[]): void {
-        // We explicitly filter out undefined frontmatter as a final step,
-        // but the linter and ts don't understand that. Maybe there's a
-        // cleaner way to do this that doesn't involve disabling the
-        // linter?
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        const filesWithFrontmatter: {
-            frontmatter: FrontMatterCache;
-            file: TFile
-        }[] = this.app.vault
+
+        const filesWithFrontmatter = this.app.vault
             .getMarkdownFiles()
             .filter(file => {
                 return !this.isFileExcluded(file, excludedFolders);
             }).map(file => {
+                const maybeFrontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
+                const value = maybeFrontmatter ? maybeFrontmatter[this.groupName] : undefined;
                 return {
                     file: file,
-                    frontmatter: this.app.metadataCache.getFileCache(file)?.frontmatter
+                    value: value
                 };
-            }).filter(fileWithMetadata => {
-                return !!(fileWithMetadata.frontmatter);
+            }).filter(fileWithValue => {
+                return !!fileWithValue.value;
             });
 
-        // This function exists at run-time
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        const propertyType = this.app.metadataCache.getAllPropertyInfos()[this.groupName].type;
+        // // This function exists at run-time
+        // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // // @ts-ignore
+        // const propertyType = this.app.metadataCache.getAllPropertyInfos()[this.groupName].type;
+        //
+        // const values = this.app.metadataCache
+        //     // This function exists at run-time
+        //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //     // @ts-ignore
+        //     .getFrontmatterPropertyValuesForKey(this.groupName)
+        //     .map((value: unknown) => this.getCondensedValue(value, propertyType));
 
-        const values = this.app.metadataCache
-            // This function exists at run-time
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            .getFrontmatterPropertyValuesForKey(this.groupName)
-            .map((value: unknown) => this.getCondensedValue(value, propertyType));
+        type ValueMap = {[key: string]: TFile[]};
+        const values = filesWithFrontmatter.reduce((acc: ValueMap, cur) => {
+            if (!Object.keys(acc).contains(cur.value)) {
+                acc[cur.value.toString()] = [];
+            }
+            acc[cur.value.toString()].push(cur.file);
+            return acc;
+        }, {});
+
+
         console.log(`values for ${this.groupName}: ${values}`)
-        values.forEach((value: string) => {
-            const filesWithValue = filesWithFrontmatter
-                .filter(fileWithFrontmatter => {
-                    const maybeValue = fileWithFrontmatter.frontmatter[this.groupName];
-                    if (!maybeValue) {
-                        return false;
-                    }
-                    const condensedValue = this.getCondensedValue(maybeValue, propertyType);
-                    console.log(`comparing ${value} to ${condensedValue}`)
-                    return value.toLowerCase() === condensedValue.toLowerCase();
-                });
-            if (filesWithValue.length === 0) {
+        Object.entries(values).forEach((mapping) => {
+            const value = mapping[0];
+            const files = mapping[1];
+            if (files.length === 0) {
                 // nothing to do
                 return;
             }
-            if (filesWithValue.length === 1) {
-                // add as a file
-                const fileWithFrontmatter = filesWithValue.first();
-                fileWithFrontmatter && this.addFileToFolder(
-                    fileWithFrontmatter.file,
-                    "",
-                    "/"
-                )
-                return;
-            }
             // add as a folder containing the files
-            filesWithValue.forEach(fileWithFrontmatter => {
+            files.forEach(fileWithFrontmatter => {
                 this.addFileToFolder(
-                    fileWithFrontmatter.file,
+                    fileWithFrontmatter,
                     value,
                     "/"
                 )
