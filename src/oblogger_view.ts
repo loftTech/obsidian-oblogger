@@ -21,7 +21,7 @@ import {
 } from "./settings";
 import { TagGroupContainer } from "./containers/otc/tag_group_container";
 import { DailiesContainer } from "./containers/rx/dailies_container";
-import { FileClickCallback, GroupFolder } from "./containers/group_folder";
+import { FileClickCallback } from "./containers/group_folder";
 import { RecentsContainer } from "./containers/rx/recents_container";
 import { UntaggedContainer } from "./containers/rx/untagged_container";
 import { FilesContainer } from "./containers/rx/files_container";
