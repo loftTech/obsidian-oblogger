@@ -1,6 +1,6 @@
 import { ContainerCallbacks } from "../container_callbacks";
-import { ObloggerSettings, OtcGroupType } from "../../settings";
-import { App, FrontMatterCache, TFile } from "obsidian";
+import { ContainerSortMethod, ObloggerSettings, OtcGroupType } from "../../settings";
+import { App, Menu, TFile } from "obsidian";
 import { OtcContainer } from "./otc_container";
 import { FileState } from "../../constants";
 
@@ -20,6 +20,19 @@ export class PropertyContainer extends OtcContainer {
             propertyName, // groupName
             isPinned
         );
+    }
+
+    protected getPillClickHandler(): ((e: MouseEvent) => void) | undefined {
+        return (e: MouseEvent) => {
+            const menu = new Menu();
+
+            this.addSortOptionsToMenu(
+                menu,
+                [ ContainerSortMethod.ALPHABETICAL ]
+            );
+
+            menu.showAtMouseEvent(e);
+        }
     }
 
     private getAllValues(value: string, valueType: string): string[] {
@@ -66,7 +79,7 @@ export class PropertyContainer extends OtcContainer {
             });
             return acc;
         }, {});
-        
+
         Object.entries(values).forEach((mapping) => {
             const value = mapping[0];
             const files = mapping[1];
