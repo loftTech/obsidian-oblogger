@@ -12,7 +12,7 @@ export class NewPropertyModal extends FuzzySuggestModal<string> {
         // The `getAllPropertyInfos()` function is added at runtime
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        return Object.keys(this.app.metadataCache.getAllPropertyInfos());
+        return Object.keys(this.app.metadataCache.getAllPropertyInfos()).sort();
     }
 
     getItemText(tag: string): string {
