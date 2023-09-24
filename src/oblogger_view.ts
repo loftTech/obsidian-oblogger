@@ -464,7 +464,7 @@ export class ObloggerView extends ItemView {
                 sortMethod: ContainerSortMethod.ALPHABETICAL,
                 sortAscending: true,
                 excludedFolders: [],
-                logsFolderVisible: false,
+                logsFolderVisible: true,
                 templatesFolderVisible: false
             });
             await this.saveSettingsCallback();
