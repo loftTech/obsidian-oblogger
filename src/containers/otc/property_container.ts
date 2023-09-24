@@ -22,21 +22,20 @@ export class PropertyContainer extends OtcContainer {
         );
     }
 
-    private getCondensedValue(value: unknown, valueType: string): string {
+    private getAllValues(value: string, valueType: string): string[] {
         switch (valueType) {
             case "tags":
                 if (Array.isArray(value)) {
-                    return (value as Array<string>).map(tag => `#${tag}`).join(", ");
+                    return value.map(v => v.trim());
                 }
-                return `#${value as string}`;
+                return value.split(",").map(v => v.trim());
             case "text":
             default:
-                return (value as string) ?? "";
+                return [(value as string) ?? ""];
         }
     }
 
     protected buildFileStructure(excludedFolders: string[]): void {
-
         const filesWithFrontmatter = this.app.vault
             .getMarkdownFiles()
             .filter(file => {
@@ -52,29 +51,22 @@ export class PropertyContainer extends OtcContainer {
                 return !!fileWithValue.value;
             });
 
-        // // This function exists at run-time
-        // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // // @ts-ignore
-        // const propertyType = this.app.metadataCache.getAllPropertyInfos()[this.groupName].type;
-        //
-        // const values = this.app.metadataCache
-        //     // This function exists at run-time
-        //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //     // @ts-ignore
-        //     .getFrontmatterPropertyValuesForKey(this.groupName)
-        //     .map((value: unknown) => this.getCondensedValue(value, propertyType));
+        // This function exists at run-time
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const propertyType = this.app.metadataCache.getAllPropertyInfos()[this.groupName].type;
 
         type ValueMap = {[key: string]: TFile[]};
         const values = filesWithFrontmatter.reduce((acc: ValueMap, cur) => {
-            if (!Object.keys(acc).contains(cur.value)) {
-                acc[cur.value.toString()] = [];
-            }
-            acc[cur.value.toString()].push(cur.file);
+            this.getAllValues(cur.value, propertyType).forEach((value) => {
+                if (!Object.keys(acc).contains(value)) {
+                    acc[value.toString()] = [];
+                }
+                acc[value.toString()].push(cur.file);
+            });
             return acc;
         }, {});
-
-
-        console.log(`values for ${this.groupName}: ${values}`)
+        
         Object.entries(values).forEach((mapping) => {
             const value = mapping[0];
             const files = mapping[1];
