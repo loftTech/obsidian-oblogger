@@ -107,7 +107,7 @@ export class PropertyContainer extends OtcContainer {
     }
 
     protected getTextIcon(): string {
-        return "";
+        return "text";
     }
 
     protected getTextIconTooltip(): string {
