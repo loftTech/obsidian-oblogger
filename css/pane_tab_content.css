@@ -395,9 +395,9 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .text-icon .svg-icon {
-    color: var(--nav-item-color);
-    height: 12px;
-    width: 12px;
+    color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/90%);
+    height: 16px;
+    width: 16px;
 }
 
 .oblogger-content .child-folder-icon .svg-icon {
