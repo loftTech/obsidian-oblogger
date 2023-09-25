@@ -70,7 +70,7 @@ export class TagGroupContainer extends OtcContainer {
         if (this.getIsolatedTagMatch()) {
             return "tags";
         }
-        return "";
+        return "hash";
     }
 
     protected getTextIconTooltip(): string {
