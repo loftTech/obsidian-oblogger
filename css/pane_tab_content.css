@@ -126,7 +126,7 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .text-icon {
     align-items: center;
     display: flex;
-    padding: 0 4px;
+    padding-right: 4px;
 }
 
 .oblogger-content .text-label {
