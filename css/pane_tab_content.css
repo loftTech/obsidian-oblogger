@@ -425,7 +425,7 @@ body.styled-scrollbars .oblogger-content {
     width: 12px;
 }
 
-.oblogger-content .rx-child .collapsed .svg-icon:not(.content .svg-icon),
+.oblogger-content .rx-child .collapsed .svg-icon:not(.content .svg-icon, .oblogger-content .text-icon svg.svg-icon),
 .oblogger-content .title-container.collapsed .svg-icon:not(.oblogger-content .text-icon svg.svg-icon) { transform: rotate(-90deg); }
 
 
