@@ -191,7 +191,7 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .status-icon.visible {
     display: flex;
     grid-column: 1;
-    left: 19px;
+    left: 20px;
     opacity: 1;
     position: absolute;
 }
