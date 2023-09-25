@@ -48,6 +48,10 @@ export class FilesContainer extends RxContainer {
             "up-arrow-with-tail"
     }
 
+    protected getTextIcon(): string {
+        return "package-2";
+    }
+
     protected getTitleText(): string {
         return "Files";
     }

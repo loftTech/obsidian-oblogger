@@ -48,6 +48,10 @@ export class DailiesContainer extends RxContainer {
         return `No documents tagged #${this.settings.dailiesTag};`
     }
 
+    protected getTextIcon(): string {
+        return "calendar-days";
+    }
+
     protected getTitleText(): string {
         return "Daily Notes";
     }
