@@ -73,6 +73,7 @@ body.styled-scrollbars .oblogger-content {
 .menu-item-icon.files-sort-confirmation { color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/90%); }
 
 .oblogger-content .title-container {
+    align-items: center;
     display: grid;
     grid-template-columns: min-content;
     height: 20px;
@@ -95,44 +96,26 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .title-chevron {
     align-items: center;
     display: flex;
-    grid-column: 1;
-    height: 20px;
-}
-
-.oblogger-content .title-chevron .svg-icon.lucide-chevron-down {
-    color: var(--nav-indentation-guide-color);
-    height: 12px;
-    stroke-width: 4px;
-}
-
-.oblogger-content .pin .svg-icon.lucide-chevrons-down {
-    color: var(--nav-indentation-guide-color);
-    height: 16px;
-    stroke-width: 3px;
-}
-
-.oblogger-content .title-chevron.is-pinned .svg-icon.lucide-chevron-down {
-    display: none;
 }
 
 .oblogger-content .title-text {
     align-items: center;
     display: flex;
     font-size: 12px;
-    grid-column: 2;
+    grid-column: 1;
     overflow: hidden;
+    position: absolute;
 }
 
 .oblogger-content .text-icon {
-    align-items: center;
-    display: flex;
-    padding-right: 4px;
+
 }
 
 .oblogger-content .text-label {
     font-weight: 600;
     overflow: hidden;
     overflow-wrap: anywhere;
+    padding-left: 4px;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -388,6 +371,24 @@ body.styled-scrollbars .oblogger-content {
     width: 12px;
 }
 
+.oblogger-content .title-chevron .svg-icon.lucide-chevron-down {
+    color: transparent;
+    height: 16px;
+    width: 16px;
+    stroke-width: 2px;
+}
+
+.oblogger-content .pin .svg-icon.lucide-chevrons-down {
+    color: var(--nav-indentation-guide-color);
+    height: 16px;
+    width: 16px;
+    stroke-width: 2px;
+}
+
+.oblogger-content .title-chevron.is-pinned .svg-icon.lucide-chevron-down {
+    display: none;
+}
+
 .oblogger-content .title-tag .svg-icon {
     color: var(--nav-item-color);
     height: 11px;
@@ -455,6 +456,12 @@ body.styled-scrollbars .oblogger-content {
     transition: 0.2s;
     width: 85px;
 }
+
+.oblogger-content .title-container:hover .title-chevron .svg-icon {
+    color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/100%);
+}
+
+.oblogger-content .title-container:hover .text-icon .svg-icon { color: transparent; }
 
 .oblogger-content .text-label:hover { color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/100%); }
 
