@@ -518,14 +518,25 @@ export class ObloggerView extends ItemView {
 
         new ButtonComponent(buttonBarDiv)
             .setClass("button-bar-button")
-            .setIcon("folder-plus")
-            .setTooltip("Add a new user tag group")
-            .onClick(() => this.showNewTagModal());
+            .setIcon("plus-square")
+            .setTooltip("Add new user group")
+            .onClick((e) => {
+                const menu = new Menu();
 
-        new ButtonComponent(buttonBarDiv)
-            .setClass("button-bar-button")
-            .setIcon("dog")
-            .onClick(() => this.showNewPropertyModal());
+                menu.addItem(item => {
+                    item.setIcon("hash");
+                    item.setTitle("Add tag group");
+                    item.onClick(() => this.showNewTagModal())
+
+                    menu.addItem(item => {
+                        item.setIcon("text");
+                        item.setTitle("Add property group");
+                        item.onClick(() => this.showNewPropertyModal())
+                    })
+                })
+                menu.showAtMouseEvent(e);
+            })
+
 
         new ButtonComponent(buttonBarDiv)
             .setClass("button-bar-button")
