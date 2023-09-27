@@ -96,6 +96,7 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .title-chevron {
     align-items: center;
     display: flex;
+    padding-bottom: 1px;
 }
 
 .oblogger-content .title-text {
