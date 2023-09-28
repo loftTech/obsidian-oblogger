@@ -112,6 +112,8 @@ body.styled-scrollbars .oblogger-content { padding: 0 4px 70px; }
     overflow: hidden;
 }
 
+.oblogger-content .tag-parts-container { display: flex; }
+
 .oblogger-content .collapsed .title-tag { display: none; }
 
 .oblogger-content .tag-label {
@@ -414,8 +416,8 @@ body.styled-scrollbars .oblogger-content { padding: 0 4px 70px; }
 
 .oblogger-content .greeter-vault-name:active { animation: wiggle 0.2s; }
 
-.oblogger-content .title-tag:hover,
-.oblogger-content .title-tag:hover .svg-icon {
+.oblogger-content .tag-parts-container:hover,
+.oblogger-content .tag-parts-container:hover .svg-icon {
     color: var(--accent-color);
     opacity: 1;
 }
