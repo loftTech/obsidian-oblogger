@@ -357,7 +357,7 @@ body.styled-scrollbars .oblogger-content { padding: 0 4px 70px; }
 }
 
 .oblogger-content .pin .svg-icon.lucide-chevrons-down {
-    color: var(--nav-indentation-guide-color);
+    color: transparent;
     height: 16px;
     width: 16px;
     stroke-width: 2px;
