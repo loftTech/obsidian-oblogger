@@ -44,6 +44,7 @@ body.styled-scrollbars .oblogger-content { padding: 0 4px 70px; }
     border-radius: 10px;
     height: 4px;
     width: 68px;
+    z-index: 11;
 }
 
 .oblogger-content .rx-separator {
