@@ -38,6 +38,7 @@ export class PropertyContainer extends OtcContainer {
     private getAllValues(value: string, valueType: string): string[] {
         switch (valueType) {
             case "tags":
+            case "multitext":
                 if (Array.isArray(value)) {
                     return value.map(v => v.trim());
                 }
