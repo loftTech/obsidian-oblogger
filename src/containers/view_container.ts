@@ -419,8 +419,7 @@ export abstract class ViewContainer extends GroupFolder {
         titleText.addClass("title-text");
         titleText.appendChild(textIcon);
         titleText.appendChild(textLabel);
-
-
+        
         titleText.addEventListener("click", () => {
             this.toggleCollapse();
         });
