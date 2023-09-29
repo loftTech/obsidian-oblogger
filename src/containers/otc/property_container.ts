@@ -45,8 +45,8 @@ export class PropertyContainer extends OtcContainer {
                 return value.split(",").map(v => v.trim());
             case "checkbox":
                 return [value ? "checked" : "unchecked"];
-            default:
             case "text":
+            default:
                 return [(value.toString() ?? "").trim()];
         }
     }
