@@ -55,13 +55,13 @@ export class PropertyContainer extends OtcContainer {
                 return !this.isFileExcluded(file, excludedFolders);
             }).map(file => {
                 const maybeFrontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
-                const value = maybeFrontmatter ? maybeFrontmatter[this.groupName] : undefined;
+                const value = maybeFrontmatter ? maybeFrontmatter[this.groupName] : null;
                 return {
                     file: file,
                     value: value
                 };
             }).filter(fileWithValue => {
-                return !!fileWithValue.value;
+                return fileWithValue.value !== null && fileWithValue.value !== undefined;
             });
 
         // This function exists at run-time
