@@ -34,8 +34,8 @@ export class FolderContainer extends OtcContainer {
                 }
                 this.addFileToFolder(
                     abstractFile,
-                    "",
-                    folder.path);
+                    abstractFile.path.split("/").slice(0, -1).join("/"),
+                    "");
             } else if (abstractFile instanceof TFolder) {
                 this.addAllFilesIn(abstractFile, excludedFolders);
             }
