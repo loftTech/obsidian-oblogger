@@ -66,6 +66,9 @@ export class FolderContainer extends OtcContainer {
     }
 
     protected getTitleText(): string {
+        if(this.basePath === "/") {
+            return this.app.vault.getName();
+        }
         return this.basePath.split("/").last() ?? this.basePath;
     }
 
