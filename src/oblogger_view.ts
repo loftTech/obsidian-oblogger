@@ -527,13 +527,14 @@ export class ObloggerView extends ItemView {
                     item.setIcon("hash");
                     item.setTitle("Add tag group");
                     item.onClick(() => this.showNewTagModal())
+                });
 
-                    menu.addItem(item => {
-                        item.setIcon("text");
-                        item.setTitle("Add property group");
-                        item.onClick(() => this.showNewPropertyModal())
-                    })
-                })
+                menu.addItem(item => {
+                    item.setIcon("text");
+                    item.setTitle("Add property group");
+                    item.onClick(() => this.showNewPropertyModal())
+                });
+
                 menu.showAtMouseEvent(e);
             })
 
