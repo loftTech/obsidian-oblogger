@@ -1,7 +1,7 @@
 import { OtcContainer } from "./otc_container";
 import { ContainerCallbacks } from "../container_callbacks";
 import { ContainerSortMethod, ObloggerSettings, OtcGroupType } from "../../settings";
-import { App, TFile, TFolder } from "obsidian";
+import { App, Menu, TFile, TFolder } from "obsidian";
 import { FileState } from "../../constants";
 
 export class FolderContainer extends OtcContainer {
@@ -87,8 +87,16 @@ export class FolderContainer extends OtcContainer {
     }
 
     protected getPillClickHandler(): ((e: MouseEvent) => void) | undefined {
-        return undefined;
-        // todo
+        return (e: MouseEvent) => {
+            const menu = new Menu();
+
+            this.addSortOptionsToMenu(
+                menu,
+                [ ContainerSortMethod.ALPHABETICAL ]
+            );
+
+            menu.showAtMouseEvent(e);
+        }
     }
 
     protected getTextIcon(isCollapsed: boolean): string {
