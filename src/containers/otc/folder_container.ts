@@ -27,6 +27,8 @@ export class FolderContainer extends OtcContainer {
     }
 
     private addAllFilesIn(folder: TFolder, excludedFolders: string[]): void {
+        const rootFolderLength = this.basePath === "/" ? 0 : (this.basePath.length + 1);
+        const adjustedFolderPath = folder.path === "/" ? "" : folder.path.slice(rootFolderLength);
         folder.children.forEach(abstractFile => {
             if (abstractFile instanceof TFile) {
                 if (this.isFileExcluded(abstractFile, excludedFolders)) {
@@ -34,7 +36,7 @@ export class FolderContainer extends OtcContainer {
                 }
                 this.addFileToFolder(
                     abstractFile,
-                    abstractFile.path.split("/").slice(0, -1).join("/"),
+                    adjustedFolderPath,
                     "");
             } else if (abstractFile instanceof TFolder) {
                 this.addAllFilesIn(abstractFile, excludedFolders);
