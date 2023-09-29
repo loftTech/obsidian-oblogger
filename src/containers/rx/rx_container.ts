@@ -38,10 +38,6 @@ export abstract class RxContainer extends ViewContainer {
         return "";
     }
 
-    protected getTextIcon(): string {
-        return "";
-    }
-
     protected getTextIconTooltip(): string {
         return "";
     }
