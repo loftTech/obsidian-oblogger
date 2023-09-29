@@ -45,7 +45,15 @@ export class PropertyContainer extends OtcContainer {
                 return value.split(",").map(v => v.trim());
             case "checkbox":
                 return [value ? "checked" : "unchecked"];
-            case "text":
+            case "datetime": {
+                const date = new Date(value);
+                const year = date.getFullYear();
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const day = date.getDate().toString().padStart(2, '0');
+                const hour = date.getHours().toString().padStart(2, '0');
+                const minute = date.getMinutes().toString().padStart(2, '0');
+                return [`${year}-${month}-${day}, ${hour}:${minute}`];
+            } case "text":
             default:
                 return [(value.toString() ?? "").trim()];
         }
