@@ -1,6 +1,6 @@
 import { OtcContainer } from "./otc_container";
 import { ContainerCallbacks } from "../container_callbacks";
-import { ObloggerSettings, OtcGroupType } from "../../settings";
+import { ContainerSortMethod, ObloggerSettings, OtcGroupType } from "../../settings";
 import { App, TFile, TFolder } from "obsidian";
 import { FileState } from "../../constants";
 
@@ -27,22 +27,49 @@ export class FolderContainer extends OtcContainer {
         this.basePath = basePath;
     }
 
-    private addAllFilesIn(folder: TFolder, excludedFolders: string[]): void {
+    private addAllFilesIn(
+        folder: TFolder,
+        excludedFolders: string[],
+        sortAscending: boolean,
+        fileSortingFn: (fileA: TFile, fileB: TFile) => number
+    ): void {
         const rootFolderLength = this.basePath === "/" ? 0 : (this.basePath.length + 1);
         const adjustedFolderPath = folder.path === "/" ? "" : folder.path.slice(rootFolderLength);
-        folder.children.forEach(abstractFile => {
-            if (abstractFile instanceof TFile) {
-                if (this.isFileExcluded(abstractFile, excludedFolders)) {
-                    return;
+
+        const subFolders: TFolder[] = folder.children
+            .filter(abstractFile => {
+                return abstractFile instanceof TFolder;
+            }).map(abstractFile => {
+                return abstractFile as TFolder;
+            });
+
+        const subFiles = folder.children
+            .filter(abstractFile => {
+                return (
+                    abstractFile instanceof TFile &&
+                    !this.isFileExcluded(abstractFile, excludedFolders)
+                );
+            }).map(abstractFile => {
+                return abstractFile as TFile;
+            }).sort((fileA, fileB) => {
+                const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
+                if (bookmarkSorting != 0) {
+                    return bookmarkSorting;
                 }
-                this.addFileToFolder(
-                    abstractFile,
-                    adjustedFolderPath,
-                    "");
-            } else if (abstractFile instanceof TFolder) {
-                this.addAllFilesIn(abstractFile, excludedFolders);
-            }
-        })
+                return (sortAscending ? 1 : -1) * fileSortingFn(fileA, fileB);
+            });
+
+        subFiles.forEach((file: TFile) => {
+            this.addFileToFolder(file, adjustedFolderPath, "");
+        });
+
+        subFolders.forEach((folder: TFolder) => {
+            this.addAllFilesIn(
+                folder,
+                excludedFolders,
+                sortAscending,
+                fileSortingFn);
+        });
     }
 
     protected buildFileStructure(excludedFolders: string[]): void {
@@ -51,7 +78,12 @@ export class FolderContainer extends OtcContainer {
             console.warn(`Unable to build container for ${this.basePath}. It is not a folder.`)
             return;
         }
-        this.addAllFilesIn(abstractFile, excludedFolders);
+
+        const ascending = this.getGroupSettings()?.sortAscending ?? true;
+        const sortMethod = this.getGroupSettings()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL;
+        const fileSortingFn = this.getFileSortingFn(sortMethod);
+
+        this.addAllFilesIn(abstractFile, excludedFolders, ascending, fileSortingFn);
     }
 
     protected getPillClickHandler(): ((e: MouseEvent) => void) | undefined {
