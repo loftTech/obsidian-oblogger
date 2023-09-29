@@ -93,6 +93,8 @@ export class PropertyContainer extends OtcContainer {
 
         const ascending = this.getGroupSettings()?.sortAscending ?? true;
         const modifier = ascending ? 1 : -1;
+        const sortMethod = this.getGroupSettings()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL;
+        const fileSortingFn = this.getFileSortingFn(sortMethod);
 
         Object.entries(values)
             .sort(([valueA], [valueB]) => {
@@ -106,7 +108,11 @@ export class PropertyContainer extends OtcContainer {
                 // add as a folder containing the files
                 files
                     .sort((fileA, fileB) => {
-                        return modifier * (fileA.name < fileB.name ? -1 : fileA.name > fileB.name ? 1 : 0);
+                        const bookmarkSorting = this.sortFilesByBookmark(fileA, fileB);
+                        if (bookmarkSorting != 0) {
+                            return bookmarkSorting;
+                        }
+                        return (ascending ? 1 : -1) * fileSortingFn(fileA, fileB);
                     })
                     .forEach(fileWithFrontmatter => {
                         this.addFileToFolder(
