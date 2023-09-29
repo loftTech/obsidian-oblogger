@@ -58,9 +58,8 @@ export class FolderContainer extends OtcContainer {
         // todo
     }
 
-    protected getTextIcon(): string {
-        return "folder";
-        // todo
+    protected getTextIcon(isCollapsed: boolean): string {
+        return isCollapsed ? "folder-closed" : "folder-open";
     }
 
     protected getTextIconTooltip(): string {

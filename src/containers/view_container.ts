@@ -31,7 +31,7 @@ export abstract class ViewContainer extends GroupFolder {
 
     protected abstract getTitleText(): string;
     protected abstract getTitleTooltip(): string;
-    protected abstract getTextIcon(): string;
+    protected abstract getTextIcon(isCollapsed: boolean): string;
     protected abstract getTextIconTooltip(): string;
     protected abstract getPillText(): string;
     protected abstract getPillTooltipText(): string;
@@ -406,12 +406,12 @@ export abstract class ViewContainer extends GroupFolder {
         return titleChevron;
     }
 
-    private buildTitleTextDiv(): HTMLElement {
+    private buildTitleTextDiv(isCollapsed: boolean): HTMLElement {
         const textLabel = document.createElement("div");
         textLabel.addClass("text-label");
 
         const textIcon = document.createElement("div");
-        setIcon(textIcon, this.getTextIcon());
+        setIcon(textIcon, this.getTextIcon(isCollapsed));
         textIcon.addClass("text-icon");
         textIcon.ariaLabel = this.getTextIconTooltip();
 
@@ -419,7 +419,7 @@ export abstract class ViewContainer extends GroupFolder {
         titleText.addClass("title-text");
         titleText.appendChild(textIcon);
         titleText.appendChild(textLabel);
-        
+
         titleText.addEventListener("click", () => {
             this.toggleCollapse();
         });
@@ -463,7 +463,7 @@ export abstract class ViewContainer extends GroupFolder {
         return titleTagDiv;
     }
 
-    protected buildTitle() {
+    protected buildTitle(isCollapsed: boolean) {
         if (this.folderName !== "") {
             console.warn(`Unexpected folder name ${this.folderName}`)
         }
@@ -472,7 +472,7 @@ export abstract class ViewContainer extends GroupFolder {
         this.titleContainer.addClass("title-container");
 
         this.titleContainer.appendChild(this.buildTitleSvgHolder());
-        this.titleContainer.appendChild(this.buildTitleTextDiv());
+        this.titleContainer.appendChild(this.buildTitleTextDiv(isCollapsed));
         this.titleContainer.appendChild(this.buildPill());
     }
 
