@@ -47,7 +47,8 @@ export const isValidRxGroupType = (groupType: RxGroupType): boolean => {
 // Note: when adding new types, ensure that the value = NAME.toLowerCase()
 export enum OtcGroupType {
     TAG_GROUP = "tag_group",
-    PROPERTY_GROUP = "property_group"
+    PROPERTY_GROUP = "property_group",
+    FOLDER_GROUP = "folder_group"
 }
 
 export const isValidOtcGroupType = (groupType: OtcGroupType): boolean => {
