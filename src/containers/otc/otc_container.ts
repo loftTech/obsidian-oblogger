@@ -11,13 +11,14 @@ export abstract class OtcContainer extends ViewContainer {
         callbacks: ContainerCallbacks,
         groupType: OtcGroupType,
         groupName: string,
-        isPinned: boolean
+        isPinned: boolean,
+        showStatusIcon: boolean
     ) {
         super(
             app,
             groupName,
             groupType,
-            false, // showStatusIcon
+            showStatusIcon,
             settings,
             false, // isMovable
             true, // canCollapseInnerFolders

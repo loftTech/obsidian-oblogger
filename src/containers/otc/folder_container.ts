@@ -20,7 +20,8 @@ export class FolderContainer extends OtcContainer {
             callbacks,
             OtcGroupType.FOLDER_GROUP,
             basePath, // groupName,
-            isPinned
+            isPinned,
+            true // showStatusIcon
         );
 
         this.basePath = basePath;
