@@ -65,6 +65,10 @@ export class UntaggedContainer extends RxContainer {
             "up-arrow-with-tail"
     }
 
+    protected getTitleTooltip(): string {
+        return "Shows untagged notes";
+    }
+
     protected getPillClickHandler(): ((e: MouseEvent) => void) | undefined {
         return (e: MouseEvent) => {
             const menu = new Menu();
