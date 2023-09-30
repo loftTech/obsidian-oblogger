@@ -21,7 +21,7 @@ import {
 } from "./settings";
 import { TagGroupContainer } from "./containers/otc/tag_group_container";
 import { DailiesContainer } from "./containers/rx/dailies_container";
-import { FileClickCallback, GroupFolder } from "./containers/group_folder";
+import { FileClickCallback } from "./containers/group_folder";
 import { RecentsContainer } from "./containers/rx/recents_container";
 import { UntaggedContainer } from "./containers/rx/untagged_container";
 import { FilesContainer } from "./containers/rx/files_container";
@@ -31,6 +31,8 @@ import { buildSeparator } from "./misc_components";
 import { NewTagModal } from "./new_tag_modal";
 import { buildStateFromFile, FileState } from "./constants";
 import { ContainerCallbacks } from "./containers/container_callbacks";
+import { PropertyContainer } from "./containers/otc/property_container";
+import { NewPropertyModal } from "./new_property_modal";
 
 export const VIEW_TYPE_OBLOGGER = "oblogger-view";
 const RENDER_DELAY_MS = 100;
@@ -268,76 +270,24 @@ export class ObloggerView extends ItemView {
         this.registerInterval(this.renderTimeout);
     }
 
-    private renderTagGroups(containers: GroupFolder[], modifiedFiles: FileState[]) {
-        containers.forEach(container => this.renderTagGroup(container, modifiedFiles));
+    private renderContainers(containers: ViewContainer[], modifiedFiles: FileState[]) {
+        containers.forEach(container => this.renderContainer(container, modifiedFiles));
     }
 
-    private renderTagGroup(group: GroupFolder, modifiedFiles: FileState[]) {
-        const maybeSettingsGroup = this.settings?.otcGroups.find(
-            settingsGroup => settingsGroup.groupName === group.groupName
-        );
-
-        if (!maybeSettingsGroup) {
-            console.warn(`unable to find settings for tag group ${group.groupName}`);
-            return;
-        }
-
-        if (group instanceof TagGroupContainer) {
-            group.render(modifiedFiles, false, maybeSettingsGroup);
-        }
-    }
-
-    private renderRxGroup(
-        groupType: RxGroupType,
-        modifiedFiles: FileState[],
-        forced: boolean
-    ) {
-        const groupSetting = getGroupSettings(
+    private renderContainer(container: ViewContainer, modifiedFiles: FileState[]) {
+        const groupSettings = getGroupSettings(
             this.settings,
-            groupType,
-            "");
-        if (!groupSetting) {
-            console.warn(`unable to find settings for rx group ${groupType}`);
+            container.groupType,
+            container.groupName);
+
+        if (!groupSettings) {
+            console.warn(
+                `Unable to find settings for container of type 
+                ${container.groupType} with name ${container.groupName}`);
             return;
         }
-        const container = this.rxContainers.find(
-            container => container.groupType === groupType);
-        if (!container) {
-            console.warn(`unable to find container for rx group ${groupType}`);
-            return;
-        }
-        container.render(
-            modifiedFiles,
-            forced,
-            groupSetting);
-    }
 
-    private renderDailies(modifiedFiles: FileState[]) {
-        this.renderRxGroup(
-            RxGroupType.DAILIES,
-            modifiedFiles,
-            false);
-    }
-
-    private renderFiles(modifiedFiles: FileState[]) {
-        this.renderRxGroup(
-            RxGroupType.FILES,
-            modifiedFiles,
-            false);
-    }
-
-    private renderUntagged(modifiedFiles: FileState[]) {
-        this.renderRxGroup(
-            RxGroupType.UNTAGGED,
-            modifiedFiles,
-            false);
-    }
-
-    private renderRecents(modifiedFiles: FileState[]) {
-        this.renderRxGroup(
-            RxGroupType.RECENTS,
-            modifiedFiles,
-            false);
+        container.render(modifiedFiles, false, groupSettings);
     }
 
     private async renderNow(modifiedFiles: FileState[]) {
@@ -347,18 +297,17 @@ export class ObloggerView extends ItemView {
         this.renderRXSeparator();
         this.renderOTCSeparator();
 
-        this.renderRecents(modifiedFiles);
-        this.renderDailies(modifiedFiles);
-        this.renderUntagged(modifiedFiles);
-        this.renderFiles(modifiedFiles);
+        // render rx containers
+        Object.values(RxGroupType).forEach(groupType => {
+            const containers = this.rxContainers.filter(container => container.groupType === groupType);
+            this.renderContainers(containers, modifiedFiles);
+        });
 
+        // render otc containers
         Object.values(OtcGroupType).forEach(groupType => {
             const containers = this.otcContainers.filter(container => container.groupType === groupType);
-            switch(groupType) {
-                case OtcGroupType.TAG_GROUP:
-                    this.renderTagGroups(containers, modifiedFiles);
-            }
-        })
+            this.renderContainers(containers, modifiedFiles);
+        });
 
         this.highlightLastOpenFile();
 
@@ -500,11 +449,36 @@ export class ObloggerView extends ItemView {
         return this.greeterDiv;
     }
 
+    private showNewPropertyModal() {
+        const modal = new NewPropertyModal(this.app, async (result: string) => {
+            if (!this.settings.otcGroups) {
+                this.settings.otcGroups = [];
+            }
+            // add the group to settings and then reload
+            this.settings.otcGroups.push({
+                groupName: result,
+                groupType: OtcGroupType.PROPERTY_GROUP,
+                collapsedFolders: [],
+                isVisible: true,
+                isPinned: false,
+                sortMethod: ContainerSortMethod.ALPHABETICAL,
+                sortAscending: true,
+                excludedFolders: [],
+                logsFolderVisible: true,
+                templatesFolderVisible: false
+            });
+            await this.saveSettingsCallback();
+            this.reloadOtcGroups();
+        });
+        modal.open();
+    }
+
     private showNewTagModal() {
         const modal = new NewTagModal(this.app, async (result: string)=> {
             if (!this.settings.otcGroups) {
                 this.settings.otcGroups = [];
             }
+            // add the group to settings and then reload
             this.settings.otcGroups.push({
                 groupName: result,
                 groupType: OtcGroupType.TAG_GROUP,
@@ -544,9 +518,25 @@ export class ObloggerView extends ItemView {
 
         new ButtonComponent(buttonBarDiv)
             .setClass("button-bar-button")
-            .setIcon("folder-plus")
-            .setTooltip("Add a new user tag group")
-            .onClick(() => this.showNewTagModal());
+            .setIcon("plus-square")
+            .setTooltip("Add new user group")
+            .onClick((e) => {
+                const menu = new Menu();
+
+                menu.addItem(item => {
+                    item.setIcon("hash");
+                    item.setTitle("Add tag group");
+                    item.onClick(() => this.showNewTagModal())
+
+                    menu.addItem(item => {
+                        item.setIcon("text");
+                        item.setTitle("Add property group");
+                        item.onClick(() => this.showNewPropertyModal())
+                    })
+                })
+                menu.showAtMouseEvent(e);
+            })
+
 
         new ButtonComponent(buttonBarDiv)
             .setClass("button-bar-button")
@@ -627,28 +617,30 @@ export class ObloggerView extends ItemView {
             });
     }
 
-    private async removeTagGroup(tag: string) {
-        const tagGroups = this.otcContainers.filter(container => {
+    private async removeOtcGroup(groupType: OtcGroupType, groupName: string) {
+        const containers = this.otcContainers.filter(container => {
             return (
-                container.groupType === OtcGroupType.TAG_GROUP &&
-                container.groupName === tag);
+                container.groupType === groupType &&
+                container.groupName === groupName);
         });
-        const tagGroup = tagGroups.first();
-        if (tagGroup === undefined) {
-            new Notice("Nothing to delete");
+        const container = containers.first();
+        if (container === undefined) {
+            new Notice(`Unable to find group of type ${groupType} with name ${groupName}`);
             return;
         }
-        if (tagGroup.groupName !== tag) {
-            console.debug("Something went wrong, tag group has wrong tag.");
+        if (container.groupName !== groupName) {
+            console.debug("Something went wrong, container has the wrong name.");
             return;
         }
-        this.otcContainers.remove(tagGroup);
-        tagGroup.rootElement.remove();
+        this.otcContainers.remove(container);
+        container.rootElement.remove();
         this.settings.otcGroups = this.settings?.otcGroups
-            .filter(group => group.groupName !== tag);
+            .filter(group => {
+                return group.groupName !== groupName || group.groupType != groupType
+            });
         await this.saveSettingsCallback();
         this.requestRender();
-        new Notice(`"${tag}" removed`);
+        new Notice(`"${groupName}" removed`);
     }
 
     private async moveRxGroup(groupType: RxGroupType, up: boolean) {
@@ -688,37 +680,52 @@ export class ObloggerView extends ItemView {
         this.requestRender();
     }
 
-    private async moveTagGroup(tag: string, up: boolean): Promise<void> {
-        const currentIndex = this.settings.otcGroups.findIndex(group => group.groupName === tag);
+    private async moveOtcGroup(
+        groupType: OtcGroupType,
+        groupName: string,
+        up: boolean
+    ): Promise<void> {
+        const otcGroups = this.settings.otcGroups;
+        const currentIndex = otcGroups.findIndex((group) => {
+            return group.groupType === groupType && group.groupName === groupName;
+        });
         if (currentIndex === -1) {
-            console.warn(`Tag ${tag} doesn't exist.`);
+            console.warn(`Group of type ${groupType} with name ${groupName} couldn't be found.`);
             return;
         }
 
-        const newIndex = currentIndex + (up ? -1 : 1);
+        // find the next group of the same type
+        let newIndex = currentIndex + (up ? -1 : 1);
+        while (newIndex > 0 && otcGroups.at(newIndex)?.groupType !== groupType) {
+            newIndex += (up ? -1 : 1);
+        }
 
-        if (newIndex < 0 || newIndex >= this.settings.otcGroups.length) {
+        if (newIndex < 0 || newIndex >= otcGroups.length) {
             console.log(`Already at ${up ? "top" : "bottom"}`);
             return;
         }
 
         // todo(#215): try to get this to one operation using splice to swap in place
-        const group = this.settings.otcGroups[currentIndex];
-        this.settings.otcGroups.remove(group);
-        this.settings.otcGroups.splice(newIndex, 0, group);
+        const group = otcGroups[currentIndex];
+        otcGroups.remove(group);
+        otcGroups.splice(newIndex, 0, group);
 
         await this.saveSettingsCallback();
         this.reloadOtcGroups();
         this.requestRender();
     }
 
-    private async pinTagGroup(tag: string, pin: boolean): Promise<void> {
-        const otcGroup = this.settings.otcGroups.find((otcGroup) => otcGroup.groupName === tag);
-        if (otcGroup === undefined) {
-            new Notice(`Unable to find tag ${tag} to ${pin ? "pin" : "unpin"}`);
+    private async pinOtcGroup(
+        groupType: OtcGroupType,
+        groupName: string,
+        pin: boolean
+    ): Promise<void> {
+        const groupSettings = getGroupSettings(this.settings, groupType, groupName);
+        if (groupSettings === undefined) {
+            new Notice(`Unable to find group type ${groupType} with name ${groupName} to ${pin ? "pin" : "unpin"}`);
             return;
         }
-        otcGroup.isPinned = pin;
+        groupSettings.isPinned = pin;
         await this.saveSettingsCallback();
         this.reloadOtcGroups();
         this.requestRender();
@@ -735,9 +742,9 @@ export class ObloggerView extends ItemView {
             requestRenderCallback: () => { this.requestRender() },
             saveSettingsCallback: this.saveSettingsCallback,
             getGroupIconCallback: (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
-            hideCallback: async () => { return await this.removeTagGroup(groupName); },
-            moveCallback: (up: boolean) => { return this.moveTagGroup(groupName, up); },
-            pinCallback: (pin: boolean) => { return this.pinTagGroup(groupName, pin); }
+            hideCallback: async () => { return await this.removeOtcGroup(OtcGroupType.TAG_GROUP, groupName); },
+            moveCallback: (up: boolean) => { return this.moveOtcGroup(OtcGroupType.TAG_GROUP, groupName, up); },
+            pinCallback: (pin: boolean) => { return this.pinOtcGroup(OtcGroupType.TAG_GROUP, groupName, pin); }
         };
 
         const container = new TagGroupContainer(
@@ -751,6 +758,63 @@ export class ObloggerView extends ItemView {
 
         parent.appendChild(container.rootElement);
         this.requestRender();
+    }
+
+    private addPropertyGroup(
+        groupName: string,
+        isPinned: boolean,
+        parent: HTMLElement
+    ) {
+        const callbacks: ContainerCallbacks = {
+            fileClickCallback: this.fileClickCallback,
+            fileAddedCallback: this.fileAddedCallback,
+            requestRenderCallback: () => { this.requestRender() },
+            saveSettingsCallback: this.saveSettingsCallback,
+            getGroupIconCallback: (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
+            hideCallback: async () => { return await this.removeOtcGroup(OtcGroupType.PROPERTY_GROUP, groupName); },
+            moveCallback: (up: boolean) => { return this.moveOtcGroup(OtcGroupType.PROPERTY_GROUP, groupName, up); },
+            pinCallback: (pin: boolean) => { return this.pinOtcGroup(OtcGroupType.PROPERTY_GROUP, groupName, pin); }
+        };
+
+        const container = new PropertyContainer(
+            this.app,
+            this.settings,
+            callbacks,
+            groupName,
+            isPinned);
+
+        this.otcContainers.push(container);
+
+        parent.appendChild(container.rootElement);
+        this.requestRender();
+    }
+
+    private reloadPropertyGroups(groups: GroupSettings[]) {
+        const groupSorter = (a: GroupSettings, b: GroupSettings): number => {
+            return a.groupName < b.groupName ? -1 : a.groupName > b.groupName ? -1 : 0;
+        }
+
+        // Add pinned groups
+        groups
+            ?.filter(otcGroup => otcGroup.isPinned)
+            ?.sort(groupSorter)
+            ?.forEach(group => {
+                this.otcGroupsDiv && this.addPropertyGroup(
+                    group.groupName,
+                    true,
+                    this.otcGroupsDiv);
+            });
+
+        // Add unpinned groups
+        groups
+            ?.filter(otcGroup => !otcGroup.isPinned)
+            ?.sort(groupSorter)
+            ?.forEach(group => {
+                this.otcGroupsDiv && this.addPropertyGroup(
+                    group.groupName,
+                    false,
+                    this.otcGroupsDiv);
+            });
     }
 
     private reloadTagGroups(groups: GroupSettings[]) {
@@ -794,12 +858,17 @@ export class ObloggerView extends ItemView {
         // Dump whatever remains (hopefully not much)
         this.otcGroupsDiv?.empty();
 
+        // todo: need to add a separator somewhere in here?
         Object.values(OtcGroupType).forEach(groupType => {
             const groups = this.settings?.otcGroups
                 .filter(group => group.groupType === groupType)
             switch(groupType) {
                 case OtcGroupType.TAG_GROUP:
                     this.reloadTagGroups(groups);
+                    break;
+                case OtcGroupType.PROPERTY_GROUP:
+                    this.reloadPropertyGroups(groups);
+                    break;
             }
         });
     }

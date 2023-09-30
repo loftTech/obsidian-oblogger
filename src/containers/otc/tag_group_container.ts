@@ -1,4 +1,4 @@
-import { App, getAllTags, TFile } from "obsidian";
+import { App, getAllTags, Menu, TFile } from "obsidian";
 import { ContainerSortMethod, ObloggerSettings, OtcGroupType } from "../../settings";
 import { FileState } from "../../constants";
 import { ContainerCallbacks } from "../container_callbacks";
@@ -70,7 +70,7 @@ export class TagGroupContainer extends OtcContainer {
         if (this.getIsolatedTagMatch()) {
             return "tags";
         }
-        return "";
+        return "hash";
     }
 
     protected getTextIconTooltip(): string {
@@ -139,6 +139,23 @@ export class TagGroupContainer extends OtcContainer {
                 });
                 return acc;
             }, {});
+    }
+
+    protected getPillClickHandler(): ((e: MouseEvent) => void) | undefined {
+        return (e: MouseEvent) => {
+            const menu = new Menu();
+
+            this.addSortOptionsToMenu(
+                menu,
+                [
+                    ContainerSortMethod.ALPHABETICAL,
+                    ContainerSortMethod.CTIME,
+                    ContainerSortMethod.MTIME
+                ]
+            );
+
+            menu.showAtMouseEvent(e);
+        }
     }
 
     protected buildFileStructure(excludedFolders: string[]) {

@@ -42,6 +42,10 @@ export class RecentsContainer extends RxContainer {
         return "No recents";
     }
 
+    protected getTextIcon(): string {
+        return "history";
+    }
+
     protected getTitleText(): string {
         return "Recents";
     }

@@ -53,23 +53,6 @@ export abstract class OtcContainer extends ViewContainer {
             "up-arrow-with-tail"
     }
 
-    protected getPillClickHandler(): ((e: MouseEvent) => void) | undefined {
-        return (e: MouseEvent) => {
-            const menu = new Menu();
-
-            this.addSortOptionsToMenu(
-                menu,
-                [
-                    ContainerSortMethod.ALPHABETICAL,
-                    ContainerSortMethod.CTIME,
-                    ContainerSortMethod.MTIME
-                ]
-            );
-
-            menu.showAtMouseEvent(e);
-        }
-    }
-
     protected getContainerClass(): string {
         return "otc-child";
     }

@@ -417,8 +417,9 @@ export abstract class ViewContainer extends GroupFolder {
 
         const titleText = document.createElement("div");
         titleText.addClass("title-text");
-        titleText.appendChild(textLabel);
         titleText.appendChild(textIcon);
+        titleText.appendChild(textLabel);
+
 
         titleText.addEventListener("click", () => {
             this.toggleCollapse();

@@ -43,6 +43,10 @@ export class UntaggedContainer extends RxContainer {
         return "No untagged documents";
     }
 
+    protected getTextIcon(): string {
+        return "alert-circle";
+    }
+
     protected getTitleText(): string {
         return "Untagged";
     }
