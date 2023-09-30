@@ -341,19 +341,10 @@
 }
 
 .logger .separator {
-    align-items: center;
     background-color: var(--nav-indentation-guide-color);
     border-radius: 10px;
-    color: var(--nav-indentation-guide-color);
-    display: flex;
-    font-size: 0;
-    height: 3px;
-    justify-content: center;
-    margin: 0 10px;
-    opacity: 0.6;
-    padding: 1px 5px;
-    transition: 0.6s;
-    width: 65px;
+    height: 4px;
+    width: 68px;
 }
 
 .logger .separator-container.metadata {
@@ -415,21 +406,6 @@
 .logger .warning-icon:active,
 .logger .separator:active,
 .logger .disabled .log-choice:active { animation: wiggle 0.2s; }
-
-.logger .separator-container:hover .separator {
-    align-items: center;
-    background-color: var(--nav-indentation-guide-color);
-    border-radius: 8px;
-    color: var(--background-secondary);
-    display: flex;
-    font-size: 8px;
-    font-weight: 700;
-    height: inherit;
-    justify-content: center;
-    opacity: 1;
-    transition: 0.2s;
-    width: 85px;
-}
 
 .logger .add-icon:hover svg.svg-icon,
 .logger .warning-icon:hover svg.svg-icon,

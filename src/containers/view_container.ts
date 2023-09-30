@@ -437,28 +437,36 @@ export abstract class ViewContainer extends GroupFolder {
     private buildPill(): HTMLElement {
         const titleTagDiv = document.createElement("div");
         titleTagDiv.addClass("title-tag");
+
+        const tagPartsContainer = document.createElement("div");
+        tagPartsContainer.addClass("tag-parts-container");
+
+        const pillIcon = this.getPillIcon();
+        pillIcon && setIcon(tagPartsContainer, pillIcon);
+
+        const tagLabelDiv = document.createElement("div");
+        tagLabelDiv.addClass("tag-label");
+        tagLabelDiv.setText(this.getPillText());
+
+        tagPartsContainer.appendChild(tagLabelDiv);
+
         const pillTooltipText = this.getPillTooltipText();
         if (pillTooltipText.length > 0) {
-            titleTagDiv.ariaLabel = pillTooltipText;
+            tagPartsContainer.ariaLabel = pillTooltipText;
         }
         const pillClickHandler = this.getPillClickHandler();
         if (!pillClickHandler) {
-            titleTagDiv.addClass("wiggle");
+            tagPartsContainer.addClass("wiggle");
         }
-        titleTagDiv.addEventListener("click", e => {
+
+        tagPartsContainer.addEventListener("click", e => {
             e.stopPropagation();
             if (pillClickHandler) {
                 pillClickHandler(e);
             }
         });
 
-        const pillIcon = this.getPillIcon();
-        pillIcon && setIcon(titleTagDiv, pillIcon);
-
-        const tagLabelDiv = document.createElement("div");
-        tagLabelDiv.addClass("tag-label");
-        tagLabelDiv.setText(this.getPillText());
-        titleTagDiv.appendChild(tagLabelDiv);
+        titleTagDiv.appendChild(tagPartsContainer);
 
         return titleTagDiv;
     }
