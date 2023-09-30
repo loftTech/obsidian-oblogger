@@ -115,7 +115,7 @@ export class FolderContainer extends OtcContainer {
     }
 
     protected getTitleTooltip(): string {
-        return "";
+        return this.basePath;
     }
 
     protected wouldBeRendered(state: FileState): boolean {
