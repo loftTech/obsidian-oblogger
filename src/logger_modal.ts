@@ -646,14 +646,12 @@ export class LoggerModal extends Modal {
 
         contentSectionDiv.appendChild(buildSeparator(
             "metadata",
-            "frontmatter",
             "These fields will write to frontmatter"));
         contentSectionDiv.appendChild(this.buildDateTimeDiv());
         contentSectionDiv.appendChild(this.buildTypeDiv());
         contentSectionDiv.appendChild(this.buildFieldsDiv());
         contentSectionDiv.appendChild(this.buildNewFieldInputDiv());
         contentSectionDiv.appendChild(buildSeparator(
-            "body",
             "body",
             "This field will write to the document body"));
 

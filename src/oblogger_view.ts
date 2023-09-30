@@ -954,7 +954,6 @@ export class ObloggerView extends ItemView {
 
         this.rxSeparatorDiv = buildSeparator(
             "rx-separator",
-            "oblogger-groups",
             "Built in groups"
         );
         body.appendChild(this.rxSeparatorDiv); 
@@ -968,7 +967,6 @@ export class ObloggerView extends ItemView {
 
         this.otcSeparatorDiv = buildSeparator(
             "otc-separator",
-            "user-groups",
             "User created tag groups"
         );
         body.appendChild(this.otcSeparatorDiv);

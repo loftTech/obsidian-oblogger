@@ -35,22 +35,16 @@ body.styled-scrollbars .oblogger-content { padding: 0 4px 70px; }
 
 .oblogger-content .separator-container {
     height: 16px;
-    padding: 8px 0 12px;
+    padding: 8px 0;
     width: fit-content;
 }
 
 .oblogger-content .separator {
-    align-items: center;
     background-color: var(--nav-indentation-guide-color);
     border-radius: 10px;
-    color: var(--nav-indentation-guide-color);
-    display: flex;
-    font-size: 0;
     height: 4px;
-    justify-content: center;
-    opacity: 0.6;
-    transition: 0.6s;
-    width: 64px;
+    width: 68px;
+    z-index: 11;
 }
 
 .oblogger-content .rx-separator {
@@ -117,6 +111,8 @@ body.styled-scrollbars .oblogger-content { padding: 0 4px 70px; }
     opacity: 0.6;
     overflow: hidden;
 }
+
+.oblogger-content .tag-parts-container { display: flex; }
 
 .oblogger-content .collapsed .title-tag { display: none; }
 
@@ -364,7 +360,7 @@ body.styled-scrollbars .oblogger-content { padding: 0 4px 70px; }
 }
 
 .oblogger-content .pin .svg-icon.lucide-chevrons-down {
-    color: var(--nav-indentation-guide-color);
+    color: transparent;
     height: 16px;
     width: 16px;
     stroke-width: 2px;
@@ -420,25 +416,14 @@ body.styled-scrollbars .oblogger-content { padding: 0 4px 70px; }
 
 .oblogger-content .greeter-vault-name:active { animation: wiggle 0.2s; }
 
-.oblogger-content .title-tag:hover,
-.oblogger-content .title-tag:hover .svg-icon {
+.oblogger-content .tag-parts-container:hover,
+.oblogger-content .tag-parts-container:hover .svg-icon {
     color: var(--accent-color);
     opacity: 1;
 }
 
 .oblogger-content .separator:active,
 .oblogger-content .title-tag.wiggle:active { animation: wiggle 0.2s; }
-
-.oblogger-content .separator-container:hover .separator {
-    background-color: var(--nav-indentation-guide-color);
-    color: var(--background-secondary);
-    font-size: 8px;
-    font-weight: 700;
-    height: inherit;
-    opacity: 1;
-    transition: 0.2s;
-    width: 85px;
-}
 
 .oblogger-content .title-container:hover .title-chevron .svg-icon { color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/100%); }
 
