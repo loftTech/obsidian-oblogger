@@ -1,4 +1,4 @@
-import { Plugin } from "obsidian";
+import { Notice, Plugin } from "obsidian";
 import { ObloggerView, VIEW_TYPE_OBLOGGER } from "./oblogger_view";
 import { ObloggerSettings, DEFAULT_SETTINGS, CURRENT_VERSION, upgradeSettings } from "./settings";
 import { LoggerModal } from "./logger_modal";
@@ -26,6 +26,13 @@ export default class Oblogger extends Plugin {
             await this.loadData()
         );
         let needsSaving = false;
+        if ((this.settings.version ?? 0) > CURRENT_VERSION) {
+            new Notice(
+                `Settings for Oblogger are at ${this.settings.version} ` +
+                `which is above the current version of ${CURRENT_VERSION}. ` +
+                `This will likely lead to some instability.`, 0);
+            return;
+        }
         while ((this.settings.version ?? 0) < CURRENT_VERSION) {
             // save when we're done upgrading
             needsSaving = true;
