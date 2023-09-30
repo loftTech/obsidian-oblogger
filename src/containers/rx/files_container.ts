@@ -56,6 +56,10 @@ export class FilesContainer extends RxContainer {
         return "Files";
     }
 
+    protected getTitleTooltip(): string {
+        return `Shows file types excluding markdown`;
+    }
+
     protected getPillText(): string {
         return getSortMethodDisplayText(this.getGroupSettings()?.sortMethod ?? ContainerSortMethod.ALPHABETICAL);
     }

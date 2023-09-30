@@ -62,6 +62,10 @@ export class RecentsContainer extends RxContainer {
         return "";
     }
 
+    protected getTitleTooltip(): string {
+        return `Shows last ${this.recentsCount} recently modified files`;
+    }
+
     protected getPillClickHandler(): ((e: MouseEvent) => void) | undefined{
         return (e: MouseEvent) => {
             const menu = new Menu();

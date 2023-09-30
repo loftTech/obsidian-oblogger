@@ -68,6 +68,10 @@ export class DailiesContainer extends RxContainer {
         return "";
     }
 
+    protected getTitleTooltip(): string {
+        return `Shows notes that are tagged with #${this.settings.dailiesTag}`;
+    }
+
     protected getPillClickHandler(): ((e: MouseEvent) => void) | undefined {
         return (e: MouseEvent) => {
             const menu = new Menu();

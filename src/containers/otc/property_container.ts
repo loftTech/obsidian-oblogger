@@ -137,7 +137,7 @@ export class PropertyContainer extends OtcContainer {
     }
 
     protected getTitleTooltip(): string {
-        return "";
+        return "Property group";
     }
 
     protected wouldBeRendered(state: FileState): boolean {

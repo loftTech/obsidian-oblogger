@@ -34,10 +34,6 @@ export abstract class RxContainer extends ViewContainer {
         return "eye-off"
     }
 
-    protected getTitleTooltip(): string {
-        return "";
-    }
-
     protected getTextIconTooltip(): string {
         return "";
     }
