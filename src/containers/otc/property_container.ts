@@ -18,7 +18,8 @@ export class PropertyContainer extends OtcContainer {
             callbacks,
             OtcGroupType.PROPERTY_GROUP,
             propertyName, // groupName
-            isPinned
+            isPinned,
+            false // showStatusIcon
         );
     }
 

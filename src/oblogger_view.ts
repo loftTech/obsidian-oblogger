@@ -33,6 +33,8 @@ import { buildStateFromFile, FileState } from "./constants";
 import { ContainerCallbacks } from "./containers/container_callbacks";
 import { PropertyContainer } from "./containers/otc/property_container";
 import { NewPropertyModal } from "./new_property_modal";
+import { FolderSuggestModal } from "./folder_suggest_modal";
+import { FolderContainer } from "./containers/otc/folder_container";
 
 export const VIEW_TYPE_OBLOGGER = "oblogger-view";
 const RENDER_DELAY_MS = 100;
@@ -497,6 +499,30 @@ export class ObloggerView extends ItemView {
         modal.open();
     }
 
+    private showNewFolderModal() {
+        const modal = new FolderSuggestModal(this.app, [], async (result: string)=> {
+            if (!this.settings.otcGroups) {
+                this.settings.otcGroups = [];
+            }
+            // add the group to settings and then reload
+            this.settings.otcGroups.push({
+                groupName: result,
+                groupType: OtcGroupType.FOLDER_GROUP,
+                collapsedFolders: [],
+                isVisible: true,
+                isPinned: false,
+                sortMethod: ContainerSortMethod.ALPHABETICAL,
+                sortAscending: true,
+                excludedFolders: [],
+                logsFolderVisible: true,
+                templatesFolderVisible: true
+            });
+            await this.saveSettingsCallback();
+            this.reloadOtcGroups();
+        });
+        modal.open();
+    }
+
     private buildHeaderInto(header: HTMLElement): void {
         const buttonBarDiv = document.createElement("div");
         buttonBarDiv.addClass("nav-buttons-container");
@@ -527,13 +553,20 @@ export class ObloggerView extends ItemView {
                     item.setIcon("hash");
                     item.setTitle("Add tag group");
                     item.onClick(() => this.showNewTagModal())
+                });
 
-                    menu.addItem(item => {
-                        item.setIcon("text");
-                        item.setTitle("Add property group");
-                        item.onClick(() => this.showNewPropertyModal())
-                    })
-                })
+                menu.addItem(item => {
+                    item.setIcon("text");
+                    item.setTitle("Add property group");
+                    item.onClick(() => this.showNewPropertyModal())
+                });
+
+                menu.addItem(item => {
+                    item.setIcon("folder");
+                    item.setTitle("Add folder group");
+                    item.onClick(() => this.showNewFolderModal())
+                });
+
                 menu.showAtMouseEvent(e);
             })
 
@@ -789,6 +822,63 @@ export class ObloggerView extends ItemView {
         this.requestRender();
     }
 
+    private addFolderGroup(
+        groupName: string,
+        isPinned: boolean,
+        parent: HTMLElement
+    ) {
+        const callbacks: ContainerCallbacks = {
+            fileClickCallback: this.fileClickCallback,
+            fileAddedCallback: this.fileAddedCallback,
+            requestRenderCallback: () => { this.requestRender() },
+            saveSettingsCallback: this.saveSettingsCallback,
+            getGroupIconCallback: (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
+            hideCallback: async () => { return await this.removeOtcGroup(OtcGroupType.FOLDER_GROUP, groupName); },
+            moveCallback: (up: boolean) => { return this.moveOtcGroup(OtcGroupType.FOLDER_GROUP, groupName, up); },
+            pinCallback: (pin: boolean) => { return this.pinOtcGroup(OtcGroupType.FOLDER_GROUP, groupName, pin); }
+        };
+
+        const container = new FolderContainer(
+            this.app,
+            this.settings,
+            callbacks,
+            groupName,
+            isPinned);
+
+        this.otcContainers.push(container);
+
+        parent.appendChild(container.rootElement);
+        this.requestRender();
+    }
+
+    private reloadFolderGroups(groups: GroupSettings[]) {
+        const groupSorter = (a: GroupSettings, b: GroupSettings): number => {
+            return a.groupName < b.groupName ? -1 : a.groupName > b.groupName ? -1 : 0;
+        }
+
+        // Add pinned groups
+        groups
+            ?.filter(otcGroup => otcGroup.isPinned)
+            ?.sort(groupSorter)
+            ?.forEach(group => {
+                this.otcGroupsDiv && this.addFolderGroup(
+                    group.groupName,
+                    true,
+                    this.otcGroupsDiv);
+            });
+
+        // Add unpinned groups
+        groups
+            ?.filter(otcGroup => !otcGroup.isPinned)
+            ?.sort(groupSorter)
+            ?.forEach(group => {
+                this.otcGroupsDiv && this.addFolderGroup(
+                    group.groupName,
+                    false,
+                    this.otcGroupsDiv);
+            });
+    }
+
     private reloadPropertyGroups(groups: GroupSettings[]) {
         const groupSorter = (a: GroupSettings, b: GroupSettings): number => {
             return a.groupName < b.groupName ? -1 : a.groupName > b.groupName ? -1 : 0;
@@ -868,6 +958,9 @@ export class ObloggerView extends ItemView {
                     break;
                 case OtcGroupType.PROPERTY_GROUP:
                     this.reloadPropertyGroups(groups);
+                    break;
+                case OtcGroupType.FOLDER_GROUP:
+                    this.reloadFolderGroups(groups);
                     break;
             }
         });

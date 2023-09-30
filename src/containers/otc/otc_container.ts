@@ -1,7 +1,7 @@
 import { ViewContainer } from "../view_container";
 import { ContainerSortMethod, getSortMethodDisplayText, ObloggerSettings, OtcGroupType } from "../../settings";
 import { ContainerCallbacks } from "../container_callbacks";
-import { App, Menu, TFile } from "obsidian";
+import { App, TFile } from "obsidian";
 import { FileState } from "../../constants";
 
 export abstract class OtcContainer extends ViewContainer {
@@ -11,13 +11,14 @@ export abstract class OtcContainer extends ViewContainer {
         callbacks: ContainerCallbacks,
         groupType: OtcGroupType,
         groupName: string,
-        isPinned: boolean
+        isPinned: boolean,
+        showStatusIcon: boolean
     ) {
         super(
             app,
             groupName,
             groupType,
-            false, // showStatusIcon
+            showStatusIcon,
             settings,
             false, // isMovable
             true, // canCollapseInnerFolders

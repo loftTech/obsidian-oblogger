@@ -28,7 +28,8 @@ export class TagGroupContainer extends OtcContainer {
             callbacks,
             OtcGroupType.TAG_GROUP,
             baseTag,
-            isPinned
+            isPinned,
+            false // showStatusIcon
         );
     }
 

@@ -47,7 +47,8 @@ export const isValidRxGroupType = (groupType: RxGroupType): boolean => {
 // Note: when adding new types, ensure that the value = NAME.toLowerCase()
 export enum OtcGroupType {
     TAG_GROUP = "tag_group",
-    PROPERTY_GROUP = "property_group"
+    PROPERTY_GROUP = "property_group",
+    FOLDER_GROUP = "folder_group"
 }
 
 export const isValidOtcGroupType = (groupType: OtcGroupType): boolean => {
@@ -195,7 +196,9 @@ interface ObloggerSettings_v5 extends ObloggerSettings_v4 {
     otcGroups: GroupSettings_v1[];
 }
 
-export type ObloggerSettings = ObloggerSettings_v5;
+type ObloggerSettings_v6 = ObloggerSettings_v5
+
+export type ObloggerSettings = ObloggerSettings_v6;
 
 const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } = {
     0: (settings: ObloggerSettings) => {
@@ -291,6 +294,13 @@ const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } =
 
             newSettings.version = 5;
         }
+    },
+    5: (settings: ObloggerSettings) => {
+        // Upgrading from 5 to 6 was because of the addition of FolderGroups as a new type
+        const newSettings = settings as ObloggerSettings_v6;
+        if (newSettings) {
+            newSettings.version = 6;
+        }
     }
 };
 
@@ -310,7 +320,7 @@ export const upgradeSettings = (currentVersion: number, settings: ObloggerSettin
     UPGRADE_FUNCTIONS[currentVersion](settings);
 }
 
-export const CURRENT_VERSION = 5;
+export const CURRENT_VERSION = 6;
 
 export const DEFAULT_SETTINGS: ObloggerSettings_v3 = {
     version: 3,
