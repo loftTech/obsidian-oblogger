@@ -91,7 +91,7 @@ export const areEnumsValid = (): boolean => {
 
 interface RxGroupSettings_v0 {
     groupName: string;
-    collapsedFolders: string[];
+    collapsedFolders?: string[];
     isVisible: boolean;
     sortMethod: string;
     sortAscending: boolean;
@@ -110,7 +110,7 @@ export type RxGroupSettings = RxGroupSettings_v1;
 
 interface OtcGroupSettings_v0 {
     tag: string;
-    collapsedFolders: string[];
+    collapsedFolders?: string[];
     isPinned: boolean;
     sortMethod?: string;
     sortAscending?: boolean;
@@ -129,7 +129,10 @@ export type OtcGroupSettings = OtcGroupSettings_v1;
 
 export interface GroupSettings_v0 {
     groupName: string;
-    collapsedFolders: string[];
+    /**
+     * @deprecated Use {@link GroupSettings_v2.openFolders}
+     */
+    collapsedFolders?: string[];
     isPinned: boolean;
     isVisible: boolean;
     sortMethod: string;
