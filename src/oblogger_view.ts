@@ -503,26 +503,32 @@ export class ObloggerView extends ItemView {
     }
 
     private showNewFolderModal() {
-        const modal = new FolderSuggestModal(this.app, [], async (result: string)=> {
-            if (!this.settings.otcGroups) {
-                this.settings.otcGroups = [];
-            }
-            // add the group to settings and then reload
-            this.settings.otcGroups.push({
-                groupName: result,
-                groupType: OtcGroupType.FOLDER_GROUP,
-                openFolders: [],
-                isVisible: true,
-                isPinned: false,
-                sortMethod: ContainerSortMethod.ALPHABETICAL,
-                sortAscending: true,
-                excludedFolders: [],
-                logsFolderVisible: true,
-                templatesFolderVisible: true
+        const openFolders = this.settings.otcGroups
+            .filter(group => (group.groupType as OtcGroupType) === OtcGroupType.FOLDER_GROUP)
+            .map(group => group.groupName);
+        const modal = new FolderSuggestModal(
+            this.app,
+            openFolders, // exclude already open folders
+            async (result: string)=> {
+                if (!this.settings.otcGroups) {
+                    this.settings.otcGroups = [];
+                }
+                // add the group to settings and then reload
+                this.settings.otcGroups.push({
+                    groupName: result,
+                    groupType: OtcGroupType.FOLDER_GROUP,
+                    openFolders: [],
+                    isVisible: true,
+                    isPinned: false,
+                    sortMethod: ContainerSortMethod.ALPHABETICAL,
+                    sortAscending: true,
+                    excludedFolders: [],
+                    logsFolderVisible: true,
+                    templatesFolderVisible: true
+                });
+                await this.saveSettingsCallback();
+                this.reloadOtcGroups();
             });
-            await this.saveSettingsCallback();
-            this.reloadOtcGroups();
-        });
         modal.open();
     }
 
