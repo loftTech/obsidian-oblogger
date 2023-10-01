@@ -154,13 +154,13 @@ export type GroupSettings = GroupSettings_v2;
 
 
 export const getSortValue = (groupSettings: GroupSettings): string => {
-    switch (groupSettings.groupType) {
-        // The linter thinks this isn't reachable. But it is. Might have to
-        // do with the combo `GroupType` and comparing to `OtcGroupType`
+    switch (groupSettings.groupType as OtcGroupType) {
         case OtcGroupType.TAG_GROUP: {
             const pattern = "\\.\\.\\./(.*)/\\.\\.\\.";
             const tag = groupSettings.groupName.match(pattern)?.at(1) ?? groupSettings.groupName;
             return tag.split("/").last() ?? "";
+        } case OtcGroupType.FOLDER_GROUP: {
+            return groupSettings.groupName.split("/").last() ?? groupSettings.groupName;
         } default:
             return groupSettings.groupName;
     }
