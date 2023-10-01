@@ -227,7 +227,7 @@ export class ObloggerView extends ItemView {
     }
 
     private highlightLastOpenFile() {
-        this.rxContainers.concat(this.otcContainers)
+        this.rxContainers?.concat(this.otcContainers)
             .forEach(container => {
                 this.lastOpenFile && container.highlightFile(this.lastOpenFile);
             });
@@ -530,8 +530,8 @@ export class ObloggerView extends ItemView {
             return;
         }
 
-        const isRxCollapsed = !this.settings.rxGroups.some(group => group.openFolders.length !== 0);
-        const isOtcCollapsed = !this.settings.otcGroups.some(group => group.openFolders.length !== 0);
+        const isRxCollapsed = !this.settings.rxGroups.some(group => group.openFolders?.length !== 0);
+        const isOtcCollapsed = !this.settings.otcGroups.some(group => group.openFolders?.length !== 0);
         const isCollapsed = isRxCollapsed && isOtcCollapsed;
 
         this.collapseAllButton.setIcon(isCollapsed ? "chevrons-up-down" : "chevrons-down-up");
@@ -539,8 +539,8 @@ export class ObloggerView extends ItemView {
     }
 
     private async toggleCollapseAll() {
-        const isAnyRxOpen = this.settings.rxGroups.some(group => group.openFolders.length !== 0);
-        const isAnyOtcOpen = this.settings.otcGroups.some(group => group.openFolders.length !== 0);
+        const isAnyRxOpen = this.settings.rxGroups.some(group => group.openFolders?.length !== 0);
+        const isAnyOtcOpen = this.settings.otcGroups.some(group => group.openFolders?.length !== 0);
         const isCollapsing = isAnyRxOpen || isAnyOtcOpen;
 
         if (isCollapsing) {
