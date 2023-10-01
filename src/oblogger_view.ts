@@ -13,6 +13,7 @@ import {
     areEnumsValid,
     ContainerSortMethod,
     getGroupSettings,
+    getSortValue,
     GroupSettings,
     isValidRxGroupType,
     ObloggerSettings,
@@ -955,11 +956,8 @@ export class ObloggerView extends ItemView {
 
     private reloadTagGroups(groups: GroupSettings[]) {
         const groupSorter = (a: GroupSettings, b: GroupSettings): number => {
-            const pattern = "\\.\\.\\./(.*)/\\.\\.\\.";
-            const aTag = a.groupName.match(pattern)?.at(1) ?? a.groupName;
-            const bTag = b.groupName.match(pattern)?.at(1) ?? b.groupName;
-            const aChildTag = aTag.split("/").last() ?? "";
-            const bChildTag = bTag.split("/").last() ?? "";
+            const aChildTag = getSortValue(a);
+            const bChildTag = getSortValue(b);
             return aChildTag < bChildTag ? -1 : aChildTag > bChildTag ? 1 : 0
         }
 
@@ -993,6 +991,7 @@ export class ObloggerView extends ItemView {
 
         // Dump whatever remains (hopefully not much)
         this.otcGroupsDiv?.empty();
+
 
         // todo: need to add a separator somewhere in here?
         Object.values(OtcGroupType).forEach(groupType => {

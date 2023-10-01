@@ -152,6 +152,13 @@ export interface GroupSettings_v2 extends GroupSettings_v1 {
 
 export type GroupSettings = GroupSettings_v2;
 
+
+export const getSortValue = (groupSettings: GroupSettings): string => {
+    const pattern = "\\.\\.\\./(.*)/\\.\\.\\.";
+    const tag = groupSettings.groupName.match(pattern)?.at(1) ?? groupSettings.groupName;
+    return tag.split("/").last() ?? "";
+}
+
 export const PostLogAction = {
     QUIETLY: "quietly",
     OPEN: "open",
