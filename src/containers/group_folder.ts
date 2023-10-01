@@ -82,13 +82,14 @@ export class GroupFolder {
         return this.sortedFiles.contains(file) || this.sortedSubFolders.some(subFolder => subFolder.hasFileWithin(file));
     }
 
-    public getCollapsedFolders(): string[] {
-        return (this.isCollapsed() ? [this.folderPath] : [])
-            .concat(this.sortedSubFolders.flatMap(f => f.getCollapsedFolders()));
+    public getOpenFolders(): string[] {
+        const openFolders = (!this.isCollapsed()) ? [this.folderPath] : [];
+        const openSubfolders = this.sortedSubFolders.flatMap(f => f.getOpenFolders());
+        return openFolders.concat(openSubfolders);
     }
 
     protected rebuild(
-        collapsedFolders: string[],
+        openFolders: string[],
         fileClickCallback: FileClickCallback,
         fileAddedCallback: FileAddedCallback,
     ) {
@@ -97,7 +98,7 @@ export class GroupFolder {
 
         // Build
         this.build(
-            collapsedFolders,
+            openFolders,
             fileClickCallback,
             fileAddedCallback,
             0);
@@ -140,12 +141,12 @@ export class GroupFolder {
     }
 
     private build(
-        collapsedFolders: string[],
+        openFolders: string[],
         fileClickCallback: FileClickCallback,
         fileAddedCallback: FileAddedCallback,
         recursionDepth: number
     ): void {
-        const isCollapsed = collapsedFolders.contains(this.folderPath);
+        const isCollapsed = !openFolders.contains(this.folderPath);
         // Build the title
         this.buildTitle(isCollapsed, recursionDepth - 1);
 
@@ -154,7 +155,7 @@ export class GroupFolder {
 
         // Build the content
         this.buildContent(
-            collapsedFolders,
+            openFolders,
             fileClickCallback,
             fileAddedCallback,
             recursionDepth);
@@ -169,7 +170,7 @@ export class GroupFolder {
     }
 
     private buildContent(
-        collapsedFolders: string[],
+        openFolders: string[],
         fileClickCallback: FileClickCallback,
         fileAddedCallback: FileAddedCallback,
         recursionDepth: number
@@ -185,7 +186,7 @@ export class GroupFolder {
         } else {
             this.sortedSubFolders.forEach((subFolder) => {
                 subFolder.build(
-                    collapsedFolders,
+                    openFolders,
                     fileClickCallback,
                     fileAddedCallback,
                     recursionDepth + 1);

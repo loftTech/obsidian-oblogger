@@ -460,7 +460,7 @@ export class ObloggerView extends ItemView {
             this.settings.otcGroups.push({
                 groupName: result,
                 groupType: OtcGroupType.PROPERTY_GROUP,
-                collapsedFolders: [],
+                openFolders: [],
                 isVisible: true,
                 isPinned: false,
                 sortMethod: ContainerSortMethod.ALPHABETICAL,
@@ -484,7 +484,7 @@ export class ObloggerView extends ItemView {
             this.settings.otcGroups.push({
                 groupName: result,
                 groupType: OtcGroupType.TAG_GROUP,
-                collapsedFolders: [],
+                openFolders: [],
                 isVisible: true,
                 isPinned: false,
                 sortMethod: ContainerSortMethod.ALPHABETICAL,
@@ -508,7 +508,7 @@ export class ObloggerView extends ItemView {
             this.settings.otcGroups.push({
                 groupName: result,
                 groupType: OtcGroupType.FOLDER_GROUP,
-                collapsedFolders: [],
+                openFolders: [],
                 isVisible: true,
                 isPinned: false,
                 sortMethod: ContainerSortMethod.ALPHABETICAL,
