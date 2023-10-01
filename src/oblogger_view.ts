@@ -455,23 +455,29 @@ export class ObloggerView extends ItemView {
     }
 
     private showNewPropertyModal() {
-        const modal = new NewPropertyModal(this.app, async (result: string) => {
-            if (!this.settings.otcGroups) {
-                this.settings.otcGroups = [];
-            }
-            // add the group to settings and then reload
-            this.settings.otcGroups.push({
-                groupName: result,
-                groupType: OtcGroupType.PROPERTY_GROUP,
-                openFolders: [],
-                isVisible: true,
-                isPinned: false,
-                sortMethod: ContainerSortMethod.ALPHABETICAL,
-                sortAscending: true,
-                excludedFolders: [],
-                logsFolderVisible: true,
-                templatesFolderVisible: false
-            });
+        const openProperties = this.settings.otcGroups
+            .filter(group => (group.groupType as OtcGroupType) === OtcGroupType.PROPERTY_GROUP)
+            .map(group => group.groupName);
+        const modal = new NewPropertyModal(
+            this.app,
+            openProperties, // exclude already open properties
+            async (result: string) => {
+                if (!this.settings.otcGroups) {
+                    this.settings.otcGroups = [];
+                }
+                // add the group to settings and then reload
+                this.settings.otcGroups.push({
+                    groupName: result,
+                    groupType: OtcGroupType.PROPERTY_GROUP,
+                    openFolders: [],
+                    isVisible: true,
+                    isPinned: false,
+                    sortMethod: ContainerSortMethod.ALPHABETICAL,
+                    sortAscending: true,
+                    excludedFolders: [],
+                    logsFolderVisible: true,
+                    templatesFolderVisible: false
+                });
             await this.saveSettingsCallback();
             this.reloadOtcGroups();
         });
@@ -484,7 +490,7 @@ export class ObloggerView extends ItemView {
             .map(group => group.groupName);
         const modal = new NewTagModal(
             this.app,
-            openTags,
+            openTags, // exclude already open tags
             async (result: string)=> {
                 if (!this.settings.otcGroups) {
                     this.settings.otcGroups = [];
