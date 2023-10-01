@@ -63,6 +63,7 @@ export class ObloggerView extends ItemView {
     fullRender: boolean;
     otcGroupsDiv: HTMLElement | undefined;
     rxGroupsDiv: HTMLElement | undefined;
+    collapseAllButton: ButtonComponent;
     showLoggerCallbackFn: () => Promise<void>;
     saveSettingsCallback: () => Promise<void>;
     fileClickCallback: FileClickCallback;
@@ -298,6 +299,7 @@ export class ObloggerView extends ItemView {
         this.renderClock(this.clockDiv);
         this.renderRXSeparator();
         this.renderOTCSeparator();
+        this.refreshCollapseAllButton();
 
         // render rx containers
         Object.values(RxGroupType).forEach(groupType => {
@@ -523,6 +525,41 @@ export class ObloggerView extends ItemView {
         modal.open();
     }
 
+    private refreshCollapseAllButton() {
+        if (!this.collapseAllButton || !this.settings) {
+            return;
+        }
+
+        const isRxCollapsed = !this.settings.rxGroups.some(group => group.openFolders.length !== 0);
+        const isOtcCollapsed = !this.settings.otcGroups.some(group => group.openFolders.length !== 0);
+        const isCollapsed = isRxCollapsed && isOtcCollapsed;
+
+        this.collapseAllButton.setIcon(isCollapsed ? "chevrons-up-down" : "chevrons-down-up");
+        this.collapseAllButton.setTooltip(isCollapsed ? "Expand all" : "Collapse all");
+    }
+
+    private async toggleCollapseAll() {
+        const isAnyRxOpen = this.settings.rxGroups.some(group => group.openFolders.length !== 0);
+        const isAnyOtcOpen = this.settings.otcGroups.some(group => group.openFolders.length !== 0);
+        const isCollapsing = isAnyRxOpen || isAnyOtcOpen;
+
+        if (isCollapsing) {
+            this.settings.rxGroups.forEach(group => {
+                group.openFolders = [];
+            });
+            this.settings.otcGroups.forEach(group => {
+                group.openFolders = [];
+            });
+
+            await this.saveSettingsCallback();
+            this.reloadRxGroups();
+            this.reloadOtcGroups();
+        } else {
+            this.rxContainers.forEach(container => container.expandAll(true));
+            this.otcContainers.forEach(container => container.expandAll(true));
+        }
+    }
+
     private buildHeaderInto(header: HTMLElement): void {
         const buttonBarDiv = document.createElement("div");
         buttonBarDiv.addClass("nav-buttons-container");
@@ -576,6 +613,15 @@ export class ObloggerView extends ItemView {
             .setIcon("form-input")
             .setTooltip("Create a log entry")
             .onClick(this.showLoggerCallbackFn);
+
+        this.collapseAllButton = new ButtonComponent(buttonBarDiv);
+        this.collapseAllButton
+            .setClass("button-bar-button")
+            .onClick(async () => {
+                await this.toggleCollapseAll();
+                this.refreshCollapseAllButton();
+            });
+        this.refreshCollapseAllButton();
 
         new ButtonComponent(buttonBarDiv)
             .setClass("button-bar-button")
