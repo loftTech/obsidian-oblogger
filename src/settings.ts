@@ -205,7 +205,12 @@ interface ObloggerSettings_v5 extends ObloggerSettings_v4 {
 
 type ObloggerSettings_v6 = ObloggerSettings_v5
 
-export type ObloggerSettings = ObloggerSettings_v6;
+interface ObloggerSettings_v7 extends ObloggerSettings_v6 {
+    rxGroups: GroupSettings_v2[];
+    otcGroups: GroupSettings_v2[];
+}
+
+export type ObloggerSettings = ObloggerSettings_v7;
 
 const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } = {
     0: (settings: ObloggerSettings) => {
@@ -308,6 +313,13 @@ const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } =
         if (newSettings) {
             newSettings.version = 6;
         }
+    },
+    6: (settings: ObloggerSettings) => {
+        //upgrading from 6 to 7 is because group settings "collapsedFolders" was changed to "openFolders"
+        const newSettings = settings as ObloggerSettings_v7
+        if (newSettings) {
+            newSettings.version = 7;
+        }
     }
 };
 
@@ -327,7 +339,7 @@ export const upgradeSettings = (currentVersion: number, settings: ObloggerSettin
     UPGRADE_FUNCTIONS[currentVersion](settings);
 }
 
-export const CURRENT_VERSION = 6;
+export const CURRENT_VERSION = 7;
 
 export const DEFAULT_SETTINGS: ObloggerSettings_v3 = {
     version: 3,
