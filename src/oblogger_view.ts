@@ -13,6 +13,7 @@ import {
     areEnumsValid,
     ContainerSortMethod,
     getGroupSettings,
+    getSortValue,
     GroupSettings,
     isValidRxGroupType,
     ObloggerSettings,
@@ -810,180 +811,58 @@ export class ObloggerView extends ItemView {
         this.requestRender();
     }
 
-    private addTagGroup(
-        groupName: string,
-        isPinned: boolean,
-        parent: HTMLElement
-    ) {
+    private createOtcContainerFromSettingsGroup(group: GroupSettings) {
         const callbacks: ContainerCallbacks = {
             fileClickCallback: this.fileClickCallback,
             fileAddedCallback: this.fileAddedCallback,
             requestRenderCallback: () => { this.requestRender() },
             saveSettingsCallback: this.saveSettingsCallback,
             getGroupIconCallback: (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
-            hideCallback: async () => { return await this.removeOtcGroup(OtcGroupType.TAG_GROUP, groupName); },
-            moveCallback: (up: boolean) => { return this.moveOtcGroup(OtcGroupType.TAG_GROUP, groupName, up); },
-            pinCallback: (pin: boolean) => { return this.pinOtcGroup(OtcGroupType.TAG_GROUP, groupName, pin); }
+            hideCallback: async () => {
+                return await this.removeOtcGroup(
+                    group.groupType as OtcGroupType,
+                    group.groupName);
+            },
+            moveCallback: (up: boolean) => {
+                return this.moveOtcGroup(
+                    group.groupType as OtcGroupType,
+                    group.groupName,
+                    up);
+            },
+            pinCallback: (pin: boolean) => {
+                return this.pinOtcGroup(
+                    group.groupType as OtcGroupType,
+                    group.groupName,
+                    pin);
+            }
         };
 
-        const container = new TagGroupContainer(
-            this.app,
-            groupName,
-            this.settings,
-            isPinned,
-            callbacks);
-
-        this.otcContainers.push(container);
-
-        parent.appendChild(container.rootElement);
-        this.requestRender();
-    }
-
-    private addPropertyGroup(
-        groupName: string,
-        isPinned: boolean,
-        parent: HTMLElement
-    ) {
-        const callbacks: ContainerCallbacks = {
-            fileClickCallback: this.fileClickCallback,
-            fileAddedCallback: this.fileAddedCallback,
-            requestRenderCallback: () => { this.requestRender() },
-            saveSettingsCallback: this.saveSettingsCallback,
-            getGroupIconCallback: (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
-            hideCallback: async () => { return await this.removeOtcGroup(OtcGroupType.PROPERTY_GROUP, groupName); },
-            moveCallback: (up: boolean) => { return this.moveOtcGroup(OtcGroupType.PROPERTY_GROUP, groupName, up); },
-            pinCallback: (pin: boolean) => { return this.pinOtcGroup(OtcGroupType.PROPERTY_GROUP, groupName, pin); }
-        };
-
-        const container = new PropertyContainer(
-            this.app,
-            this.settings,
-            callbacks,
-            groupName,
-            isPinned);
-
-        this.otcContainers.push(container);
-
-        parent.appendChild(container.rootElement);
-        this.requestRender();
-    }
-
-    private addFolderGroup(
-        groupName: string,
-        isPinned: boolean,
-        parent: HTMLElement
-    ) {
-        const callbacks: ContainerCallbacks = {
-            fileClickCallback: this.fileClickCallback,
-            fileAddedCallback: this.fileAddedCallback,
-            requestRenderCallback: () => { this.requestRender() },
-            saveSettingsCallback: this.saveSettingsCallback,
-            getGroupIconCallback: (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
-            hideCallback: async () => { return await this.removeOtcGroup(OtcGroupType.FOLDER_GROUP, groupName); },
-            moveCallback: (up: boolean) => { return this.moveOtcGroup(OtcGroupType.FOLDER_GROUP, groupName, up); },
-            pinCallback: (pin: boolean) => { return this.pinOtcGroup(OtcGroupType.FOLDER_GROUP, groupName, pin); }
-        };
-
-        const container = new FolderContainer(
-            this.app,
-            this.settings,
-            callbacks,
-            groupName,
-            isPinned);
-
-        this.otcContainers.push(container);
-
-        parent.appendChild(container.rootElement);
-        this.requestRender();
-    }
-
-    private reloadFolderGroups(groups: GroupSettings[]) {
-        const groupSorter = (a: GroupSettings, b: GroupSettings): number => {
-            return a.groupName < b.groupName ? -1 : a.groupName > b.groupName ? -1 : 0;
+        switch (group.groupType as OtcGroupType) {
+            case OtcGroupType.FOLDER_GROUP:
+                return new FolderContainer(
+                    this.app,
+                    this.settings,
+                    callbacks,
+                    group.groupName,
+                    group.isPinned);
+            case OtcGroupType.TAG_GROUP:
+                return new TagGroupContainer(
+                    this.app,
+                    group.groupName,
+                    this.settings,
+                    group.isPinned,
+                    callbacks);
+            case OtcGroupType.PROPERTY_GROUP:
+                return new PropertyContainer(
+                    this.app,
+                    this.settings,
+                    callbacks,
+                    group.groupName,
+                    group.isPinned);
+            default:
+                console.warn(`Unexpected group type: ${group.groupType}`);
+                return null;
         }
-
-        // Add pinned groups
-        groups
-            ?.filter(otcGroup => otcGroup.isPinned)
-            ?.sort(groupSorter)
-            ?.forEach(group => {
-                this.otcGroupsDiv && this.addFolderGroup(
-                    group.groupName,
-                    true,
-                    this.otcGroupsDiv);
-            });
-
-        // Add unpinned groups
-        groups
-            ?.filter(otcGroup => !otcGroup.isPinned)
-            ?.sort(groupSorter)
-            ?.forEach(group => {
-                this.otcGroupsDiv && this.addFolderGroup(
-                    group.groupName,
-                    false,
-                    this.otcGroupsDiv);
-            });
-    }
-
-    private reloadPropertyGroups(groups: GroupSettings[]) {
-        const groupSorter = (a: GroupSettings, b: GroupSettings): number => {
-            return a.groupName < b.groupName ? -1 : a.groupName > b.groupName ? -1 : 0;
-        }
-
-        // Add pinned groups
-        groups
-            ?.filter(otcGroup => otcGroup.isPinned)
-            ?.sort(groupSorter)
-            ?.forEach(group => {
-                this.otcGroupsDiv && this.addPropertyGroup(
-                    group.groupName,
-                    true,
-                    this.otcGroupsDiv);
-            });
-
-        // Add unpinned groups
-        groups
-            ?.filter(otcGroup => !otcGroup.isPinned)
-            ?.sort(groupSorter)
-            ?.forEach(group => {
-                this.otcGroupsDiv && this.addPropertyGroup(
-                    group.groupName,
-                    false,
-                    this.otcGroupsDiv);
-            });
-    }
-
-    private reloadTagGroups(groups: GroupSettings[]) {
-        const groupSorter = (a: GroupSettings, b: GroupSettings): number => {
-            const pattern = "\\.\\.\\./(.*)/\\.\\.\\.";
-            const aTag = a.groupName.match(pattern)?.at(1) ?? a.groupName;
-            const bTag = b.groupName.match(pattern)?.at(1) ?? b.groupName;
-            const aChildTag = aTag.split("/").last() ?? "";
-            const bChildTag = bTag.split("/").last() ?? "";
-            return aChildTag < bChildTag ? -1 : aChildTag > bChildTag ? 1 : 0
-        }
-
-        // Add pinned groups
-        groups
-            ?.filter(otcGroup => otcGroup.isPinned)
-            ?.sort(groupSorter)
-            ?.forEach(group => {
-                this.otcGroupsDiv && this.addTagGroup(
-                    group.groupName,
-                    true,
-                    this.otcGroupsDiv);
-            });
-
-        // Add unpinned groups
-        groups
-            ?.filter(otcGroup => !otcGroup.isPinned)
-            ?.sort(groupSorter)
-            ?.forEach(group => {
-                this.otcGroupsDiv && this.addTagGroup(
-                    group.groupName,
-                    false,
-                    this.otcGroupsDiv);
-            });
     }
 
     private reloadOtcGroups() {
@@ -994,22 +873,51 @@ export class ObloggerView extends ItemView {
         // Dump whatever remains (hopefully not much)
         this.otcGroupsDiv?.empty();
 
-        // todo: need to add a separator somewhere in here?
-        Object.values(OtcGroupType).forEach(groupType => {
-            const groups = this.settings?.otcGroups
-                .filter(group => group.groupType === groupType)
-            switch(groupType) {
-                case OtcGroupType.TAG_GROUP:
-                    this.reloadTagGroups(groups);
-                    break;
-                case OtcGroupType.PROPERTY_GROUP:
-                    this.reloadPropertyGroups(groups);
-                    break;
-                case OtcGroupType.FOLDER_GROUP:
-                    this.reloadFolderGroups(groups);
-                    break;
-            }
-        });
+        // All pinned otc groups
+        this.settings?.otcGroups
+            .filter(group => {
+                return group.isPinned
+            })
+            .sort((a, b) => {
+                const aSortValue = getSortValue(a);
+                const bSortValue = getSortValue(b);
+                return aSortValue < bSortValue ? -1 : aSortValue > bSortValue ? 1 : 0;
+            }).forEach(group => {
+                if (!this.otcGroupsDiv) {
+                    return;
+                }
+
+                const newContainer = this.createOtcContainerFromSettingsGroup(group);
+                if (!newContainer) {
+                    return;
+                }
+                this.otcContainers.push(newContainer);
+                this.otcGroupsDiv.appendChild(newContainer.rootElement);
+                this.requestRender();
+            });
+
+        // all unpinned otc groups
+        this.settings?.otcGroups
+            .filter(group => {
+                return !group.isPinned
+            })
+            .sort((a, b) => {
+                const aSortValue = getSortValue(a);
+                const bSortValue = getSortValue(b);
+                return aSortValue < bSortValue ? -1 : aSortValue > bSortValue ? 1 : 0;
+            }).forEach(group => {
+                if (!this.otcGroupsDiv) {
+                    return;
+                }
+
+                const newContainer = this.createOtcContainerFromSettingsGroup(group);
+                if (!newContainer) {
+                    return;
+                }
+                this.otcContainers.push(newContainer);
+                this.otcGroupsDiv.appendChild(newContainer.rootElement);
+                this.requestRender();
+            });
     }
 
     private async hideRxGroup(groupType: RxGroupType) {
