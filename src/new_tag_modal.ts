@@ -2,12 +2,19 @@ import { App, FuzzySuggestModal, Notice } from "obsidian";
 
 
 export class NewTagModal extends FuzzySuggestModal<string> {
-    onSelect: (tag: string) => void
+    excludedTags: string[];
+    onSelect: (tag: string) => void;
 
-    constructor(app: App, onSelect: (tag: string) => Promise<void>) {
+    constructor(
+        app: App,
+        excludedTags: string[],
+        onSelect: (tag: string) => Promise<void>
+    ) {
         super(app);
         this.onSelect = onSelect;
+        this.excludedTags = excludedTags;
     }
+
     getItems(): string[] {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -21,10 +28,16 @@ export class NewTagModal extends FuzzySuggestModal<string> {
                 if (splitTag.startsWith("#")) {
                     splitTag = splitTag.substring(1);
                 }
-                individualTags.add(`.../${splitTag}/...`);
+                const multiTagString = `.../${splitTag}/...`;
+                if (this.excludedTags.contains(multiTagString)) {
+                    return;
+                }
+                individualTags.add(multiTagString);
             });
         });
-        return allTags.concat(Array.from(individualTags));
+        return allTags
+            .filter(tag => !this.excludedTags.contains(tag.substring(1)))
+            .concat(Array.from(individualTags));
     }
 
     getItemText(tag: string): string {

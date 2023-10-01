@@ -8,9 +8,9 @@ interface FolderSelection {
 export class FolderSuggestModal extends SuggestModal<FolderSelection> {
     allFolders: string[];
 
-    onSelect: (logPath: string) => void;
+    onSelect: (path: string) => void;
 
-    constructor(app: App, excludedFolders: string[], onSelect: (logPath: string) => void) {
+    constructor(app: App, excludedFolders: string[], onSelect: (path: string) => void) {
         super(app);
 
         this.scope.register(["Shift"], "Enter", async (event: KeyboardEvent) => {
@@ -88,14 +88,14 @@ export class FolderSuggestModal extends SuggestModal<FolderSelection> {
             if (!abstractFile) {
                 // it doesn't exist as a file or folder, so create it as a folder
                 await this.app.vault.createFolder(folder.folderName);
-                new Notice(`Created logging folder at "${folder.folderName}"`);
+                new Notice(`Created folder at "${folder.folderName}"`);
             } else if (abstractFile instanceof TFile) {
-                // it exists as a TFile, won't be able to log to this path
+                // it exists as a TFile, won't be able to create the folder
                 new Notice(`Path ${folder.folderName} already exists as a file. Please choose a different path.`);
                 return;
             }
         }
-        new Notice(`Changed logging folder to "${folder.folderName}"`);
+        new Notice(`Selected "${folder.folderName}"`);
         this.onSelect(folder.folderName);
     }
 }

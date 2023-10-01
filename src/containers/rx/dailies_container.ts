@@ -79,15 +79,18 @@ export class DailiesContainer extends RxContainer {
                 item.setTitle("Change daily tag");
                 item.setIcon("replace");
                 item.onClick(() => {
-                    const modal = new NewTagModal(this.app, async (result: string) => {
-                        if (!result) {
-                            new Notice("Not setting dailies tag")
-                            return;
-                        }
-                        this.settings.dailiesTag = result;
-                        await this.callbacks.saveSettingsCallback();
-                        this.requestRender();
-                    });
+                    const modal = new NewTagModal(
+                        this.app,
+                        [],
+                        async (result: string) => {
+                            if (!result) {
+                                new Notice("Not setting dailies tag")
+                                return;
+                            }
+                            this.settings.dailiesTag = result;
+                            await this.callbacks.saveSettingsCallback();
+                            this.requestRender();
+                        });
                     modal.open();
                 });
             });
