@@ -375,8 +375,17 @@ export abstract class ViewContainer extends GroupFolder {
         return menu;
     }
 
+    public expandAll(save: boolean) {
+        this.setInnerFoldersCollapsed(false, save);
+        this.setCollapsed(false, save);
+    }
+
+    private setInnerFoldersCollapsed(collapsed: boolean, save: boolean) {
+        this.sortedSubFolders.forEach(folder => folder.setCollapsed(collapsed, save));
+    }
+
     private collapseInnerFolders() {
-        this.sortedSubFolders.forEach(folder => folder.setCollapsed(true, true));
+        this.setInnerFoldersCollapsed(true, true);
     }
 
     private buildPinContainer(): HTMLElement {

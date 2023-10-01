@@ -523,6 +523,28 @@ export class ObloggerView extends ItemView {
         modal.open();
     }
 
+    private async toggleCollapseAll() {
+        const isAnyRxOpen = this.settings.rxGroups.some(group => group.openFolders.length !== 0);
+        const isAnyOtcOpen = this.settings.otcGroups.some(group => group.openFolders.length !== 0);
+        const isCollapsing = isAnyRxOpen || isAnyOtcOpen;
+
+        if (isCollapsing) {
+            this.settings.rxGroups.forEach(group => {
+                group.openFolders = [];
+            });
+            this.settings.otcGroups.forEach(group => {
+                group.openFolders = [];
+            });
+
+            await this.saveSettingsCallback();
+            this.reloadRxGroups();
+            this.reloadOtcGroups();
+        } else {
+            this.rxContainers.forEach(container => container.expandAll(true));
+            this.otcContainers.forEach(container => container.expandAll(true));
+        }
+    }
+
     private buildHeaderInto(header: HTMLElement): void {
         const buttonBarDiv = document.createElement("div");
         buttonBarDiv.addClass("nav-buttons-container");
@@ -576,6 +598,12 @@ export class ObloggerView extends ItemView {
             .setIcon("form-input")
             .setTooltip("Create a log entry")
             .onClick(this.showLoggerCallbackFn);
+
+        new ButtonComponent(buttonBarDiv)
+            .setClass("button-bar-button")
+            .setIcon("dog")
+            .setTooltip("placeholder should change")
+            .onClick(() => {return this.toggleCollapseAll()});
 
         new ButtonComponent(buttonBarDiv)
             .setClass("button-bar-button")
