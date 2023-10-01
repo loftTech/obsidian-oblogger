@@ -879,8 +879,8 @@ export class ObloggerView extends ItemView {
                 return group.isPinned
             })
             .sort((a, b) => {
-                const aSortValue = getSortValue(a);
-                const bSortValue = getSortValue(b);
+                const aSortValue = getSortValue(a, this.app.vault.getName());
+                const bSortValue = getSortValue(b, this.app.vault.getName());
                 return aSortValue < bSortValue ? -1 : aSortValue > bSortValue ? 1 : 0;
             }).forEach(group => {
                 if (!this.otcGroupsDiv) {
@@ -902,8 +902,8 @@ export class ObloggerView extends ItemView {
                 return !group.isPinned
             })
             .sort((a, b) => {
-                const aSortValue = getSortValue(a);
-                const bSortValue = getSortValue(b);
+                const aSortValue = getSortValue(a, this.app.vault.getName());
+                const bSortValue = getSortValue(b, this.app.vault.getName());
                 return aSortValue < bSortValue ? -1 : aSortValue > bSortValue ? 1 : 0;
             }).forEach(group => {
                 if (!this.otcGroupsDiv) {
