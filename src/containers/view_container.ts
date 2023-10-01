@@ -73,7 +73,7 @@ export abstract class ViewContainer extends GroupFolder {
                     groupType,
                     viewName);
                 if (groupSetting) {
-                    groupSetting.collapsedFolders = this.getCollapsedFolders();
+                    groupSetting.openFolders = this.getOpenFolders();
                     return callbacks.saveSettingsCallback();
                 }
             },
@@ -647,7 +647,7 @@ export abstract class ViewContainer extends GroupFolder {
         forced: boolean,
         groupSetting: GroupSettings
     ) {
-        const collapsedFolders = groupSetting.collapsedFolders ?? [];
+        const openFolders = groupSetting.openFolders ?? [];
         const excludedFolders = [...groupSetting.excludedFolders ?? []];
         if (!groupSetting.templatesFolderVisible) {
             excludedFolders.push(...this.getTemplatesFolders());
@@ -673,7 +673,7 @@ export abstract class ViewContainer extends GroupFolder {
         }
 
         super.rebuild(
-            collapsedFolders,
+            openFolders,
             this.callbacks.fileClickCallback,
             this.callbacks.fileAddedCallback
         );

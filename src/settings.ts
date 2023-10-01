@@ -143,7 +143,11 @@ export interface GroupSettings_v1 extends GroupSettings_v0 {
     groupType: GroupType;
 }
 
-export type GroupSettings = GroupSettings_v1;
+export interface GroupSettings_v2 extends GroupSettings_v1 {
+    openFolders: string[];
+}
+
+export type GroupSettings = GroupSettings_v2;
 
 export const PostLogAction = {
     QUIETLY: "quietly",
