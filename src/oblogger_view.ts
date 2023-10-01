@@ -479,26 +479,32 @@ export class ObloggerView extends ItemView {
     }
 
     private showNewTagModal() {
-        const modal = new NewTagModal(this.app, async (result: string)=> {
-            if (!this.settings.otcGroups) {
-                this.settings.otcGroups = [];
-            }
-            // add the group to settings and then reload
-            this.settings.otcGroups.push({
-                groupName: result,
-                groupType: OtcGroupType.TAG_GROUP,
-                openFolders: [],
-                isVisible: true,
-                isPinned: false,
-                sortMethod: ContainerSortMethod.ALPHABETICAL,
-                sortAscending: true,
-                excludedFolders: [],
-                logsFolderVisible: false,
-                templatesFolderVisible: false
+        const openTags = this.settings.otcGroups
+            .filter(group => (group.groupType as OtcGroupType) === OtcGroupType.TAG_GROUP)
+            .map(group => group.groupName);
+        const modal = new NewTagModal(
+            this.app,
+            openTags,
+            async (result: string)=> {
+                if (!this.settings.otcGroups) {
+                    this.settings.otcGroups = [];
+                }
+                // add the group to settings and then reload
+                this.settings.otcGroups.push({
+                    groupName: result,
+                    groupType: OtcGroupType.TAG_GROUP,
+                    openFolders: [],
+                    isVisible: true,
+                    isPinned: false,
+                    sortMethod: ContainerSortMethod.ALPHABETICAL,
+                    sortAscending: true,
+                    excludedFolders: [],
+                    logsFolderVisible: false,
+                    templatesFolderVisible: false
+                });
+                await this.saveSettingsCallback();
+                this.reloadOtcGroups();
             });
-            await this.saveSettingsCallback();
-            this.reloadOtcGroups();
-        });
         modal.open();
     }
 
