@@ -1,15 +1,16 @@
 import {
     App,
-    Modal,
-    Notice,
-    TextComponent,
-    TFolder,
-    TFile,
-    moment,
     FrontMatterCache,
-    TextAreaComponent,
+    Modal,
+    moment,
+    normalizePath,
+    Notice,
     setIcon,
-    TAbstractFile
+    TAbstractFile,
+    TextAreaComponent,
+    TextComponent,
+    TFile,
+    TFolder
 } from "obsidian";
 import { ObloggerSettings, PostLogAction } from "./settings";
 import { StringPopoverSuggest } from "./string_popover_suggest";
