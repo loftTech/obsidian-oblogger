@@ -1,4 +1,4 @@
-import { App, Notice, SuggestModal, TFile, TFolder } from "obsidian";
+import { App, normalizePath, Notice, SuggestModal, TFile, TFolder } from "obsidian";
 
 interface FolderSelection {
     folderName: string;
@@ -15,7 +15,10 @@ export class FolderSuggestModal extends SuggestModal<FolderSelection> {
 
         this.scope.register(["Shift"], "Enter", async (event: KeyboardEvent) => {
             await this.onChooseSuggestion(
-                { folderName: this.inputEl.value, isCreator: true },
+                {
+                    folderName: normalizePath(this.inputEl.value),
+                    isCreator: true
+                },
                 event);
             this.close();
         })
