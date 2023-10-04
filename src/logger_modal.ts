@@ -1,15 +1,16 @@
 import {
     App,
-    Modal,
-    Notice,
-    TextComponent,
-    TFolder,
-    TFile,
-    moment,
     FrontMatterCache,
-    TextAreaComponent,
+    Modal,
+    moment,
+    normalizePath,
+    Notice,
     setIcon,
-    TAbstractFile
+    TAbstractFile,
+    TextAreaComponent,
+    TextComponent,
+    TFile,
+    TFolder
 } from "obsidian";
 import { ObloggerSettings, PostLogAction } from "./settings";
 import { StringPopoverSuggest } from "./string_popover_suggest";
@@ -110,12 +111,13 @@ export class LoggerModal extends Modal {
         titleBarLabelText.addClass("title-bar-label-text");
 
         const getLogFolderText = () => {
-            const lastFolder = this.settings.loggingPath?.split("/").last();
+            const loggingPath = normalizePath(this.settings.loggingPath);
+            const lastFolder = loggingPath?.split("/").last();
             if (lastFolder === undefined) {
                 return "click here to set log path";
             }
-            return (this.settings.loggingPath === lastFolder || this.settings.loggingPath === "/") ?
-                this.settings.loggingPath :
+            return (loggingPath === lastFolder || loggingPath === "/") ?
+                loggingPath :
                 `.../${lastFolder}`;
         }
         titleBarLabelText.setText(getLogFolderText());
@@ -126,7 +128,7 @@ export class LoggerModal extends Modal {
                 this.app,
                 ["/"],
                 async (logPath: string) => {
-                    this.settings.loggingPath = logPath;
+                    this.settings.loggingPath = normalizePath(logPath);
                     titleBarLabelText.setText(getLogFolderText());
                     this.updateSubmitButtonIsDisabled();
                     await this.saveSettingsCallback();
@@ -349,10 +351,11 @@ export class LoggerModal extends Modal {
     }
 
     private async saveLog() {
+        const loggingPath = normalizePath(this.settings.loggingPath);
         // make sure the logging path exists
-        if (!this.app.vault.getAbstractFileByPath(this.settings.loggingPath)) {
-            await this.app.vault.createFolder(this.settings.loggingPath);
-            new Notice(`Created logging folder at "${this.settings.loggingPath}"`);
+        if (!this.app.vault.getAbstractFileByPath(loggingPath)) {
+            await this.app.vault.createFolder(loggingPath);
+            new Notice(`Created logging folder at "${loggingPath}"`);
         }
 
         // get the type folder, create it if it doesn't exist
@@ -361,7 +364,7 @@ export class LoggerModal extends Modal {
             new Notice("Unable to log without a type");
             return;
         }
-        const baseFolder = this.settings.loggingPath === "/" ? "" : (this.settings.loggingPath + "/");
+        const baseFolder = loggingPath === "/" ? "" : (loggingPath + "/");
         const subFolderPath = baseFolder + logType;
 
         const subFolder = this.app.vault.getAbstractFileByPath(subFolderPath) ?? await (async () =>
