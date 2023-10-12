@@ -698,16 +698,18 @@ export class ObloggerView extends ItemView {
                     menu.addSeparator();
 
                     this.settings.rxGroups.forEach(groupSetting => {
-                        menu.addItem(item => {
-                            const isVisible = groupSetting.isVisible;
-                            item.setTitle(`${isVisible ? "Hide" : "Show"} ${groupSetting.groupType}`);
-                            item.setIcon(isVisible ? "eye-off" : "eye");
-                            item.onClick(async () => {
-                                groupSetting.isVisible = !groupSetting.isVisible;
-                                await this.saveSettingsCallback();
-                                this.requestRender();
+                        if (groupTypeSupportedOnPlatform(groupSetting.groupType)) {
+                            menu.addItem(item => {
+                                const isVisible = groupSetting.isVisible;
+                                item.setTitle(`${isVisible ? "Hide" : "Show"} ${groupSetting.groupType}`);
+                                item.setIcon(isVisible ? "eye-off" : "eye");
+                                item.onClick(async () => {
+                                    groupSetting.isVisible = !groupSetting.isVisible;
+                                    await this.saveSettingsCallback();
+                                    this.requestRender();
+                                });
                             });
-                        });
+                        }
                     });
                     menu.showAtMouseEvent(e);
                 }
