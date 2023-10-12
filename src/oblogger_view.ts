@@ -14,7 +14,7 @@ import {
     ContainerSortMethod,
     getGroupSettings,
     getSortValue,
-    GroupSettings, 
+    GroupSettings,
     groupTypeSupportedOnPlatform,
     isValidRxGroupType,
     ObloggerSettings,
@@ -900,6 +900,10 @@ export class ObloggerView extends ItemView {
                     return;
                 }
 
+                if (!groupTypeSupportedOnPlatform(group.groupType)) {
+                    return;
+                }
+
                 const newContainer = this.createOtcContainerFromSettingsGroup(group);
                 if (!newContainer) {
                     return;
@@ -920,6 +924,10 @@ export class ObloggerView extends ItemView {
                 return aSortValue < bSortValue ? -1 : aSortValue > bSortValue ? 1 : 0;
             }).forEach(group => {
                 if (!this.otcGroupsDiv) {
+                    return;
+                }
+
+                if (!groupTypeSupportedOnPlatform(group.groupType)) {
                     return;
                 }
 
