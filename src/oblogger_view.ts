@@ -5,6 +5,7 @@ import {
     Menu,
     moment,
     Notice,
+    Platform,
     setIcon,
     TFile,
     WorkspaceLeaf
@@ -593,34 +594,35 @@ export class ObloggerView extends ItemView {
                 await this.app.workspace.getLeaf(false).openFile(ret);
             })
 
-        new ButtonComponent(buttonBarDiv)
-            .setClass("button-bar-button")
-            .setIcon("plus-square")
-            .setTooltip("Add new user group")
-            .onClick((e) => {
-                const menu = new Menu();
+        if (Platform.isDesktop) {
+            new ButtonComponent(buttonBarDiv)
+                .setClass("button-bar-button")
+                .setIcon("plus-square")
+                .setTooltip("Add new user group")
+                .onClick((e) => {
+                    const menu = new Menu();
 
-                menu.addItem(item => {
-                    item.setIcon("hash");
-                    item.setTitle("Add tag group");
-                    item.onClick(() => this.showNewTagModal())
-                });
+                    menu.addItem(item => {
+                        item.setIcon("hash");
+                        item.setTitle("Add tag group");
+                        item.onClick(() => this.showNewTagModal())
+                    });
 
-                menu.addItem(item => {
-                    item.setIcon("text");
-                    item.setTitle("Add property group");
-                    item.onClick(() => this.showNewPropertyModal())
-                });
+                    menu.addItem(item => {
+                        item.setIcon("text");
+                        item.setTitle("Add property group");
+                        item.onClick(() => this.showNewPropertyModal())
+                    });
 
-                menu.addItem(item => {
-                    item.setIcon("folder");
-                    item.setTitle("Add folder group");
-                    item.onClick(() => this.showNewFolderModal())
-                });
+                    menu.addItem(item => {
+                        item.setIcon("folder");
+                        item.setTitle("Add folder group");
+                        item.onClick(() => this.showNewFolderModal())
+                    });
 
-                menu.showAtMouseEvent(e);
-            })
-
+                    menu.showAtMouseEvent(e);
+                })
+        }
 
         new ButtonComponent(buttonBarDiv)
             .setClass("button-bar-button")
