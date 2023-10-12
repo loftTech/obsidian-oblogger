@@ -377,7 +377,7 @@ export class ObloggerView extends ItemView {
     }
 
     private renderOTCSeparator() {
-        if (this.settings?.otcSeparatorVisible) {
+        if (this.settings?.otcSeparatorVisible && Platform.isDesktop) {
             this.otcSeparatorDiv?.removeClass("hidden");
         } else {
             this.otcSeparatorDiv?.addClass("hidden");
