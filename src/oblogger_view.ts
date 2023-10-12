@@ -886,59 +886,45 @@ export class ObloggerView extends ItemView {
         // Dump whatever remains (hopefully not much)
         this.otcGroupsDiv?.empty();
 
+        const sortOtcGroups = (groupA: GroupSettings, groupB: GroupSettings): number => {
+            const aSortValue = getSortValue(groupA, this.app.vault.getName());
+            const bSortValue = getSortValue(groupB, this.app.vault.getName());
+            return aSortValue < bSortValue ? -1 : aSortValue > bSortValue ? 1 : 0;
+        };
+
+        const loadOtcGroup = (group: GroupSettings): void => {
+            if (!this.otcGroupsDiv) {
+                return;
+            }
+
+            if (!groupTypeSupportedOnPlatform(group.groupType)) {
+                return;
+            }
+
+            const newContainer = this.createOtcContainerFromSettingsGroup(group);
+            if (!newContainer) {
+                return;
+            }
+            this.otcContainers.push(newContainer);
+            this.otcGroupsDiv.appendChild(newContainer.rootElement);
+            this.requestRender();
+        }
+
         // All pinned otc groups
         this.settings?.otcGroups
             .filter(group => {
                 return group.isPinned
             })
-            .sort((a, b) => {
-                const aSortValue = getSortValue(a, this.app.vault.getName());
-                const bSortValue = getSortValue(b, this.app.vault.getName());
-                return aSortValue < bSortValue ? -1 : aSortValue > bSortValue ? 1 : 0;
-            }).forEach(group => {
-                if (!this.otcGroupsDiv) {
-                    return;
-                }
-
-                if (!groupTypeSupportedOnPlatform(group.groupType)) {
-                    return;
-                }
-
-                const newContainer = this.createOtcContainerFromSettingsGroup(group);
-                if (!newContainer) {
-                    return;
-                }
-                this.otcContainers.push(newContainer);
-                this.otcGroupsDiv.appendChild(newContainer.rootElement);
-                this.requestRender();
-            });
+            .sort(sortOtcGroups)
+            .forEach(loadOtcGroup);
 
         // all unpinned otc groups
         this.settings?.otcGroups
             .filter(group => {
                 return !group.isPinned
             })
-            .sort((a, b) => {
-                const aSortValue = getSortValue(a, this.app.vault.getName());
-                const bSortValue = getSortValue(b, this.app.vault.getName());
-                return aSortValue < bSortValue ? -1 : aSortValue > bSortValue ? 1 : 0;
-            }).forEach(group => {
-                if (!this.otcGroupsDiv) {
-                    return;
-                }
-
-                if (!groupTypeSupportedOnPlatform(group.groupType)) {
-                    return;
-                }
-
-                const newContainer = this.createOtcContainerFromSettingsGroup(group);
-                if (!newContainer) {
-                    return;
-                }
-                this.otcContainers.push(newContainer);
-                this.otcGroupsDiv.appendChild(newContainer.rootElement);
-                this.requestRender();
-            });
+            .sort(sortOtcGroups)
+            .forEach(loadOtcGroup);
     }
 
     private async hideRxGroup(groupType: RxGroupType) {
