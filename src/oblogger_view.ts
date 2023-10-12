@@ -682,15 +682,17 @@ export class ObloggerView extends ItemView {
                                 this.requestRender();
                             })
                         });
-                        menu.addItem(item => {
-                            item.setTitle(`${this.settings.otcSeparatorVisible ? "Hide" : "Show"} user group separator`);
-                            item.setIcon(this.settings.otcSeparatorVisible ? "eye-off" : "eye");
-                            item.onClick(async () => {
-                                this.settings.otcSeparatorVisible = !this.settings.otcSeparatorVisible;
-                                await this.saveSettingsCallback();
-                                this.requestRender();
-                            })
-                        });
+                        if (Platform.isDesktop) {
+                            menu.addItem(item => {
+                                item.setTitle(`${this.settings.otcSeparatorVisible ? "Hide" : "Show"} user group separator`);
+                                item.setIcon(this.settings.otcSeparatorVisible ? "eye-off" : "eye");
+                                item.onClick(async () => {
+                                    this.settings.otcSeparatorVisible = !this.settings.otcSeparatorVisible;
+                                    await this.saveSettingsCallback();
+                                    this.requestRender();
+                                })
+                            });
+                        }
                     });
 
                     menu.addSeparator();
