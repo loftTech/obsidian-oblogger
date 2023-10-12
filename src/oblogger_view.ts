@@ -14,7 +14,8 @@ import {
     ContainerSortMethod,
     getGroupSettings,
     getSortValue,
-    GroupSettings,
+    GroupSettings, 
+    groupTypeSupportedOnPlatform,
     isValidRxGroupType,
     ObloggerSettings,
     OtcGroupType,
@@ -994,7 +995,12 @@ export class ObloggerView extends ItemView {
 
         this.rxContainers = [];
         this.settings?.rxGroups.forEach(rxGroupSetting => {
-            const newGroup = createRxGroup(rxGroupSetting.groupType as RxGroupType);
+            const groupType = rxGroupSetting.groupType as RxGroupType;
+            if (!groupTypeSupportedOnPlatform(groupType)) {
+                return;
+            }
+
+            const newGroup = createRxGroup(groupType);
             if (newGroup) {
                 this.rxContainers.push(newGroup);
             }
