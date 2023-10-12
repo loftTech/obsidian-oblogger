@@ -303,16 +303,10 @@ export class ObloggerView extends ItemView {
         this.refreshCollapseAllButton();
 
         // render rx containers
-        Object.values(RxGroupType).forEach(groupType => {
-            const containers = this.rxContainers.filter(container => container.groupType === groupType);
-            this.renderContainers(containers, modifiedFiles);
-        });
+        this.renderContainers(this.rxContainers, modifiedFiles);
 
         // render otc containers
-        Object.values(OtcGroupType).forEach(groupType => {
-            const containers = this.otcContainers.filter(container => container.groupType === groupType);
-            this.renderContainers(containers, modifiedFiles);
-        });
+        this.renderContainers(this.otcContainers, modifiedFiles);
 
         this.highlightLastOpenFile();
 
