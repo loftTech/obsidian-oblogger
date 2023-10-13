@@ -1,9 +1,9 @@
 // We're using deprecated symbols in this because we're loading possibly old
-// json settings and we want to keep track of previous (now deprecated) versions
+// json settings, and we want to keep track of previous (now deprecated) versions
 // of the settings objects
 // noinspection JSDeprecatedSymbols
 
-import { TFile } from "obsidian";
+import { Platform, TFile } from "obsidian";
 
 export const ContainerSortMethod = {
     ALPHABETICAL: "alphabetical",
@@ -64,6 +64,16 @@ export const isValidGroupType = (groupType: GroupType): boolean => {
         isValidRxGroupType(groupType as RxGroupType) ||
         isValidOtcGroupType(groupType as OtcGroupType)
     );
+}
+
+const MOBILE_GROUP_TYPES: Set<GroupType> = new Set([
+    RxGroupType.DAILIES,
+    RxGroupType.RECENTS,
+    RxGroupType.FILES
+]);
+
+export const groupTypeSupportedOnPlatform = (groupType: GroupType): boolean => {
+    return Platform.isDesktop || MOBILE_GROUP_TYPES.has(groupType);
 }
 
 /**

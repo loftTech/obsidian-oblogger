@@ -5,6 +5,7 @@ import {
     Menu,
     moment,
     Notice,
+    Platform,
     setIcon,
     TFile,
     WorkspaceLeaf
@@ -15,6 +16,7 @@ import {
     getGroupSettings,
     getSortValue,
     GroupSettings,
+    groupTypeSupportedOnPlatform,
     isValidRxGroupType,
     ObloggerSettings,
     OtcGroupType,
@@ -303,16 +305,10 @@ export class ObloggerView extends ItemView {
         this.refreshCollapseAllButton();
 
         // render rx containers
-        Object.values(RxGroupType).forEach(groupType => {
-            const containers = this.rxContainers.filter(container => container.groupType === groupType);
-            this.renderContainers(containers, modifiedFiles);
-        });
+        this.renderContainers(this.rxContainers, modifiedFiles);
 
         // render otc containers
-        Object.values(OtcGroupType).forEach(groupType => {
-            const containers = this.otcContainers.filter(container => container.groupType === groupType);
-            this.renderContainers(containers, modifiedFiles);
-        });
+        this.renderContainers(this.otcContainers, modifiedFiles);
 
         this.highlightLastOpenFile();
 
@@ -381,7 +377,7 @@ export class ObloggerView extends ItemView {
     }
 
     private renderOTCSeparator() {
-        if (this.settings?.otcSeparatorVisible) {
+        if (this.settings?.otcSeparatorVisible && Platform.isDesktop) {
             this.otcSeparatorDiv?.removeClass("hidden");
         } else {
             this.otcSeparatorDiv?.addClass("hidden");
@@ -598,34 +594,35 @@ export class ObloggerView extends ItemView {
                 await this.app.workspace.getLeaf(false).openFile(ret);
             })
 
-        new ButtonComponent(buttonBarDiv)
-            .setClass("button-bar-button")
-            .setIcon("plus-square")
-            .setTooltip("Add new user group")
-            .onClick((e) => {
-                const menu = new Menu();
+        if (Platform.isDesktop) {
+            new ButtonComponent(buttonBarDiv)
+                .setClass("button-bar-button")
+                .setIcon("plus-square")
+                .setTooltip("Add new user group")
+                .onClick((e) => {
+                    const menu = new Menu();
 
-                menu.addItem(item => {
-                    item.setIcon("hash");
-                    item.setTitle("Add tag group");
-                    item.onClick(() => this.showNewTagModal())
-                });
+                    menu.addItem(item => {
+                        item.setIcon("hash");
+                        item.setTitle("Add tag group");
+                        item.onClick(() => this.showNewTagModal())
+                    });
 
-                menu.addItem(item => {
-                    item.setIcon("text");
-                    item.setTitle("Add property group");
-                    item.onClick(() => this.showNewPropertyModal())
-                });
+                    menu.addItem(item => {
+                        item.setIcon("text");
+                        item.setTitle("Add property group");
+                        item.onClick(() => this.showNewPropertyModal())
+                    });
 
-                menu.addItem(item => {
-                    item.setIcon("folder");
-                    item.setTitle("Add folder group");
-                    item.onClick(() => this.showNewFolderModal())
-                });
+                    menu.addItem(item => {
+                        item.setIcon("folder");
+                        item.setTitle("Add folder group");
+                        item.onClick(() => this.showNewFolderModal())
+                    });
 
-                menu.showAtMouseEvent(e);
-            })
-
+                    menu.showAtMouseEvent(e);
+                })
+        }
 
         new ButtonComponent(buttonBarDiv)
             .setClass("button-bar-button")
@@ -685,30 +682,34 @@ export class ObloggerView extends ItemView {
                                 this.requestRender();
                             })
                         });
-                        menu.addItem(item => {
-                            item.setTitle(`${this.settings.otcSeparatorVisible ? "Hide" : "Show"} user group separator`);
-                            item.setIcon(this.settings.otcSeparatorVisible ? "eye-off" : "eye");
-                            item.onClick(async () => {
-                                this.settings.otcSeparatorVisible = !this.settings.otcSeparatorVisible;
-                                await this.saveSettingsCallback();
-                                this.requestRender();
-                            })
-                        });
+                        if (Platform.isDesktop) {
+                            menu.addItem(item => {
+                                item.setTitle(`${this.settings.otcSeparatorVisible ? "Hide" : "Show"} user group separator`);
+                                item.setIcon(this.settings.otcSeparatorVisible ? "eye-off" : "eye");
+                                item.onClick(async () => {
+                                    this.settings.otcSeparatorVisible = !this.settings.otcSeparatorVisible;
+                                    await this.saveSettingsCallback();
+                                    this.requestRender();
+                                })
+                            });
+                        }
                     });
 
                     menu.addSeparator();
 
                     this.settings.rxGroups.forEach(groupSetting => {
-                        menu.addItem(item => {
-                            const isVisible = groupSetting.isVisible;
-                            item.setTitle(`${isVisible ? "Hide" : "Show"} ${groupSetting.groupType}`);
-                            item.setIcon(isVisible ? "eye-off" : "eye");
-                            item.onClick(async () => {
-                                groupSetting.isVisible = !groupSetting.isVisible;
-                                await this.saveSettingsCallback();
-                                this.requestRender();
+                        if (groupTypeSupportedOnPlatform(groupSetting.groupType)) {
+                            menu.addItem(item => {
+                                const isVisible = groupSetting.isVisible;
+                                item.setTitle(`${isVisible ? "Hide" : "Show"} ${groupSetting.groupType}`);
+                                item.setIcon(isVisible ? "eye-off" : "eye");
+                                item.onClick(async () => {
+                                    groupSetting.isVisible = !groupSetting.isVisible;
+                                    await this.saveSettingsCallback();
+                                    this.requestRender();
+                                });
                             });
-                        });
+                        }
                     });
                     menu.showAtMouseEvent(e);
                 }
@@ -891,51 +892,45 @@ export class ObloggerView extends ItemView {
         // Dump whatever remains (hopefully not much)
         this.otcGroupsDiv?.empty();
 
+        const sortOtcGroups = (groupA: GroupSettings, groupB: GroupSettings): number => {
+            const aSortValue = getSortValue(groupA, this.app.vault.getName());
+            const bSortValue = getSortValue(groupB, this.app.vault.getName());
+            return aSortValue < bSortValue ? -1 : aSortValue > bSortValue ? 1 : 0;
+        };
+
+        const loadOtcGroup = (group: GroupSettings): void => {
+            if (!this.otcGroupsDiv) {
+                return;
+            }
+
+            if (!groupTypeSupportedOnPlatform(group.groupType)) {
+                return;
+            }
+
+            const newContainer = this.createOtcContainerFromSettingsGroup(group);
+            if (!newContainer) {
+                return;
+            }
+            this.otcContainers.push(newContainer);
+            this.otcGroupsDiv.appendChild(newContainer.rootElement);
+            this.requestRender();
+        }
+
         // All pinned otc groups
         this.settings?.otcGroups
             .filter(group => {
                 return group.isPinned
             })
-            .sort((a, b) => {
-                const aSortValue = getSortValue(a, this.app.vault.getName());
-                const bSortValue = getSortValue(b, this.app.vault.getName());
-                return aSortValue < bSortValue ? -1 : aSortValue > bSortValue ? 1 : 0;
-            }).forEach(group => {
-                if (!this.otcGroupsDiv) {
-                    return;
-                }
-
-                const newContainer = this.createOtcContainerFromSettingsGroup(group);
-                if (!newContainer) {
-                    return;
-                }
-                this.otcContainers.push(newContainer);
-                this.otcGroupsDiv.appendChild(newContainer.rootElement);
-                this.requestRender();
-            });
+            .sort(sortOtcGroups)
+            .forEach(loadOtcGroup);
 
         // all unpinned otc groups
         this.settings?.otcGroups
             .filter(group => {
                 return !group.isPinned
             })
-            .sort((a, b) => {
-                const aSortValue = getSortValue(a, this.app.vault.getName());
-                const bSortValue = getSortValue(b, this.app.vault.getName());
-                return aSortValue < bSortValue ? -1 : aSortValue > bSortValue ? 1 : 0;
-            }).forEach(group => {
-                if (!this.otcGroupsDiv) {
-                    return;
-                }
-
-                const newContainer = this.createOtcContainerFromSettingsGroup(group);
-                if (!newContainer) {
-                    return;
-                }
-                this.otcContainers.push(newContainer);
-                this.otcGroupsDiv.appendChild(newContainer.rootElement);
-                this.requestRender();
-            });
+            .sort(sortOtcGroups)
+            .forEach(loadOtcGroup);
     }
 
     private async hideRxGroup(groupType: RxGroupType) {
@@ -1000,7 +995,12 @@ export class ObloggerView extends ItemView {
 
         this.rxContainers = [];
         this.settings?.rxGroups.forEach(rxGroupSetting => {
-            const newGroup = createRxGroup(rxGroupSetting.groupType as RxGroupType);
+            const groupType = rxGroupSetting.groupType as RxGroupType;
+            if (!groupTypeSupportedOnPlatform(groupType)) {
+                return;
+            }
+
+            const newGroup = createRxGroup(groupType);
             if (newGroup) {
                 this.rxContainers.push(newGroup);
             }
