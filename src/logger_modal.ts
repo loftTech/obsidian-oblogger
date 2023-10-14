@@ -194,6 +194,7 @@ export class LoggerModal extends Modal {
         typeInputDiv.addClass("field-div");
         this.typeInput = new TextComponent(typeInputDiv);
         this.typeInput.setPlaceholder("type");
+        const typeValues = Array.from(this.logMap.keys()).filter(t => t !== "");
         const typeSuggest = new StringPopoverSuggest(
             this.app,
             this.typeInput.inputEl,
@@ -202,7 +203,7 @@ export class LoggerModal extends Modal {
                 this.typeInput?.onChanged();
                 this.rebuildFieldsDiv();
             },
-            Array.from(this.logMap.keys()).filter(t => t !== ""));
+            typeValues);
         this.typeInput.onChange((value) => {
             typeSuggest.suggestFrom(value);
             this.logFrontmatter.type = value;
