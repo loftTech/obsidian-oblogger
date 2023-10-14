@@ -1,5 +1,4 @@
 import { App, PopoverSuggest, prepareFuzzySearch } from "obsidian";
-import { isDesktopLikeResolution } from "./constants";
 
 const CLOSE_OPTION = "CLOSE_OPTION";
 
@@ -88,17 +87,12 @@ export class StringPopoverSuggest extends PopoverSuggest<string> {
         }
         this.suggestions.setSuggestions([CLOSE_OPTION].concat(suggestions));
 
-        // Using a minimum resolution width to determine desktop (including ipad)
-        // and mobile, in order to move the suggester window to the correct
-        // position.
-        if (isDesktopLikeResolution()) {
-            const rect = this.parentEl.getBoundingClientRect();
-            this.suggestEl.style.width = rect.width + 'px'
+        const rect = this.parentEl.getBoundingClientRect();
+        this.suggestEl.style.width = rect.width + 'px'
 
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            this.reposition(rect);
-        }
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        this.reposition(rect);
 
         this.open();
     }
