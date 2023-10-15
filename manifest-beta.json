@@ -1,0 +1,11 @@
+{
+	"id": "oblogger",
+	"name": "oblogger",
+	"version": "0.9.0-rc",
+	"minAppVersion": "0.15.0",
+	"description": "tagger explorer and frontmatter logger",
+	"author": "loftTech",
+	"authorUrl": "https://github.com/loftTech",
+	"fundingUrl": "https://www.buymeacoffee.com/lofttech",
+	"isDesktopOnly": false
+}
