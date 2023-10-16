@@ -206,7 +206,6 @@ export class LoggerModal extends Modal {
             },
             types);
         this.typeInput.onChange((value) => {
-            typeSuggester.open();
             this.logFrontmatter.type = value;
         });
         this.typeInput.inputEl.addEventListener("focusout", () => {
