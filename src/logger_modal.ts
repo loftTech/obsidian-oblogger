@@ -262,12 +262,13 @@ export class LoggerModal extends Modal {
             fieldInputDiv.appendChild(newFieldIconsDiv);
         }
 
-        new StringPopoverSuggest(
+        const suggester = new StringPopoverSuggest(
             this.app,
             fieldInput.inputEl,
             (v) => {
                 fieldInput.setValue(v);
                 fieldInput.onChanged();
+                suggester.close();
             },
             Array.from(values)
         );
