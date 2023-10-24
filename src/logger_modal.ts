@@ -286,6 +286,8 @@ export class LoggerModal extends Modal {
         }
 
         const currentType = this.typeInput?.getValue() ?? "";
+        this.logFrontmatter.type = currentType;
+
         const files = this.logMap.get(currentType) ?? [];
 
         const fieldsMap = files.reduce((acc, file) => {
