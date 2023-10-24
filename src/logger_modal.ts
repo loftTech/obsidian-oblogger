@@ -194,17 +194,18 @@ export class LoggerModal extends Modal {
         typeInputDiv.addClass("field-div");
         this.typeInput = new TextComponent(typeInputDiv);
         this.typeInput.setPlaceholder("type");
-        const typeSuggest = new StringPopoverSuggest(
+        const types = Array.from(this.logMap.keys()).filter(t => t !== "");
+        const typeSuggester = new StringPopoverSuggest(
             this.app,
             this.typeInput.inputEl,
             (value) => {
                 this.typeInput?.setValue(value);
                 this.typeInput?.onChanged();
                 this.rebuildFieldsDiv();
+                typeSuggester.close();
             },
-            Array.from(this.logMap.keys()).filter(t => t !== ""));
+            types);
         this.typeInput.onChange((value) => {
-            typeSuggest.suggestFrom(value);
             this.logFrontmatter.type = value;
         });
         this.typeInput.inputEl.addEventListener("focusout", () => {
@@ -261,12 +262,13 @@ export class LoggerModal extends Modal {
             fieldInputDiv.appendChild(newFieldIconsDiv);
         }
 
-        const fieldSuggester = new StringPopoverSuggest(
+        const suggester = new StringPopoverSuggest(
             this.app,
             fieldInput.inputEl,
             (v) => {
                 fieldInput.setValue(v);
                 fieldInput.onChanged();
+                suggester.close();
             },
             Array.from(values)
         );
@@ -274,7 +276,6 @@ export class LoggerModal extends Modal {
             if (isNewField) {
                 warningIcon && warningIcon.toggleClass("hidden", !!v);
             }
-            fieldSuggester.suggestFrom(v);
             this.logFrontmatter[key] = v;
         });
 
