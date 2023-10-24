@@ -30,9 +30,9 @@ const EXCLUDED_FIELDS = new Set([
 
 export class LoggerModal extends Modal {
     settings: ObloggerSettings;
-    logMap: Map<string, TFile[]>
-    typeInput: TextComponent | undefined
-    fieldsDiv: HTMLElement | undefined
+    logMap: Map<string, TFile[]>;
+    typeInput: TextComponent | undefined;
+    fieldsDiv: HTMLElement | undefined;
     logFrontmatter: {[id: string]: string};
     logContent: string;
     submitButton: HTMLElement | undefined;
