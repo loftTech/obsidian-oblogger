@@ -30,9 +30,9 @@ const EXCLUDED_FIELDS = new Set([
 
 export class LoggerModal extends Modal {
     settings: ObloggerSettings;
-    logMap: Map<string, TFile[]>
-    typeInput: TextComponent | undefined
-    fieldsDiv: HTMLElement | undefined
+    logMap: Map<string, TFile[]>;
+    typeInput: TextComponent | undefined;
+    fieldsDiv: HTMLElement | undefined;
     logFrontmatter: {[id: string]: string};
     logContent: string;
     submitButton: HTMLElement | undefined;
@@ -205,11 +205,10 @@ export class LoggerModal extends Modal {
                 typeSuggester.close();
             },
             types);
-        this.typeInput.onChange((value) => {
-            this.logFrontmatter.type = value;
-        });
         this.typeInput.inputEl.addEventListener("focusout", () => {
-            setTimeout(() => { this.rebuildFieldsDiv(); }, 100);
+            if (this.typeInput?.getValue() !== this.logFrontmatter.type) {
+                this.rebuildFieldsDiv();
+            }
         });
         typeDiv.appendChild(typeInputDiv);
 
@@ -289,6 +288,8 @@ export class LoggerModal extends Modal {
         }
 
         const currentType = this.typeInput?.getValue() ?? "";
+        this.logFrontmatter.type = currentType;
+
         const files = this.logMap.get(currentType) ?? [];
 
         const fieldsMap = files.reduce((acc, file) => {
