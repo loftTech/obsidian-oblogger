@@ -1,7 +1,7 @@
 {
 	"id": "oblogger",
 	"name": "oblogger",
-	"version": "0.9.1-rc",
+	"version": "0.9.2",
 	"minAppVersion": "0.15.0",
 	"description": "tagger explorer and frontmatter logger",
 	"author": "loftTech",
