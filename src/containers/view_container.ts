@@ -1,4 +1,4 @@
-import { App, FrontMatterCache, Menu, MenuItem, moment, setIcon, TFile } from "obsidian";
+import {App, FrontMatterCache, Menu, MenuItem, moment, setIcon, TAbstractFile, TFile, TFolder} from "obsidian";
 import { GroupFolder } from "./group_folder";
 import {
     ContainerSortMethod,
@@ -12,6 +12,9 @@ import {
 import { buildStateFromFile, FileState } from "../constants";
 import { FolderSuggestModal } from "../folder_suggest_modal";
 import { ContainerCallbacks } from "./container_callbacks";
+import {hidden} from "colorette";
+import * as fs from "fs";
+import * as Path from "path";
 
 interface RenderedFileCache {
     file: TFile;
@@ -92,6 +95,42 @@ export abstract class ViewContainer extends GroupFolder {
         this.canBePinned = canBePinned;
         this.isPinned = isPinned;
         this.callbacks = callbacks;
+    }
+
+    protected getTotalItemCount(): number {
+        const groupSettings = this.getGroupSettings();
+        if (groupSettings === undefined) {
+            return this.getVisibleItemCount();
+        }
+
+        // todo: this breaks because if the file is in logs, it's counted twice
+
+        const excludedFolders = [...groupSettings.excludedFolders];
+        if (!groupSettings.logsFolderVisible && this.settings && this.settings.loggingPath) {
+            excludedFolders.push(this.settings.loggingPath);
+        }
+        if (!groupSettings.templatesFolderVisible && this.settings && this.getTemplatesFolders()) {
+            excludedFolders.push(...this.getTemplatesFolders());
+        }
+
+        const countFiles = (fileOrFolder: TAbstractFile | null): number => {
+            if (fileOrFolder === null) {
+                return 0;
+            }
+            if (fileOrFolder instanceof TFile) {
+                return 1;
+            }
+            if (fileOrFolder instanceof TFolder) {
+                return fileOrFolder.children.reduce((fileCount: number, child: TAbstractFile) => {
+                    return fileCount + countFiles(child);
+                }, 0)
+            }
+            return 0;
+        }
+        const hiddenFiles = excludedFolders.reduce((acc: number, folder: string) => {
+            return acc + countFiles(this.app.vault.getAbstractFileByPath(folder));
+        }, 0) ?? 0;
+        return this.getVisibleItemCount() + hiddenFiles;
     }
 
     protected addFileToFolder(
