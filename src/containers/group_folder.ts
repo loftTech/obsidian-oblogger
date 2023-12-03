@@ -82,11 +82,15 @@ export class GroupFolder {
         return this.sortedFiles.contains(file) || this.sortedSubFolders.some(subFolder => subFolder.hasFileWithin(file));
     }
 
-    protected getItemCount(): number {
+    protected getVisibleItemCount(): number {
         const childrenItemCount = this.sortedSubFolders.reduce((acc: number, folder: GroupFolder) => {
-            return acc + folder.getItemCount();
+            return acc + folder.getVisibleItemCount();
         }, 0);
         return childrenItemCount + this.sortedFiles.length;
+    }
+
+    protected getTotalItemCount(): number {
+        return 100;
     }
 
     public getOpenFolders(): string[] {
