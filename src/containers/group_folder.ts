@@ -90,7 +90,8 @@ export class GroupFolder {
     }
 
     protected getTotalItemCount(): number {
-        return 100;
+        // By default, return the visible item count. But different containers should determine it on their own.
+        return this.getVisibleItemCount();
     }
 
     public getOpenFolders(): string[] {

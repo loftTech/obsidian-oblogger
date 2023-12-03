@@ -452,14 +452,19 @@ export abstract class ViewContainer extends GroupFolder {
         visibleItemCountDiv.setText(this.getVisibleItemCount().toString());
         itemCountContainer.appendChild(visibleItemCountDiv);
 
+        const totalItemCount = this.getTotalItemCount();
+        if (totalItemCount === 0) {
+            return itemCountContainer;
+        }
+
         const itemCountSeparator = document.createElement("div");
         itemCountSeparator.addClass("item-count-separator");
         itemCountSeparator.setText("/");
         itemCountContainer.appendChild(itemCountSeparator);
-        
+
         const totalItemCountDiv = document.createElement("div");
         totalItemCountDiv.addClass("total-item-count");
-        totalItemCountDiv.setText(this.getTotalItemCount().toString());
+        totalItemCountDiv.setText(totalItemCount.toString());
         itemCountContainer.appendChild(totalItemCountDiv);
 
         return itemCountContainer;
