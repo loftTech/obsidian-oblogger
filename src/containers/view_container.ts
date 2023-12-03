@@ -443,10 +443,6 @@ export abstract class ViewContainer extends GroupFolder {
         return titleText;
     }
 
-    private getItemCount(): number {
-        return this.sortedFiles.length
-    }
-
     private buildItemCountDiv(): HTMLElement {
         const itemCount = document.createElement('div');
         itemCount.addClass("item-count");

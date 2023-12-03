@@ -82,6 +82,13 @@ export class GroupFolder {
         return this.sortedFiles.contains(file) || this.sortedSubFolders.some(subFolder => subFolder.hasFileWithin(file));
     }
 
+    protected getItemCount(): number {
+        const childrenItemCount = this.sortedSubFolders.reduce((acc: number, folder: GroupFolder) => {
+            return acc + folder.getItemCount();
+        }, 0);
+        return childrenItemCount + this.sortedFiles.length;
+    }
+
     public getOpenFolders(): string[] {
         const openFolders = (!this.isCollapsed()) ? [this.folderPath] : [];
         const openSubfolders = this.sortedSubFolders.flatMap(f => f.getOpenFolders());
