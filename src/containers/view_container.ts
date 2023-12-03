@@ -443,6 +443,18 @@ export abstract class ViewContainer extends GroupFolder {
         return titleText;
     }
 
+    private getItemCount(): number {
+        return this.sortedFiles.length
+    }
+
+    private buildItemCountDiv(): HTMLElement {
+        const itemCount = document.createElement('div');
+        itemCount.addClass("item-count");
+        itemCount.setText(this.getItemCount().toString())
+
+        return itemCount;
+    }
+
     private buildPill(): HTMLElement {
         const titleTagDiv = document.createElement("div");
         titleTagDiv.addClass("title-tag");
@@ -490,6 +502,7 @@ export abstract class ViewContainer extends GroupFolder {
 
         this.titleContainer.appendChild(this.buildTitleSvgHolder());
         this.titleContainer.appendChild(this.buildTitleTextDiv(isCollapsed));
+        this.titleContainer.appendChild(this.buildItemCountDiv());
         this.titleContainer.appendChild(this.buildPill());
     }
 
