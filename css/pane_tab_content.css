@@ -522,6 +522,9 @@ body.styled-scrollbars .oblogger-content {
 
 .is-phone .oblogger-content .child-item:hover .status-icon .svg-icon { animation: none; }
 
+/* disabling animation everywhere for now */
+.oblogger-content .child-item:hover .status-icon .svg-icon { animation: none; }
+
 .is-phone .oblogger-content .separator-container .separator {
     background-color: var(--nav-indentation-guide-color);
     color: var(--background-secondary);
