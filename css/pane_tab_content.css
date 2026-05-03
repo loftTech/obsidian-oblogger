@@ -19,7 +19,12 @@
 .mod-macos .oblogger-content { padding: 0 20px 70px 10px; }
 
 /* modification for minimal styled scrollbars setting */
-body.styled-scrollbars .oblogger-content { padding: 0 4px 70px; }
+body.styled-scrollbars .oblogger-content {
+  padding-top: 0px;
+  padding-right: 4px;
+  padding-left: 16px;
+  padding-bottom: 70px;
+}
 
 .oblogger-content .hidden { display:none !important; }
 
