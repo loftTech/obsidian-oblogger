@@ -111,7 +111,8 @@ this should allow you to make changes to CSS files and see them update in obsidi
     - start gnome builder
     - click "select a folder" at the bottom
     - select the cloned folder location (~/Projects/obsidian-oblogger)
-- go to configure project next to the build button
+- click the build button
+- go to configure project in the dropdown next to the build button
 - click commands
 - click create command
 - call it "dev"
@@ -128,12 +129,25 @@ this should allow you to make changes to CSS files and see them update in obsidi
 - install obsidian
 - open `~/Projects/obsidian-oblogger/test-vault` in obsidian and trust community plugins
 - open community plugins and ensure that "hot reload" plugin is installed and enabled
+
+at this point, you may have oblogger already showing up, but ensure it isn't the version from obsidian's manifest or your local changes won't stick.
+
+if you want to be really sure,
+
 - click the folder icon next to "installed plugins" to open nautilus at the plugins location
+- if there are any oblogger folders
+    - make sure to backup the `data.json` if you don't want to lose your settings
+    - delete the oblogger folders
 - right click open space in the folder and "open in console" to open console at that location
 - enter `ln -s ../../../build oblogger` to create a link from plugins to the build directory
-- enter `touch oblogger/.hotreload` to create an empty file that enables the hot reload plugin to auto-refresh obsidian when the plugin's files change
+- back in nautilus, there should now be a link called "oblogger" in the plugins folder. follow the link and if there is no file called `.hotreload`, go back to the console and enter `touch oblogger/.hotreload` to create an empty file that enables the hot reload plugin to auto-refresh obsidian when the plugin's files change
 - back in obsidian, click the refresh button next to installed plugins and then find and enable the oblogger plugin
 
+at this point, you should be able to start making changes to files in `css/*.css` and when you save them, obsidian should refresh and show your changes
+
+you can test this by opening `css/pane_tab_content.css` finding `.greeter-vault-name` and changing `display: ~flex?` to `display: none`. when you save, the vault name in the oblogger pane under the avatar should disappear.
+
+whenever you close builder (or click the stop button) you can just click the play button again to re-enable "change detection" deployment
 
 ## acknowledgments
 
