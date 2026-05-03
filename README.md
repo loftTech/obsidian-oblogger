@@ -68,13 +68,43 @@ oblogger is a side-panel plugin for Obsidian which focuses on two primary core f
 - how can I give you guys money for all your hard work?
   - thank you so much! see [buy me a coffee](#buy-me-a-coffee)
 
-## how to build
+## how to build the plugin
 
 `npm run dev` for debug and watching
 
 `npm run build` for release
 
-## acknowledgements
+## setting up a dev environment
+
+this should allow you to make changes to CSS files and see them update in obsidian in our test vault
+
+- clone this repo using git. the rest of the documentation will assume it's at "~/Projects/obsidian-oblogger"
+
+### set up gnome builder
+
+- install gnome builder
+- open the repo as an existing project in gnome builder
+- go to configure project next to the build button
+- click commands
+- click create command
+- call it "dev"
+- the command should be `npm run dev`
+- set the working directory to `~/Projects/obsidian-oblogger/build` (`$SRCDIR/build` might also work)
+- whenever you save a file, it should run the command and refresh the build artifacts in the build directory
+
+### setup the test vault
+
+- install obsidian
+- open `~/Projects/obsidian-oblogger/test-vault` in obsidian and trust community plugins
+- open community plugins and ensure that "hot reload" plugin is installed and enabled
+- click the folder icon next to "installed plugins" to open nautilus at the plugins location
+- right click open space in the folder and "open in console" to open console at that location
+- enter `ln -s ../../../build oblogger` to create a link from plugins to the build directory
+- enter `touch oblogger/.hotreload` to create an empty file that enables the hot reload plugin to auto-refresh obsidian when the plugin's files change
+- back in obsidian, click the refresh button next to installed plugins and then find and enable the oblogger plugin
+
+
+## acknowledgments
 
 we want to thank the [obsidian plugin-dev discord server](https://discordapp.com/channels/686053708261228577/840286264964022302) for all the help they gave us when we felt stuck. if you're reading this and working on a theme, plugin, or just want to engage more with the obsidian community, do yourself a favor and [join that discord channel](https://discord.gg/obsidianmd).
 
