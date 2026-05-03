@@ -70,29 +70,60 @@ oblogger is a side-panel plugin for Obsidian which focuses on two primary core f
 
 ## how to build the plugin
 
+### quick commands (will not work without `npm` but putting up top for quick access)
+
 `npm run dev` for debug and watching
 
 `npm run build` for release
 
-## setting up a dev environment
+### install npm using nvm
+
+as of (2026-05-01), `nvm` is the currently suggested way of doing this (according to https://nodejs.org/en/download)
+
+```bash
+# Download and install nvm:
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
+
+# in lieu of restarting the shell
+\. "$HOME/.nvm/nvm.sh"
+
+# Download and install Node.js:
+nvm install 24
+
+# Verify the Node.js version:
+node -v # Should print "v24.15.0".
+
+# Verify npm version:
+npm -v # Should print "11.12.1".
+```
+
+### setting up a dev environment
 
 this should allow you to make changes to CSS files and see them update in obsidian in our test vault
 
 - clone this repo using git. the rest of the documentation will assume it's at "~/Projects/obsidian-oblogger"
 
-### set up gnome builder
+#### set up gnome builder
 
+- create the build directory: `mkdir ~/Projects/obsidian-oblogger/build`
 - install gnome builder
 - open the repo as an existing project in gnome builder
+    - start gnome builder
+    - click "select a folder" at the bottom
+    - select the cloned folder location (~/Projects/obsidian-oblogger)
 - go to configure project next to the build button
 - click commands
 - click create command
 - call it "dev"
 - the command should be `npm run dev`
-- set the working directory to `~/Projects/obsidian-oblogger/build` (`$SRCDIR/build` might also work)
+- set the working directory to `~/Projects/obsidian-oblogger/build`
+- save the command window which should take you back to the project configuration window.
+- on the left, select "Application" and change "Run Command" to "dev" (if you don't see dev, try closing and re-opening builder. if you still don't see it, start this section again. if you still don't see it, these instructions are likely out of date.
+- close the configure project window
+- click the play button and this will 
 - whenever you save a file, it should run the command and refresh the build artifacts in the build directory
 
-### setup the test vault
+#### setup the test vault
 
 - install obsidian
 - open `~/Projects/obsidian-oblogger/test-vault` in obsidian and trust community plugins
