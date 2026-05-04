@@ -35,7 +35,8 @@ export enum RxGroupType {
     RECENTS = "recents",
     FILES = "files",
     UNTAGGED = "untagged",
-    DAILIES = "dailies"
+    DAILIES = "dailies",
+    ALL_TAGS = "all_tags"
 }
 
 export const isValidRxGroupType = (groupType: RxGroupType): boolean => {
@@ -237,6 +238,8 @@ interface ObloggerSettings_v7 extends ObloggerSettings_v6 {
     otcGroups: GroupSettings_v2[];
 }
 
+type ObloggerSettings_v8 = ObloggerSettings_v7
+
 export type ObloggerSettings = ObloggerSettings_v7;
 
 const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } = {
@@ -347,6 +350,27 @@ const UPGRADE_FUNCTIONS: {[id: number]: (settings: ObloggerSettings) => void } =
         if (newSettings) {
             newSettings.version = 7;
         }
+    },
+    7: (settings: ObloggerSettings) => {
+        //upgrading from 7 to 8 is because all tags rx group was added
+        const newSettings = settings as ObloggerSettings_v8
+        if (newSettings) {
+            newSettings.version = 8;
+            newSettings.rxGroups.push(
+                {
+                    groupType: RxGroupType.ALL_TAGS,
+                    isPinned: false,
+                    openFolders: [],
+                    groupName: RxGroupType.ALL_TAGS,
+                    isVisible: true,
+                    sortMethod: ContainerSortMethod.ALPHABETICAL,
+                    sortAscending: true,
+                    logsFolderVisible: false,
+                    templatesFolderVisible: false,
+                    excludedFolders: []
+                }
+            );
+        }
     }
 };
 
@@ -366,7 +390,7 @@ export const upgradeSettings = (currentVersion: number, settings: ObloggerSettin
     UPGRADE_FUNCTIONS[currentVersion](settings);
 }
 
-export const CURRENT_VERSION = 7;
+export const CURRENT_VERSION = 8;
 
 export const DEFAULT_SETTINGS: ObloggerSettings_v3 = {
     version: 3,
@@ -414,6 +438,16 @@ export const DEFAULT_SETTINGS: ObloggerSettings_v3 = {
         },
         {
             groupName: RxGroupType.UNTAGGED,
+            collapsedFolders: [],
+            isVisible: true,
+            sortMethod: ContainerSortMethod.ALPHABETICAL,
+            sortAscending: true,
+            logsFolderVisible: false,
+            templatesFolderVisible: false,
+            excludedFolders: []
+        },
+        {
+            groupName: RxGroupType.ALL_TAGS,
             collapsedFolders: [],
             isVisible: true,
             sortMethod: ContainerSortMethod.ALPHABETICAL,

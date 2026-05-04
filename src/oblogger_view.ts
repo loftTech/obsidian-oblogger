@@ -24,6 +24,7 @@ import {
 } from "./settings";
 import { TagGroupContainer } from "./containers/otc/tag_group_container";
 import { DailiesContainer } from "./containers/rx/dailies_container";
+import { AllTagsContainer } from "./containers/rx/all_tags_container";
 import { FileClickCallback } from "./containers/group_folder";
 import { RecentsContainer } from "./containers/rx/recents_container";
 import { UntaggedContainer } from "./containers/rx/untagged_container";
@@ -965,6 +966,8 @@ export class ObloggerView extends ItemView {
                     return DailiesContainer;
                 case RxGroupType.UNTAGGED:
                     return UntaggedContainer;
+                case RxGroupType.ALL_TAGS:
+                    return AllTagsContainer;
                 case RxGroupType.FILES:
                 default: // this is here so the compiler doesn't see undefined
                     return FilesContainer;
