@@ -624,11 +624,11 @@ export class ObloggerView extends ItemView {
                 })
         }
 
-        new ButtonComponent(buttonBarDiv)
-            .setClass("button-bar-button")
-            .setIcon("form-input")
-            .setTooltip("Create a log entry")
-            .onClick(this.showLoggerCallbackFn);
+        // new ButtonComponent(buttonBarDiv)
+        //     .setClass("button-bar-button")
+        //     .setIcon("form-input")
+        //     .setTooltip("Create a log entry")
+        //     .onClick(this.showLoggerCallbackFn);
 
         this.collapseAllButton = new ButtonComponent(buttonBarDiv);
         this.collapseAllButton
