@@ -159,7 +159,7 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .status-icon.visible {
     display: flex;
     grid-column: 1;
-    left: 20px;
+    left: 18px;
     opacity: 1;
     position: absolute;
 }
@@ -389,9 +389,14 @@ body.styled-scrollbars .oblogger-content {
     width: 16px;
 }
 
+.oblogger-content .status-icon {
+    padding-top: 4px;
+}
+
 .oblogger-content .status-icon .svg-icon {
     color: var(--background-secondary);
-    fill: var(--vault-name-color);
+    /* fill: var(--vault-name-color); */
+    fill: var(--text-normal);
     height: 8px;
     stroke-width: 6px;
     z-index: 1;
