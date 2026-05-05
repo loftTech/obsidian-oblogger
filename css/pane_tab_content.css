@@ -39,8 +39,8 @@ body.styled-scrollbars .oblogger-content {
 }
 
 .oblogger-content .separator-container {
-    height: 16px;
-    padding: 8px 0;
+    height: 12px;
+    padding: 6px 0;
     width: fit-content;
 }
 
@@ -56,6 +56,7 @@ body.styled-scrollbars .oblogger-content {
     align-items: center;
     display: flex;
     margin: auto;
+    height: 0px;
 }
 
 .oblogger-content .otc-separator {
@@ -77,6 +78,10 @@ body.styled-scrollbars .oblogger-content {
 .oblogger-content .folder-holder.rx-child:last-child .content { padding-bottom: 0; }
 
 .oblogger-content .folder-holder.rx-child:last-child .title-container.collapsed { margin-bottom: 1px; }
+
+.oblogger-content .otc-groups .family-title.collapsed .svg-icon {
+    transform: rotate(-90deg);
+}
 
 .oblogger-content .pin { display: none; }
 

@@ -836,7 +836,7 @@ export class ObloggerView extends ItemView {
             fileAddedCallback: this.fileAddedCallback,
             requestRenderCallback: () => { this.requestRender() },
             saveSettingsCallback: this.saveSettingsCallback,
-            getGroupIconCallback: (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
+            getGroupIconCallback: (_) => "chevron-down", // (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
             hideCallback: async () => {
                 return await this.removeOtcGroup(
                     group.groupType as OtcGroupType,
