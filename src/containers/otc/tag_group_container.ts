@@ -102,10 +102,13 @@ export class TagGroupContainer extends OtcContainer {
         if (cache === null) {
             return null;
         }
-        const tags = getAllTags(cache)
+
+        let tags = getAllTags(cache)
             ?.map(tag => tag.replace("#", ""))
-            ?.unique()
-            ?.filter((tag: string) => {
+            ?.unique();
+
+        if (!this.groupName.startsWith("All Tags")) {
+            tags = tags?.filter((tag: string) => {
                 if (isolatedGroupName) {
                     return tag.contains(isolatedGroupName);
                 } else {
@@ -113,6 +116,8 @@ export class TagGroupContainer extends OtcContainer {
                     return tag.split("/").slice(0, nestDepth).join("/") === this.groupName;
                 }
             });
+        }
+
         if (!tags?.length) {
             return null;
         }
@@ -123,7 +128,7 @@ export class TagGroupContainer extends OtcContainer {
         const isolatedGroupName = this.getIsolatedTagMatch()?.at(1);
 
         // This is pretty confusing bit of code. we're first getting all files
-        // and their tags (wrapped in special objects and saved to `renderedFileTags`,
+        // and their tags (wrapped in special objects and saved to `renderedFileTags`)
         // and then inverted to be a map of tag to list of files associated with
         // that tag.
         this.renderedFileTags = this.app.vault

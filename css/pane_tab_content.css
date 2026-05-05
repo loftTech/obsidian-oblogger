@@ -19,7 +19,12 @@
 .mod-macos .oblogger-content { padding: 0 20px 70px 10px; }
 
 /* modification for minimal styled scrollbars setting */
-body.styled-scrollbars .oblogger-content { padding: 0 4px 70px; }
+body.styled-scrollbars .oblogger-content {
+  padding-top: 0px;
+  padding-right: 4px;
+  padding-left: 16px;
+  padding-bottom: 70px;
+}
 
 .oblogger-content .hidden { display:none !important; }
 
@@ -34,23 +39,24 @@ body.styled-scrollbars .oblogger-content { padding: 0 4px 70px; }
 }
 
 .oblogger-content .separator-container {
-    height: 16px;
-    padding: 8px 0;
+    height: 12px;
+    padding: 6px 0;
     width: fit-content;
 }
 
 .oblogger-content .separator {
-    background-color: var(--nav-indentation-guide-color);
-    border-radius: 10px;
+    /* background-color: var(--nav-indentation-guide-color); */
+    /* border-radius: 10px; */
     height: 4px;
-    width: 68px;
-    z-index: 11;
+    /* width: 68px; */
+    /* z-index: 11; */
 }
 
 .oblogger-content .rx-separator {
     align-items: center;
     display: flex;
     margin: auto;
+    height: 0px;
 }
 
 .oblogger-content .otc-separator {
@@ -72,6 +78,10 @@ body.styled-scrollbars .oblogger-content { padding: 0 4px 70px; }
 .oblogger-content .folder-holder.rx-child:last-child .content { padding-bottom: 0; }
 
 .oblogger-content .folder-holder.rx-child:last-child .title-container.collapsed { margin-bottom: 1px; }
+
+.oblogger-content .otc-groups .family-title.collapsed .svg-icon {
+    transform: rotate(-90deg);
+}
 
 .oblogger-content .pin { display: none; }
 
@@ -154,7 +164,7 @@ body.styled-scrollbars .oblogger-content { padding: 0 4px 70px; }
 .oblogger-content .status-icon.visible {
     display: flex;
     grid-column: 1;
-    left: 20px;
+    left: 18px;
     opacity: 1;
     position: absolute;
 }
@@ -352,10 +362,19 @@ body.styled-scrollbars .oblogger-content { padding: 0 4px 70px; }
 }
 
 .oblogger-content .title-chevron .svg-icon.lucide-chevron-down {
-    color: transparent;
     height: 16px;
     width: 16px;
     stroke-width: 2px;
+}
+
+/* this is here because we disabled the rx icons */
+.oblogger-content .rx-groups .title-chevron .svg-icon.lucide-chevron-down {
+    /* color: transparent; */
+}
+
+/* these icons should start hidden and are exposed on hover */
+.oblogger-content .otc-groups .title-chevron .svg-icon.lucide-chevron-down {
+    color: transparent;
 }
 
 .oblogger-content .pin .svg-icon.lucide-chevrons-down {
@@ -384,9 +403,14 @@ body.styled-scrollbars .oblogger-content { padding: 0 4px 70px; }
     width: 16px;
 }
 
+.oblogger-content .status-icon {
+    padding-top: 4px;
+}
+
 .oblogger-content .status-icon .svg-icon {
     color: var(--background-secondary);
-    fill: var(--vault-name-color);
+    /* fill: var(--vault-name-color); */
+    fill: var(--text-normal);
     height: 8px;
     stroke-width: 6px;
     z-index: 1;
@@ -424,9 +448,19 @@ body.styled-scrollbars .oblogger-content { padding: 0 4px 70px; }
 .oblogger-content .separator:active,
 .oblogger-content .title-tag.wiggle:active { animation: wiggle 0.2s; }
 
-.oblogger-content .title-container:hover .title-chevron .svg-icon { color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/100%); }
+.oblogger-content .title-container:hover .title-chevron .svg-icon {
+    color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/100%);
+}
 
-.oblogger-content .title-container:hover .text-icon .svg-icon { color: transparent; }
+/* keeping the icons hidden regardless of hover. too cluttered with them on */
+.oblogger-content .rx-groups /*.title-container:hover*/ .text-icon .svg-icon {
+    color: transparent;
+}
+
+/* hide the hashtag in otc-groups when hovered (should expose chevron) */
+.oblogger-content .otc-groups .title-container:hover .text-icon .svg-icon {
+    color: transparent;
+}
 
 .oblogger-content .text-label:hover { color: hsla(var(--accent-h) var(--accent-s) var(--accent-l)/100%); }
 
@@ -516,6 +550,9 @@ body.styled-scrollbars .oblogger-content { padding: 0 4px 70px; }
 }
 
 .is-phone .oblogger-content .child-item:hover .status-icon .svg-icon { animation: none; }
+
+/* disabling animation everywhere for now */
+.oblogger-content .child-item:hover .status-icon .svg-icon { animation: none; }
 
 .is-phone .oblogger-content .separator-container .separator {
     background-color: var(--nav-indentation-guide-color);

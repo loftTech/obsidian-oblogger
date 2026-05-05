@@ -1,17 +1,6 @@
 ## about
 
-**oblogger is still in beta and will update frequently!**
-
-oblogger is a side-panel plugin for Obsidian which focuses on two primary core features:
-1. a **tag explorer** panel that lets you choose the tag groups you want to display as well as some pre-defined groups such as dailies, recent documents, files, and all of your untagged documents (these pre-defined groups can be hidden)
-2. a helpful modal for **logging** information to a new document's frontmatter
-
-<p align="center">
-    <img width="500" alt="side panel preview" src="https://github.com/loftTech/obsidian-oblogger/assets/69363905/2b62b8cf-3579-498a-b3ef-19938c6eb362">
-</p>
-<p align="center">
-    <img width="500" alt="logger" src="https://github.com/loftTech/obsidian-oblogger/assets/69363905/f4562622-e843-44b9-a2f9-c65356e11379">
-</p>
+oblogger is a side-panel plugin for Obsidian that focuses on **tags** as the primary organizational tool. oblogger lets you choose the tag groups you want to display as well as some pre-defined groups such as dailies, recent documents, files, and all of your untagged documents (these pre-defined groups can be hidden)
 
 ## features
 
@@ -30,24 +19,15 @@ oblogger is a side-panel plugin for Obsidian which focuses on two primary core f
     - "#daily" can be changed to any tag you'd like to assoicate with daily notes
   - **untagged note list**
   - **custom tag groups** let you add any of your tags as a group
+    - supports adding "all tags" group
     - supports tag nesting 
     - supports multiple tags per file and multiple files per tag
     - supports tags in body and frontmatter
   - use a photo as an **avatar** to add some personality to the side panel
-    - default avatar will show first letter of vault  
-- **logger modal**
-  - custom logging path (does not support logging to root of vault)
-  - easy frontmatter generation
-    - add new fields
-    - suggester popup based on previously logged data
+    - default avatar will show first letter of vault
 
 ## roadmap
 
-- version 2.0 and beyond
-  - "scheduled" logging
-  - "session" logging
-  - continuous logging
-  - rich editor functionality in logger body field
   - multi-select
   - expanded frontmatter editing
 
@@ -55,8 +35,6 @@ oblogger is a side-panel plugin for Obsidian which focuses on two primary core f
 
 - why can't I rename notes/files from the side panel?
   - because it's hard :(. if you figure out how to link into the FileExplorer core plugin in a clean way, please let us know!
-- why can't I log to the root vault folder?
-  - because you didn't eat your vegetables
 - how do I remove the avatar picture?
   - you have to go to your data.json for oblogger and remove the `avatarPath` setting. sowwy :( (feature incoming)
 - can I at least **hide** my avatar?

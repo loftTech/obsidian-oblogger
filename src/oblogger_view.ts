@@ -624,11 +624,11 @@ export class ObloggerView extends ItemView {
                 })
         }
 
-        new ButtonComponent(buttonBarDiv)
-            .setClass("button-bar-button")
-            .setIcon("form-input")
-            .setTooltip("Create a log entry")
-            .onClick(this.showLoggerCallbackFn);
+        // new ButtonComponent(buttonBarDiv)
+        //     .setClass("button-bar-button")
+        //     .setIcon("form-input")
+        //     .setTooltip("Create a log entry")
+        //     .onClick(this.showLoggerCallbackFn);
 
         this.collapseAllButton = new ButtonComponent(buttonBarDiv);
         this.collapseAllButton
@@ -836,7 +836,7 @@ export class ObloggerView extends ItemView {
             fileAddedCallback: this.fileAddedCallback,
             requestRenderCallback: () => { this.requestRender() },
             saveSettingsCallback: this.saveSettingsCallback,
-            getGroupIconCallback: (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
+            getGroupIconCallback: (_) => "chevron-down", // (isCollapsed) => isCollapsed ? "folder-closed" : "folder-open",
             hideCallback: async () => {
                 return await this.removeOtcGroup(
                     group.groupType as OtcGroupType,
