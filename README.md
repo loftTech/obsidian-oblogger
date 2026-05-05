@@ -127,6 +127,33 @@ you can test this by opening `css/pane_tab_content.css` finding `.greeter-vault-
 
 whenever you close builder (or click the stop button) you can just click the play button again to re-enable "change detection" deployment
 
+## how to release
+
+- update the version in `package.json`
+- from `.../obsidian-oblogger/`, execute `npm run version`
+- run `git add package.json`
+- verify that `git status` and `git diff --cached` show that three files are being changed with matching versions:
+    - `package.json`
+    - `versions.json`
+    - `manifest.json`
+- run `git commit -m "version bump"`
+- push the change with `git push`
+- if you are on a branch, merge the branch into `main` via PR or directly
+- run `git tag {version}` where version is the new version text without anything else. ie: `git tag 1.0.2`
+- run `git push --tags`
+- execute `npm run build`
+- create a release using GitHub for that tag
+- attach 3 files as binaries for the new release from `.../obsidian-oblogger/build`
+    - `main.js`
+    - `manifest.json`
+    - `style.css`
+- now that...
+    - there is a new highest tag version number on GitHub
+    - that tag is attached to the three binaries
+    - the version in the `manifest.json` matche the version number of the tag
+    - ... obsidian will pick up the new version
+
+
 ## acknowledgments
 
 we want to thank the [obsidian plugin-dev discord server](https://discordapp.com/channels/686053708261228577/840286264964022302) for all the help they gave us when we felt stuck. if you're reading this and working on a theme, plugin, or just want to engage more with the obsidian community, do yourself a favor and [join that discord channel](https://discord.gg/obsidianmd).
