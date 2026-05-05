@@ -35,9 +35,10 @@ export class NewTagModal extends FuzzySuggestModal<string> {
                 individualTags.add(multiTagString);
             });
         });
-        return allTags
+        const calculatedTags = allTags
             .filter(tag => !this.excludedTags.contains(tag.substring(1)))
             .concat(Array.from(individualTags));
+        return ['All Tags', ...calculatedTags];
     }
 
     getItemText(tag: string): string {
@@ -52,3 +53,4 @@ export class NewTagModal extends FuzzySuggestModal<string> {
         this.onSelect(tag);
     }
 }
+
